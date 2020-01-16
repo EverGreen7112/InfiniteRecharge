@@ -13,7 +13,9 @@ public interface RobotMap {
             chassisLeftBack = 0,
             chassisLeftFront = 1,
             chassisRightBack = 2,
-            chassisRightFront = 3;
+            chassisRightFront = 3,
+            climbingElevator = 8,
+            climbingPuller = 9;
         
 
     }
@@ -37,13 +39,17 @@ public interface RobotMap {
 
     //Declare Encoder
     public interface EncoderPorts {
-        
+        public static final int 
+            climbingElevatorA = 0,
+            climbingElevatorB = 1;
     }
     
     //Detail Joysticks used
     public interface JoystickPorts {
-        
-        
+        public static final int
+            rightChasisJS = 0,
+            leftChassisJS = 1,
+            buttonJS = 2;        
     }
     
     //Detail Cameras used

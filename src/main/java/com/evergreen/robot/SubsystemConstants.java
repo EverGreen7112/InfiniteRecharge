@@ -15,7 +15,7 @@ public interface SubsystemConstants {
 
         static
         {
-            DashboardConstants.getInstance().startConstantsOf("SubsystemA");
+            DashboardConstants.getInstance().startConstantsOf("Chassis Subsystem");
         }
 
         public static final ConstantDouble
@@ -61,5 +61,17 @@ public interface SubsystemConstants {
         // public static final ConstantDouble
         // ...
         
+    }
+
+    public static class ClimbingConstants {
+
+        static {
+            DashboardConstants.getInstance().startConstantsOf("Climbing Subsystem");
+        }
+
+        public static final ConstantDouble 
+            elevatorSpeed = new ConstantDouble("Elevator Speed", 0.5),
+            pullerSpeed = new ConstantDouble("Puller Speed",0.5);
+
     }
 }
