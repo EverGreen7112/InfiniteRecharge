@@ -21,10 +21,11 @@ public interface SubsystemComponents extends RobotMap {
     }
 
     /**
-     * SubsystemBComponents
+     * CollectorComponents
+     * <b> motor </b> - The motor moving the collecting subsystem
      */
-    public interface SubsystemBComponents {
-            
+    public interface CollectorComponents {
+        MotorController motor = new MotorController(ControllerType.TALON_SRX, MotorPorts.collector); //TODO Change to the correct one when decided
     }
 
 
@@ -32,7 +33,6 @@ public interface SubsystemComponents extends RobotMap {
      * SubsystemCComponents
      */
     public interface SubsystemCComponents {
-    
-        
+
     }
 }
