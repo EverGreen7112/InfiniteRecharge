@@ -1,14 +1,11 @@
 package com.evergreen.robot;
 
-import com.evergreen.everlib.oi.joysticks.JoystickEG;
 import com.evergreen.everlib.subsystems.motors.commands.MoveMotorSystem;
-
 /**
  * The list of all commands used by the robot, for both {@link OI} configurations
- * this shoulf be seperated into
+ * this should be seperated into
  */
 public interface CommandList extends SubsystemConstants {
-
 
     public interface SubsystemACommands {
     
@@ -20,6 +17,14 @@ public interface CommandList extends SubsystemConstants {
 
     public interface SubsystemCCommands {
             
+    }
+
+    public interface ClimbingCommands {
+        MoveMotorSystem moveElevator = 
+            new MoveMotorSystem("Elevator Moves", Robot.climbElevator, () -> Robot.joystickButton.getY());
+        
+        MoveMotorSystem pullUp = 
+            new MoveMotorSystem("Pull Up", Robot.climbPuller, ClimbingConstants.pullerSpeed);
     }
 
 }
