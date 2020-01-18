@@ -10,15 +10,21 @@ package com.evergreen.robot;
 import java.util.List;
 
 import com.evergreen.everlib.CommandEG;
+import com.evergreen.everlib.oi.joysticks.F310GamePad;
+import com.evergreen.everlib.oi.joysticks.JoystickEG;
+import com.evergreen.everlib.oi.joysticks.F310GamePad.F310;
 import com.evergreen.everlib.shuffleboard.loggables.DashboardStreams;
 import com.evergreen.everlib.structure.Tree;
 import com.evergreen.everlib.subsystems.motors.subsystems.DriveTank;
 import com.evergreen.everlib.subsystems.motors.subsystems.MotorSubsystem;
+import com.evergreen.robot.SubsystemConstants.CollectorConstants;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
  * This is the class representing our robot!
@@ -32,7 +38,7 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
  * <b>Note That these methods aren't overriden in here, and it is preferable to only use the supplied {@link Tree} methods for
  * organizing the robot code.</b>
  */
-public class Robot extends Tree implements SubsystemComponents {
+public class Robot extends Tree implements SubsystemComponents, RobotMap {
 
   
   //----------Subsystem Declerations----------
@@ -40,6 +46,9 @@ public class Robot extends Tree implements SubsystemComponents {
   // public static final MotorSubsystem subsystemA = new MotorSubsystem(...);
   // public static final MotorSubsystem subsystemB = new MotorSubsystem(...);
   // public static final DriveTank chassis = new DriveTank(...);
+  public static final MotorSubsystem collector = new MotorSubsystem(
+    "Collector",
+     CollectorComponents.motor);
 
   //-----Piston Subsytem-----
   // public static final PistonSubsystem subsystemC = new PistonSubsystem(..);
@@ -48,6 +57,10 @@ public class Robot extends Tree implements SubsystemComponents {
   // public static final F310Gamepad joystickButton = new F310Gamepad(...)
   // public static final ExtremeProJoystick joystickLeft = new Joystick(...)
   // public static final ExtremeProJoystick joystickRight = new Joystick(...)
+
+  //public static final JoystickEG joystick = new JoystickEG("name", JoystickPorts.button); //Change name!
+  F310GamePad joystickButton = new F310GamePad("ButtonsJoystick", JoystickPorts.button);
+
 
   //-----Network Tables-----
   // public final NetworkTable imageProccesing = NetworkTableInstance.getDefault().getTable("...");
@@ -61,7 +74,7 @@ public class Robot extends Tree implements SubsystemComponents {
   
   @Override
   protected void bindButtons() {
-    // joystickButton.getButton(F310.X).whenPressed(...)
+    joystickButton.getButton(F310.X).whileHeld(CommandList.CollectorCommands.collect); //TODO Change button type when decided
   }
   
   @Override

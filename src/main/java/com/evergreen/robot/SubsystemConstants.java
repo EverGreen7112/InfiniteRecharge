@@ -34,13 +34,17 @@ public interface SubsystemConstants {
     
     /**
      * SubsystemBConstant
+     * <b> speed </b> - The speed of the collector motor
      */
-    public static class SubsystemBConstants {
+    public static class CollectorConstants {
         
         static
         {
             DashboardConstants.getInstance().startConstantsOf("SubsystemB");
         }
+        public static final ConstantDouble
+                speed = new ConstantDouble("Speed", 0.5);
+
 
         // public static final ConstantDouble
         // ...
