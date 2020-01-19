@@ -14,7 +14,7 @@ public interface RobotMap {
             chassisLeftFront = 1,
             chassisRightBack = 2,
             chassisRightFront = 3,
-            collector = 4; //TODO Change port when decided
+            collector = 4, //TODO Change port when decided
             climbingElevator = 8,
             climbingPuller = 9;
         

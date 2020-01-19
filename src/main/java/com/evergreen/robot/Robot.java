@@ -11,22 +11,10 @@ import java.util.List;
 
 import com.evergreen.everlib.CommandEG;
 import com.evergreen.everlib.oi.joysticks.F310GamePad;
-import com.evergreen.everlib.oi.joysticks.JoystickEG;
-import com.evergreen.everlib.oi.joysticks.F310GamePad;
 import com.evergreen.everlib.oi.joysticks.F310GamePad.F310;
-import com.evergreen.everlib.shuffleboard.loggables.DashboardStreams;
 import com.evergreen.everlib.structure.Tree;
-import com.evergreen.everlib.subsystems.motors.subsystems.DriveTank;
 import com.evergreen.everlib.subsystems.motors.subsystems.MotorSubsystem;
-import com.evergreen.robot.SubsystemConstants.CollectorConstants;
 import com.evergreen.robot.CommandList.ClimbingCommands;
-
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
  * This is the class representing our robot!

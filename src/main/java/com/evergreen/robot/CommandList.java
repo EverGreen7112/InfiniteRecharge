@@ -1,7 +1,5 @@
 package com.evergreen.robot;
 
-import com.evergreen.everlib.subsystems.motors.subsystems.MotorSubsystem;
-import com.evergreen.robot.commands.Climb;
 import com.evergreen.everlib.subsystems.motors.commands.MoveMotorSystem;
 /**
  * The list of all commands used by the robot, for both {@link OI} configurations
