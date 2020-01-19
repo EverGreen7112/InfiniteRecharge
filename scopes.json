@@ -1,21 +1,17 @@
 {
-    "lib": "Everlib",
-    "robot":
+    "map": "Robot Map",
+    "oi": "Output-Input",
+    "consts": "Subsystem Constants",
+    "utils": "Utilities",
+    "cmds": "Commands (classes & one-lines)",
+    "comps": "Subsystem Components",
+    "bot":
     {
-        "map": "Robot Map",
-        "oi": "Output-Input",
-        "consts": "Subsystem Constants",
-        "utils": "Utilities",
-        "cmds": "Commands (classes & one-lines)",
-        "comps": "Subsystem Components",
-        "bot":
-        {
-            "sysdec": "Subsystem Decleration",
-            "log": "Dashboard Streams Logging",
-            "cmddef": "Subsystem's Default Commands",
-            "init": "Init Configuration",
-            "tele": "Teleop configuration",
-            "auto": "Auto Configuration"
-        }
+        "sysdec": "Subsystem Decleration",
+        "log": "Dashboard Streams Logging",
+        "cmddef": "Subsystem's Default Commands",
+        "init": "Init Configuration",
+        "tele": "Teleop configuration",
+        "auto": "Auto Configuration"
     }
 }
