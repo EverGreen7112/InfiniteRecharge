@@ -8,6 +8,13 @@ targetCompatibility = JavaVersion.VERSION_11
 
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
 
+repositories {
+    maven {
+        url "https://mymavenrepo.com/repo/J2l8WZYbO7zaNPK3awQK/"    
+    }
+}
+
+
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project EmbeddedTools.
 deploy {
@@ -20,6 +27,7 @@ deploy {
             team = frc.getTeamNumber()
         }
     }
+
     artifacts {
         frcJavaArtifact('frcJava') {
             targets << "roborio"
@@ -53,6 +61,8 @@ dependencies {
     nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
 
     testImplementation 'junit:junit:4.12'
+
+    implementation 'com.evergreen:EverLib:0.8.0' //TODO update when available.
 
     // Enable simulation gui support. Must check the box in vscode to enable support
     // upon debugging
