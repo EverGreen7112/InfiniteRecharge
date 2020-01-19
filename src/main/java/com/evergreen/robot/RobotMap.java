@@ -13,8 +13,9 @@ public interface RobotMap {
             chassisLeftBack = 0,
             chassisLeftFront = 1,
             chassisRightBack = 2,
-            chassisRightFront = 3;
-        
+            chassisRightFront = 3,
+            thrower = 4,
+            aimer =5;        
 
     }
     
@@ -31,8 +32,9 @@ public interface RobotMap {
     
     //Detail Digital components
     public interface DigitalPorts {
-        
-        
+        public static final int 
+        throwerEncouderA =1,
+        throwerEncouderB =2;       
     }
 
     //Declare Encoder

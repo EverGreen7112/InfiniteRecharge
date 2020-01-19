@@ -62,4 +62,32 @@ public interface SubsystemConstants {
         // ...
         
     }
+    public static class ShooterConstant{
+       public static final ConstantDouble 
+       /**
+        * the speed that used to raise the aimer
+        */
+        //TODO: add correct speed
+        aimingUpSpeed = new ConstantDouble("aimingUpSpeed", 0.5),
+        /**
+        * the speed that used to move down the aimer
+        */
+        //TODO: add correct speed
+        aimingDownSpeed = new ConstantDouble("aimingDownSpeed", -0.3),
+        /**
+        * the time(secends) that takes to raise the aimer
+        */
+        //TODO: add correct time
+        aimingUpTime = new ConstantDouble("aimingUpTime", 3),
+        /**
+        * the time(secends) that takes to move down the aimer
+        */
+        //TODO: add correct time
+        aimingDownTime = new ConstantDouble("aimingDownTime", 2.5);
+        
+       
+
+        
+    }
+    
 }

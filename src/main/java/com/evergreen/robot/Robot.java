@@ -51,7 +51,12 @@ public class Robot extends Tree implements SubsystemComponents {
 
   //-----Network Tables-----
   // public final NetworkTable imageProccesing = NetworkTableInstance.getDefault().getTable("...");
-
+  public static final MotorSubsystem m_thrower = new MotorSubsystem(
+    "Thrower",
+    ShooterComponents.Thrower.throwerEncouder,
+    ShooterComponents.Thrower.thrower);
+    public static final MotorSubsystem m_aimer = new MotorSubsystem(
+      "aimer", ShooterComponents.Aimer.aimer);
 
   @Override
   protected void componentSetup() {
