@@ -8,6 +8,7 @@ package com.evergreen.robot;
 public interface RobotMap {
 
     //Detail Motor Components
+    //every time when you are change port in RobotMap change it in Robot Characterization python file!!!!!!!
     public interface MotorPorts {
         public static final int 
             chassisLeftBack = 0,
