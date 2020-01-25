@@ -8,6 +8,7 @@ package com.evergreen.robot;
 public interface RobotMap {
 
     //Detail Motor Components
+    //every time when you are change port in RobotMap change it in Robot Characterization python file!!!!!!!
     public interface MotorPorts {
         public static final int 
             chassisLeftBack = 0,
@@ -15,9 +16,10 @@ public interface RobotMap {
             chassisRightBack = 2,
             chassisRightFront = 3,
             collector = 4, //TODO Change port when decided
-            climbingElevator = 8,
-            climbingPuller = 9;
-        
+            climbingElevator = 5,
+            climbingPuller = 6,
+            thrower = 8,
+            aimer = 9;        
 
     }
     
@@ -34,8 +36,9 @@ public interface RobotMap {
     
     //Detail Digital components
     public interface DigitalPorts {
-        
-        
+        public static final int 
+        throwerEncouderA =1,
+        throwerEncouderB =2;       
     }
 
     //Declare Encoder
