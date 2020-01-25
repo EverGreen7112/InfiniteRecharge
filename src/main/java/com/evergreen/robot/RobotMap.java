@@ -19,7 +19,7 @@ public interface RobotMap {
             climbingElevator = 5,
             climbingPuller = 6,
             thrower = 8,
-            aimer = 9;        
+            aimer = 9;
 
     }
     
