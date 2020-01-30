@@ -15,7 +15,7 @@ public interface SubsystemConstants {
 
         static
         {
-            DashboardConstants.getInstance().startConstantsOf("SubsystemA");
+            DashboardConstants.getInstance().startConstantsOf("Chassis");
         }
 
         public static final ConstantDouble
@@ -34,13 +34,17 @@ public interface SubsystemConstants {
     
     /**
      * SubsystemBConstant
+     * <b> speed </b> - The speed of the collector motor
      */
-    public static class SubsystemBConstants {
+    public static class CollectorConstants {
         
         static
         {
-            DashboardConstants.getInstance().startConstantsOf("SubsystemB");
+            DashboardConstants.getInstance().startConstantsOf("Collector");
         }
+        public static final ConstantDouble
+                speed = new ConstantDouble("Speed", 0.5);
+
 
         // public static final ConstantDouble
         // ...
@@ -61,5 +65,45 @@ public interface SubsystemConstants {
         // public static final ConstantDouble
         // ...
         
+    }
+    public static class ShooterConstants{
+       public static final ConstantDouble 
+       /**
+        * the speed that used to raise the aimer
+        */
+        //TODO: add correct speed
+        aimingUpSpeed = new ConstantDouble("aimingUpSpeed", 0.5),
+        /**
+        * the speed that used to move down the aimer
+        */
+        //TODO: add correct speed
+        aimingDownSpeed = new ConstantDouble("aimingDownSpeed", -0.3),
+        /**
+        * the time(secends) that takes to raise the aimer
+        */
+        //TODO: add correct time
+        aimingUpTime = new ConstantDouble("aimingUpTime", 3),
+        /**
+        * the time(secends) that takes to move down the aimer
+        */
+        //TODO: add correct time
+        aimingDownTime = new ConstantDouble("aimingDownTime", 2.5);
+        
+       
+
+        
+    }
+    
+
+    public static class ClimbingConstants {
+
+        static {
+            DashboardConstants.getInstance().startConstantsOf("Climbing Subsystem");
+        }
+
+        public static final ConstantDouble 
+            elevatorSpeed = new ConstantDouble("Elevator Speed", 0.5),
+            pullerSpeed = new ConstantDouble("Puller Speed",0.5);
+
     }
 }

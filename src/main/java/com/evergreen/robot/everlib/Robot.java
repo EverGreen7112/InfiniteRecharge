@@ -10,15 +10,11 @@ package com.evergreen.robot.everlib;
 import java.util.List;
 
 import com.evergreen.everlib.CommandEG;
-import com.evergreen.everlib.shuffleboard.loggables.DashboardStreams;
+import com.evergreen.everlib.oi.joysticks.F310GamePad;
+import com.evergreen.everlib.oi.joysticks.F310GamePad.F310;
 import com.evergreen.everlib.structure.Tree;
-import com.evergreen.everlib.subsystems.motors.subsystems.DriveTank;
 import com.evergreen.everlib.subsystems.motors.subsystems.MotorSubsystem;
-
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
+import com.evergreen.robot.CommandList.ClimbingCommands;
 
 /**
  * This is the class representing our robot!
@@ -32,26 +28,39 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
  * <b>Note That these methods aren't overriden in here, and it is preferable to only use the supplied {@link Tree} methods for
  * organizing the robot code.</b>
  */
-public class Robot extends Tree implements SubsystemComponents {
+public class Robot extends Tree implements SubsystemComponents, RobotMap {
 
   
   //----------Subsystem Declerations----------
   //-----Motor Subsystems-----
-  // public static final MotorSubsystem subsystemA = new MotorSubsystem(...);
-  // public static final MotorSubsystem subsystemB = new MotorSubsystem(...);
+  public static final MotorSubsystem climbElevator = 
+    new MotorSubsystem("climbing elevator",ClimbingComponents.elevator);
+  public static final MotorSubsystem climbPuller =
+    new MotorSubsystem("climbing puller", ClimbingComponents.puller);
   // public static final DriveTank chassis = new DriveTank(...);
+  public static final MotorSubsystem collector = new MotorSubsystem(
+    "Collector",
+     CollectorComponents.motor);
 
   //-----Piston Subsytem-----
   // public static final PistonSubsystem subsystemC = new PistonSubsystem(..);
   
   //-----Joysticks-----
-  // public static final F310Gamepad joystickButton = new F310Gamepad(...)
-  // public static final ExtremeProJoystick joystickLeft = new Joystick(...)
-  // public static final ExtremeProJoystick joystickRight = new Joystick(...)
+  public static final F310GamePad joystickButton = new F310GamePad("Button JS", JoystickPorts.buttonJS);
+  // public static final ExtremeProJoystick joystickLeft = new Joystick(...);
+  // public static final ExtremeProJoystick joystickRight = new Joystick(...);
+
+  //public static final JoystickEG joystick = new JoystickEG("name", JoystickPorts.button); //Change name!
+
 
   //-----Network Tables-----
   // public final NetworkTable imageProccesing = NetworkTableInstance.getDefault().getTable("...");
-
+  public static final MotorSubsystem m_thrower = new MotorSubsystem(
+    "Thrower",
+    ShooterComponents.Thrower.throwerEncouder,
+    ShooterComponents.Thrower.thrower);
+    public static final MotorSubsystem m_aimer = new MotorSubsystem(
+      "aimer", ShooterComponents.Aimer.aimer);
 
   @Override
   protected void componentSetup() {
@@ -61,7 +70,8 @@ public class Robot extends Tree implements SubsystemComponents {
   
   @Override
   protected void bindButtons() {
-    // joystickButton.getButton(F310.X).whenPressed(...)
+    joystickButton.getButton(F310.X).whileHeld(CommandList.CollectorCommands.collect); //TODO Change button type when decided
+    joystickButton.getButton(F310.Y).whenPressed(ClimbingCommands.pullUp);
   }
   
   @Override
@@ -72,7 +82,7 @@ public class Robot extends Tree implements SubsystemComponents {
   @Override
   protected void log() {
     // DashboardStreams.addLoggable(...);
-    // DashboardStreams.addDouble(...)
+    // DashboardStreams.addDouble(...);
   }
   
   @Override
@@ -92,7 +102,7 @@ public class Robot extends Tree implements SubsystemComponents {
 
   @Override
   protected void teleopConfig() {
-    // subsystem.setDefaultCommand(...)
+    // subsystem.setDefaultCommand(...);
   }
 
   @Override
