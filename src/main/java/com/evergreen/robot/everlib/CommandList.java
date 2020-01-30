@@ -1,4 +1,4 @@
-package com.evergreen.robot;
+package com.evergreen.robot.everlib;
 
 /**
  * The list of all commands used by the robot, for both {@link OI} configurations

@@ -1,4 +1,4 @@
-package com.evergreen.robot;
+package com.evergreen.robot.everlib;
 
 import com.evergreen.everlib.shuffleboard.constants.ConstantDouble;
 import com.evergreen.everlib.shuffleboard.constants.DashboardConstants;
