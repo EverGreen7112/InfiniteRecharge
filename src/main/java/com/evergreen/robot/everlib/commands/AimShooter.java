@@ -1,13 +1,13 @@
-package com.evergreen.robot.commands;
+package com.evergreen.robot.everlib.commands;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import com.evergreen.everlib.subsystems.motors.commands.MoveMotorSystem;
-import com.evergreen.robot.Robot;
-import com.evergreen.robot.SubsystemConstants;
-import com.evergreen.robot.Utillities;
-import com.evergreen.robot.SubsystemComponents.ShooterComponents;
+import com.evergreen.robot.everlib.Robot;
+import com.evergreen.robot.everlib.SubsystemConstants;
+import com.evergreen.robot.everlib.Utillities;
+import com.evergreen.robot.everlib.SubsystemComponents.ShooterComponents;
 
 /**
  * ShooterAimer used to aim the shooter - to raise it or to move it down or to

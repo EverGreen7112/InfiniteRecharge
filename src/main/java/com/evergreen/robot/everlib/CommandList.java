@@ -1,8 +1,9 @@
 package com.evergreen.robot.everlib;
 
 import com.evergreen.everlib.subsystems.motors.commands.MoveMotorSystem;
-import com.evergreen.robot.commands.AimShooter;
-import com.evergreen.robot.commands.AimShooter.AimOption;
+import com.evergreen.robot.everlib.commands.AimShooter;
+import com.evergreen.robot.everlib.commands.AimShooter.AimOption;
+
 /**
  * The list of all commands used by the robot, for both {@link OI} configurations
  * this should be seperated into
