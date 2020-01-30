@@ -1,4 +1,4 @@
-package com.evergreen.robot;
+package com.evergreen.robot.everlib;
 
 /**
  * A map mapping all the robot's elecronic component into integer ports.

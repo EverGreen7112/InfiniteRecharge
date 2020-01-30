@@ -7,6 +7,8 @@
 
 package com.evergreen.robot;
 
+import com.evergreen.robot.everlib.Robot;
+
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -23,6 +25,7 @@ public final class Main {
    *
    * <p>If you change your main robot class, change the parameter type.
    */
+  //TODO: make sure that robot import is correct
   public static void main(String... args) {
     RobotBase.startRobot(Robot::new);
   }
