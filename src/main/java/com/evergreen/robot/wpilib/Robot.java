@@ -1,51 +1,65 @@
 package com.evergreen.robot.wpilib;
 
+import com.evergreen.everlib.structure.Tree;
+import com.evergreen.robot.RobotMap.JoystickPorts;
+
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 /**
  * Robot
  */
-public class Robot extends TimedRobot {
-    
+public class Robot extends Tree {
+
+    //Creates JS objects
+    public Joystick buttonJS = new Joystick(JoystickPorts.buttonJS);
+
     @Override
-    public void autonomousInit() {
+    protected void autoConfig() {
+        // TODO Auto-generated method stub
 
     }
+
     @Override
-    public void autonomousPeriodic() {
-        
+    protected void bindButtons() {
+
+
     }
+
     @Override
-    public void teleopInit() {
-        
+    protected void commandConfig() {
+        // TODO Auto-generated method stub
+
     }
+
     @Override
-    public void teleopPeriodic() {
-        
+    protected void componentSetup() {
+        // TODO Auto-generated method stub
+
     }
+
     @Override
-    public void testInit() {
-        
+    protected void log() {
+        // TODO Auto-generated method stub
+
     }
+
     @Override
-    public void testPeriodic() {
-        
+    protected void teleopConfig() {
+        // TODO Auto-generated method stub
+
     }
+
     @Override
-    public void disabledInit() {
-        
+    protected void test() {
+        // TODO Auto-generated method stub
+
     }
+
     @Override
-    public void disabledPeriodic() {
-        
-    }
-    @Override
-    public void robotInit() {
-        
-    }
-    @Override
-    public void robotPeriodic() {
-        
+    protected void whenEnabled() {
+        // TODO Auto-generated method stub
+
     }
 
     
