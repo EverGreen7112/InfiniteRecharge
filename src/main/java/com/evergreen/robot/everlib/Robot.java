@@ -47,7 +47,7 @@ public class Robot extends Tree implements SubsystemComponents, RobotMap {
   // public static final PistonSubsystem subsystemC = new PistonSubsystem(..);
   
   //-----Joysticks-----
-  public static final F310GamePad joystickButton = new F310GamePad("Button JS", JoystickPorts.buttonJS);
+  public static final F310GamePad joystickButton = new F310GamePad("Button JS", JoystickPorts.operatorJS);
   // public static final ExtremeProJoystick joystickLeft = new Joystick(...);
   // public static final ExtremeProJoystick joystickRight = new Joystick(...);
 
