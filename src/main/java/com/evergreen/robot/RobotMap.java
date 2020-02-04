@@ -19,7 +19,8 @@ public interface RobotMap {
             climbUp = 5,
             climbPull = 6,
             thrower = 8,
-            aimer = 9;
+            aimer = 9,
+            passer = 10; //The motor which passes a power cell from the storage to the shooter
 
     }
     
@@ -38,7 +39,9 @@ public interface RobotMap {
     public interface DigitalPorts {
         public static final int 
         throwerEncouderA =1,
-        throwerEncouderB =2;       
+        throwerEncouderB =2,
+        storageUltrasonicA = 3,
+        storageUltrasonicB = 4;       
     }
 
     //Declare Encoder
