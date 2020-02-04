@@ -1,5 +1,6 @@
 package com.evergreen.robot.everlib;
 
+import com.evergreen.robot.RobotMap;
 import com.evergreen.everlib.subsystems.motors.subsystems.MotorController;
 import com.evergreen.everlib.subsystems.motors.subsystems.MotorController.ControllerType;
 import com.evergreen.everlib.subsystems.sensors.EncoderEG;
@@ -43,9 +44,9 @@ public interface SubsystemComponents extends RobotMap {
      */
     public interface ClimbingComponents {
         MotorController elevator = 
-            new MotorController(ControllerType.TALON_SRX, MotorPorts.climbingElevator);
+            new MotorController(ControllerType.TALON_SRX, MotorPorts.climbUp);
         MotorController puller = 
-            new MotorController(ControllerType.TALON_SRX, MotorPorts.climbingPuller);
+            new MotorController(ControllerType.TALON_SRX, MotorPorts.climbPull);
         EncoderEG elevatorEncoder = 
             new EncoderEG(EncoderPorts.climbingElevatorA, EncoderPorts.climbingElevatorB);
     } // TODO: check to which controller types are the actual motors connected.
