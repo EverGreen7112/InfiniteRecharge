@@ -7,61 +7,66 @@
 
 package com.evergreen.robot.wpilib;
 
-import java.util.function.Supplier;
-
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.evergreen.robot.RobotMap.MotorPorts;
 
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.SpeedController;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climb extends SubsystemBase {
   
-  //creates an instance of Climb
+  // creates an instance of Climb
   private static Climb m_instance;
 
   //creates speed constants
-  double CLIMB_UP_SPEED = 0.5;
-  double CLIMB_PULL_SPEED = 0.5; 
+  private double CLIMB_UP_SPEED = 0.5;
+  private double CLIMB_PULL_SPEED = 0.5; 
+  private double ELEVATOR_DESCEND_SPEED = -0.5;
+  private long DESCEND_TIME = 2000;
 
-  //creates suppliers for the speeds
-  private Supplier<Double> climbUpSpeed =
-     () -> Preferences.getInstance().getDouble("Climb/Elevator Speed", CLIMB_UP_SPEED);
-  private Supplier<Double> climbPullSpeed =
-    () -> Preferences.getInstance().getDouble("Climb/Pull-Up Speed", CLIMB_PULL_SPEED);
-  
   //creates the speed controllers
-  private SpeedController m_climbPull = new WPI_TalonSRX(MotorPorts.climbPull);
-  private SpeedController m_climbUp = new WPI_TalonSRX(MotorPorts.climbUp);
+  private SpeedController m_climbPull = new WPI_VictorSPX(MotorPorts.climbPull);
+  private SpeedController m_climbUp = new WPI_VictorSPX(MotorPorts.climbUp);
 
-  //creates object for the hook elevating method
-  public CommandBase m_up = new RunCommand(() -> climbUp(climbUpSpeed.get()), Climb.getInstance()) {
+  /**
+   * Lifts the hook elevator
+   */
+  public CommandBase m_up = new RunCommand(() -> climbUp(getUpSpeed()), Climb.getInstance()) {
     @Override
     public void end(boolean interrupted) {
+      m_climbUp.set(getDescendSpeed());
+      try {
+        Thread.sleep(getDescendTime());
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+        throw new RuntimeException();
+      }
       m_climbUp.set(0.0);
     }
   };
 
-  //creates object for pulling up method
-  public CommandBase m_pull = new RunCommand(() -> climbPull(climbPullSpeed.get()), Climb.getInstance()) {
+  /**
+   * Pulls up the robot
+   */
+  public CommandBase m_pull = new RunCommand(() -> climbPull(getPullSpeed()), Climb.getInstance()) {
     @Override
     public void end(boolean interrupted) {
       m_climbPull.set(0.0);
     }
   };
 
-  /**
+  /** Climb Constructor:
    * Creates a new Climb.
    */
   private Climb() {
     //uploads the speed constants to the shuffelboard
     Preferences.getInstance().putDouble("Climb/Elevator Speed", CLIMB_UP_SPEED);
     Preferences.getInstance().putDouble("Climb/Pull-Up Speed", CLIMB_PULL_SPEED);
+    Preferences.getInstance().putDouble("Climb/Elevator Descend Speed", ELEVATOR_DESCEND_SPEED);
+    Preferences.getInstance().putLong("Climb/Elevator Descend Time", DESCEND_TIME);
   }
 
   //creates get instance method
@@ -86,6 +91,34 @@ public class Climb extends SubsystemBase {
     m_climbUp.set(0);
     m_climbPull.set(0);
   }
+
+   /**
+    * Gets the climber elevator speed
+    */
+   public double getUpSpeed(){
+   return Preferences.getInstance().getDouble("Climb/Elevator Speed", CLIMB_UP_SPEED);
+   }
+
+   /**
+    * Gets the pulling up speed
+    */
+   public double getPullSpeed() {
+   return Preferences.getInstance().getDouble("Climb/Pull-Up Speed", CLIMB_PULL_SPEED);
+   }
+
+      /**
+    * Gets the elevator descending speed
+    */
+   public double getDescendSpeed() {
+     return Preferences.getInstance().getDouble("Climb/Elevator Descend Speed", ELEVATOR_DESCEND_SPEED); 
+   }
+
+      /**
+    * Gets the elevator descending time
+    */
+   public long getDescendTime() {
+     return Preferences.getInstance().getLong("Climb/Elevator Descend Time", DESCEND_TIME);
+   }
 
   @Override
   public void periodic() {
