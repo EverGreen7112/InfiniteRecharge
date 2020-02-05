@@ -23,9 +23,11 @@ public class Storage extends SubsystemBase {
   // Declares the Storage single instance
   private static Storage m_instance;
 
-  // The passing speed and time constants
+  // The passing speed, time and minimum empty distance constants
   private double PASS_SPEED = 0.5;
   private long PASS_TIME = 2000; //Notice the time is in milliseconds
+  private double MIN_EMPTY_DIST; //Minimum Distance in which Storage is Empty, in mm
+  //TODO: find the correct value of minimum distance
 
   //New speed controller and ultrasonic sensor for passing the power cells.
   private SpeedController m_passMotor = new WPI_VictorSPX(MotorPorts.passer);
@@ -33,9 +35,10 @@ public class Storage extends SubsystemBase {
     new Ultrasonic(DigitalPorts.storageUltrasonicA, DigitalPorts.storageUltrasonicB);
 
   /**
-   * Passes a Power Cell to the Shooter
+   * Passes a Power Cell to the Shooter, stops after a fixed amount of time.
    */
-  public CommandBase passByTime = new RunCommand(() -> m_passByTime(getSpeed(), getTime()), Storage.getInstance()) {
+  public CommandBase passByTime = 
+    new RunCommand(() -> m_passByTime(getSpeed(), getTime()), Storage.getInstance()) {
     @Override
     public void end(boolean interrupted) {
       m_passMotor.set(0);
@@ -43,15 +46,28 @@ public class Storage extends SubsystemBase {
   };
 
   /**
+   * Passes a Power Cell to the Shooter, stops by the Ultrasonic sensor signals.
+   */
+  public CommandBase passBySensor = 
+    new RunCommand(() -> m_passBySensor(getSpeed(), getUltrasonicDistance()), Storage.getInstance()) {
+    @Override 
+    public void end(boolean interrupted) {
+      m_passMotor.set(0);
+    }
+  };
+  
+  /**
    * Creates a new Storage.
    */
   private Storage() {
     Preferences.getInstance().putDouble("Storage/Passing Speed", PASS_SPEED);
     Preferences.getInstance().putLong("Storage/Passing Time", PASS_TIME);
+    Preferences.getInstance().putDouble("Storage/Minimum Empty Distance", MIN_EMPTY_DIST); 
+    //Minimum Distance in which Storage is Empty
   }
 
   /**
-   * Gets the Storage single instance
+   * Gets the Storage single instance.
    */
   public static Storage getInstance() {
     if (m_instance == null)
@@ -60,7 +76,7 @@ public class Storage extends SubsystemBase {
   }
 
   /**
-   * Sets the passing motor to input speed
+   * Sets the passing motor to input speed.
    * 
    * @throws InterruptedException
    */
@@ -76,7 +92,10 @@ public class Storage extends SubsystemBase {
   }
 
   public void m_passBySensor(double m_speed, double dist) {
-//TODO: add the pass by sensor command + everything it needs.
+    if ((dist <= MIN_EMPTY_DIST) && (dist != 0)) {
+      m_passMotor.set(m_speed);
+    }
+    if (dist > MIN_EMPTY_DIST) m_passMotor.set(0);
   }
 
 
@@ -88,11 +107,25 @@ public class Storage extends SubsystemBase {
   }
 
   /**
-   * Gets the storage passing motor time (in milliseconds)
+   * Gets the storage passing motor time (in milliseconds).
    */
   public long getTime() {
     return Preferences.getInstance().getLong("Storage/Passing Time", PASS_TIME);
 
+  }
+
+  /**
+   * Gets the Ultrasonic value (in mm).
+   */
+  public double getUltrasonicDistance() {
+    return ultrasonic.getRangeMM();
+  }
+
+  /**
+   * Gets the minimum distance in which the storage is considered empty (in mm).
+   */
+  public double getMinEmptyDistance() {
+    return Preferences.getInstance().getDouble("Storage/Minimum Empty Distance", MIN_EMPTY_DIST);
   }
 
   @Override

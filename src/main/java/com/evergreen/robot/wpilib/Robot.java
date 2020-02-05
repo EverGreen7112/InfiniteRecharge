@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
  * Robot
  */
 public class Robot extends Tree {
-
+    
     //Creates JS objects
     public Joystick operatorJS = new Joystick(JoystickPorts.operatorJS);
 
@@ -33,7 +33,7 @@ public class Robot extends Tree {
 
         //The robot passes a Power Cells to the Shooter when the button is pressed
         new JoystickButton(operatorJS, ButtonPorts.operatorJSY).whenPressed(Storage.getInstance().passByTime);
-
+        //TODO check which passing command is the best - by time or by sensor
 
     }
 
