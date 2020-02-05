@@ -19,7 +19,9 @@ public interface RobotMap {
             climbUp = 5,
             climbPull = 6,
             thrower = 8,
-            aimer = 9;
+            aimer = 9,
+            lifter=10,
+            spiner=11;
 
     }
     
@@ -38,14 +40,20 @@ public interface RobotMap {
     public interface DigitalPorts {
         public static final int 
         throwerEncouderA =1,
-        throwerEncouderB =2;       
+        throwerEncouderB =2,
+        rollettaUpperSwitch = 3,
+        rollettaLowerSwitch = 4;       
     }
 
     //Declare Encoder
     public interface EncoderPorts {
         public static final int 
             climbingElevatorA = 0,
-            climbingElevatorB = 1;
+            climbingElevatorB = 1,
+            rollettaA = 2,
+            rollettaB = 3;            
+
+
     }
     
     //Detail Joysticks used
