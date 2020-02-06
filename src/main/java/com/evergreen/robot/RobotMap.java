@@ -33,26 +33,25 @@ public interface RobotMap {
     
     //Detail Analog Components
     public interface AnalogPorts {
+    
         
     }
     
     //Detail Digital components
     public interface DigitalPorts {
         public static final int 
-        throwerEncouderA =1,
-        throwerEncouderB =2,
-        rollettaUpperSwitch = 3,
-        rollettaLowerSwitch = 4;       
+           throwerEncouderB =2,
+           throwerEncouderA =1,
+           rollettaUpperSwitch = 3,
+           rollettaLowerSwitch = 4,
+           climbingElevatorA = 0,
+           climbingElevatorB = 1,
+           rollettaA = 2,
+           rollettaB = 3;           
     }
 
     //Declare Encoder
     public interface EncoderPorts {
-        public static final int 
-            climbingElevatorA = 0,
-            climbingElevatorB = 1,
-            rollettaA = 2,
-            rollettaB = 3;            
-
 
     }
     
