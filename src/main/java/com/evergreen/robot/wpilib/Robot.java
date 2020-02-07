@@ -18,7 +18,6 @@ public class Robot extends Tree {
 
     @Override
     protected void autoConfig() {
-        // TODO Auto-generated method stub
 
     }
 
@@ -30,41 +29,52 @@ public class Robot extends Tree {
 
     @Override
     protected void commandConfig() {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     protected void componentSetup() {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     protected void log() {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     protected void teleopConfig() {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     protected void test() {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     protected void whenEnabled() {
-        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    protected void update() {
+        
+    }
+
+    @Override
+    public void disabledInit() {
 
     }
 
-    
+    @Override
+    public void disabledPeriodic() {
+        new JoystickButton(operatorJS, ButtonPorts.operatorJSA).whenPressed(Rolletta.getInstance().calibrateGreen);
+        new JoystickButton(operatorJS, ButtonPorts.operatorJSB).whenPressed(Rolletta.getInstance().calibrateRed);
+        new JoystickButton(operatorJS, ButtonPorts.operatorJSX).whenPressed(Rolletta.getInstance().calibrateBlue);
+        new JoystickButton(operatorJS, ButtonPorts.operatorJSY).whenPressed(Rolletta.getInstance().calibrateYellow);
+        
+    }
 
     
 }   
