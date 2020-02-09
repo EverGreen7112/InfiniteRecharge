@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandGroupBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -34,13 +35,13 @@ public class Shooter extends SubsystemBase implements RobotMap {
     /**
      * the part that aim the thrower
      */
-    private SpeedController m_aimer = new WPI_TalonSRX(MotorPorts.aimer);
+    public SpeedController m_aimer = new WPI_TalonSRX(MotorPorts.aimer);
     /**
      * the two wheels which shoot the power cell
      */
-    private SpeedController m_thrower = new WPI_TalonSRX(MotorPorts.thrower);
-    private Encoder m_aimerEncoder = new Encoder(AnalogPorts.aimerA, AnalogPorts.aimerB);
-    private Encoder m_throwerEncoder = new Encoder(AnalogPorts.throwerA, AnalogPorts.throwerB);
+    public SpeedController m_thrower = new WPI_TalonSRX(MotorPorts.thrower);
+    public Encoder m_aimerEncoder = new Encoder(AnalogPorts.aimerA, AnalogPorts.aimerB);
+    public Encoder m_throwerEncoder = new Encoder(AnalogPorts.throwerA, AnalogPorts.throwerB);
     
     //////////////////////////////////////////////////////////////////////////
     
@@ -100,8 +101,16 @@ public class Shooter extends SubsystemBase implements RobotMap {
     public double throwerDistancePerPulse() {
         return Preferences.getInstance().getDouble("thrower/distancePerPulse", 0.1);
     }
-    ////////////////////////////////////////////////////////////////////////////
     
+    /**
+     * 
+     * @return the speed that used to drop the ball
+     */
+    public double droppingSpeed() {
+        return Preferences.getInstance().getDouble("thrower/droppingSpeed", 0.06);
+    }
+    
+    ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////encouders output/////////////////////////////////
     public double getAimerAngle() {
         return m_aimerEncoder.getDistance();
@@ -185,10 +194,25 @@ public class Shooter extends SubsystemBase implements RobotMap {
      * aim and shoot to bottom port
      */
     public CommandBase shootToBottom = m_aimDown.andThen(m_throw);
-       
-
+     /**
+      *  used to drop the ball and leave it for our aliince members.
+      */  
+    public CommandBase drop = new InstantCommand(() -> m_thrower.set(droppingSpeed()),Shooter.getInstance()) {
+        public void end(boolean interrupted){
+            m_thrower.set(0);
+        }
+    };
+    /**
+     * used to pass the ball to our allience members
+     */
+    public PassPowerCell m_pass = new PassPowerCell(700);
     /////////////////////////////////////////////////////////////////////////
-
+    /**
+     * update the distance that we want to throw to
+     */
+    public void updatePassDistance(){
+        //TODO decide how to implemnt by m_pass.setDistance()
+    }
     /**
      * Construct new Shooter and at the values to the shufflBoard
      */
@@ -204,11 +228,12 @@ public class Shooter extends SubsystemBase implements RobotMap {
         Preferences.getInstance().putDouble("thrower/speedGoal", 0.1);
         Preferences.getInstance().putDouble("aimer/anglePerPulse", 1);
         Preferences.getInstance().putDouble("thrower/distancePerPulse", 1);
+        Preferences.getInstance().putDouble("thrower/droppingSpeed", 0.06);
         m_aimerEncoder.setDistancePerPulse(aimerAnglePerPulse());
         m_throwerEncoder.setDistancePerPulse(throwerDistancePerPulse());
 
     }
-
+    
     public static Shooter getInstance() {
         return m_shooter;
     }
@@ -218,6 +243,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
      * Present the power ports and their constant in cm for calculate the motorspeed
      */
     public enum PowerPorts {
+        //sizes in cm
         INNER(0, 249,Shooter.getInstance().aimingUpAngle(), "circle"), 
         OUTER(74.295, 249,Shooter.getInstance().aimingUpAngle(), "hexagon"),
         BOTTOM(74.295, 46,Shooter.getInstance().aimingDownAngle(), "rectangle");
@@ -239,19 +265,19 @@ public class Shooter extends SubsystemBase implements RobotMap {
             X_GOAL = xGoal;
             m_shape = shape;
             m_angle = angle;
-            //FIXME: when find my phone check correct formula
+            //FIXME: check if this formula is like the orignal, if change here change
+            // in PassPowerCell
             shootingTime =
-           Math.sqrt((2*(X_GOAL - Utilites.getDistanceFromPowerPort()) * 
-           Math.tan(m_angle) + Shooter.getInstance().SHOOTER_HIGHET -HIGHT_GOAL)
-                                             /2);
+           Math.sqrt((-2*Utilites.getDistanceFromPowerPort() * 
+           Math.tan(m_angle) + Shooter.getInstance().SHOOTER_HIGHET -HIGHT_GOAL) /Utilites.GRAVITY_CONSTANT);
             startXVelocity = 
-            X_GOAL - (Utilites.getDistanceFromPowerPort())/shootingTime;
+            (-Utilites.getDistanceFromPowerPort())/shootingTime;
             
             startHightVelocity = 
             (2*(HIGHT_GOAL - Shooter.getInstance().SHOOTER_HIGHET) - 
             Utilites.GRAVITY_CONSTANT*Math.pow(shootingTime, 2))
                                 /2*shootingTime;
-            motorSpeed = Math.sqrt(Math.pow(X_GOAL, 2) + Math.pow(HIGHT_GOAL, 2));
+            motorSpeed = Math.sqrt(Math.pow(startXVelocity, 2) + Math.pow(startHightVelocity, 2));
 
 
         }
