@@ -1,5 +1,7 @@
 package com.evergreen.robot.wpilib;
 
+import com.evergreen.robot.wpilib.subsystem.Shooter;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 
 /**
@@ -9,7 +11,7 @@ public class Robot extends TimedRobot {
     
     @Override
     public void autonomousInit() {
-
+        
     }
     @Override
     public void autonomousPeriodic() {
@@ -45,6 +47,7 @@ public class Robot extends TimedRobot {
     }
     @Override
     public void robotPeriodic() {
+        Shooter.getInstance().updatePassDistance();
         
     }
 
