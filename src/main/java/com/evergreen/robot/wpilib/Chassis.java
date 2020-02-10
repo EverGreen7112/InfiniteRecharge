@@ -31,7 +31,7 @@ private static Chassis m_instance;
    //declaring the front speed controllers (talon)
   private WPI_TalonSRX m_rightFront = new WPI_TalonSRX(MotorPorts.chassisRightFront);
   private WPI_TalonSRX m_leftFront = new WPI_TalonSRX(MotorPorts.chassisLeftFront);
-  
+  //declaring the gyro
   private Gyro m_gyro = new ADXRS450_Gyro();
   
 
@@ -54,25 +54,13 @@ private static Chassis m_instance;
     DISTANCE_KI = 0,
     DISTANCE_KD = 0,
     DISTANCE_TOLERANCE = 1;
-
+//creating pid controllers for angle velocity and distance
   private PIDController 
     m_anglePID = new PIDController(ANGLE_KP, ANGLE_KI, ANGLE_KD),
     m_velocityPID = new PIDController(VELOCITY_KP, VELOCITY_KI, VELOCITY_KD),
     m_distancePID = new PIDController(DISTANCE_KP, DISTANCE_KI, DISTANCE_KD);
-  private SpeedController rightFront = new WPI_TalonSRX(MotorPorts.chassisRightFront);
-  private SpeedController leftFront = new WPI_TalonSRX(MotorPorts.chassisLeftFront);
   
-  private Gyro gyro = new ADXRS450_Gyro();
-  private Encoder leftChassis = new s
-
-  //declaring the other speed controllers
-  private SpeedControllerGroup rightBack = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisRightBack), new WPI_VictorSPX(MotorPorts.chassisRightUp));
-  private SpeedControllerGroup leftBack = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisLeftBack), new WPI_VictorSPX(MotorPorts.chassisLeftUp));
-  //creating pid componets for angle velocity and distance
-  private double angleKp=0,angleKi=0,angleKd=0,velocityKp=0,velocityKi=0,velocityKd=0,distanceKp=0,distanceKi=0,distanceKd=0;
-  private PIDController anglePID = new PIDController(angleKp, angleKi, angleKd);
-  private PIDController velocityPID = new PIDController(velocityKp, velocityKi, velocityKd);
-  private PIDController distancePID = new PIDController(distanceKp, distanceKi, distanceKd);
+ 
   
   
 
@@ -92,36 +80,16 @@ private static Chassis m_instance;
     Preferences.getInstance().putDouble("Chassis/distance/TOLERANCE", VELOCITY_TOLERANCE);
   }
 
-    Preferences.getInstance().putDouble("Chassis/angle/KP", angleKp);
-    Preferences.getInstance().putDouble("Chassis/angle/KI", angleKi);
-    Preferences.getInstance().putDouble("Chassis/angle/KD", angleKd);
-    Preferences.getInstance().putDouble("Chassis/velocity/KP", velocityKp);
-    Preferences.getInstance().putDouble("Chassis/velocity/KI", velocityKi);
-    Preferences.getInstance().putDouble("Chassis/velocity/KD", velocityKd);
-    Preferences.getInstance().putDouble("Chassis/distance/KP", distanceKp);
-    Preferences.getInstance().putDouble("Chassis/distance/KI", distanceKi);
-    Preferences.getInstance().putDouble("Chassis/distance/KD", distanceKd);
-  }
+
+  // creating a chassis object
   public static Chassis getInstance(){
     if (m_instance==null){
       m_instance = new Chassis();
     }
     return m_instance;
-
-  public void move(double speed){
-    
-    m_leftBack.set(speed);
-    m_leftFront.set(speed);
-    m_rightBack.set(speed);
-    m_rightFront.set(speed);
-  } 
-  public void drive(double speedR, double speedL){
-    m_leftBack.set(speedL);
-    m_leftFront.set(speedL);
-    m_rightFront.set(speedR);
-    m_rightBack.set(speedR);
   }
-
+ 
+//rotating chassis to a choosen set point with pid
   public void rotateTo(double setpoint){
     
     m_anglePID.setSetpoint(setpoint);
@@ -135,105 +103,122 @@ private static Chassis m_instance;
       m_leftBack.set(-speed);
     }
   }
+  //sets same speed to all left motors
   public void setLeftSpeed(double speed){
     m_leftBack.set(speed);
     m_leftFront.set(speed);
   }
+  // sets same speed to all right motors
   public void setRightSpeed(double speed){
     m_rightBack.set(speed);
     m_rightFront.set(speed);
   }
   
-
+//returning the angle kp
   public double getAngleKp(){
     return Preferences.getInstance().getDouble("Chassis/distance/KD", ANGLE_KP);
   }
-
+//returning the angle ki
   public double getAngleKi(){
     return ANGLE_KI;
   }
-
+//returning the angle kd
   public double getAngleKd() {
     return ANGLE_KD;
   }
-
+//returning the velocity kp
   public double getVelocityKp() {
     return VELOCITY_KP;
   }
-
+//returning the velocity ki
   public double getVelocityKi() {
     return VELOCITY_KI;
   }
-
+//returning the velocity kd
   public double getVelocityKd() {
     return VELOCITY_KD;
   }
-
+//returning the distance kp
   public double getDistanceKp() {
     return DISTANCE_KP;
   }
-
+//returning the distance ki
   public double getDistanceKi() {
     return DISTANCE_KI;
   }
-
+//returning the distance kd
   public double getDistanceKd() {
     return DISTANCE_KD;
   }
-
+//returning the distance from left sensor
   public double getLeftDistance() {
     return m_leftFront.getSelectedSensorPosition();
   } 
-
+//returning the distance from right sensor
   public double getRightDistance() {
     return m_rightFront.getSelectedSensorPosition();
   }
-
+//returning the speed of the right motors
  public double getRightVelocity(){
    return m_rightFront.getSelectedSensorVelocity();
  }
+ //returning the speed of the left motor
  public double getLeftVelocity(){
    return m_leftFront.getSelectedSensorVelocity();
  }
+ // returning the average speed
  private double getVelocity(){
    return (getLeftVelocity()+getRightVelocity())/2;
  }
+ //returning the average distance from both sensors
  public double getDistance(){
    return (getLeftDistance()+getRightDistance())/2;
  }
+ //returning the angle tolerance
  private double getPIDAngleTolerance(){
    return ANGLE_TOLERANCE;
  }
+ //returning the distance tolerance
  public double getPIDDistanceTolerance(){
   return DISTANCE_TOLERANCE;
 }
+//returning the velocity tolerance
 private double getPIDVelocityTolerance(){
   return VELOCITY_TOLERANCE;
 }
+//returning the angle pid controller
 public PIDController getAnglePID(){
   return m_anglePID;
 }
+//returning the distance pid controller
 public PIDController getDistancePID(){
   return m_distancePID;
 }
+//returning the velocity pid controller
 private PIDController getVelocityPID(){
   return m_velocityPID;
 }
+//returing the gyro object
 public Gyro getGyro(){
   return m_gyro;
 }
+//returning the right talon mototr
 public TalonSRX getRightTalonSRX(){
   return m_rightFront;
 }
+//returning the left talon motor
 public TalonSRX getLefTalonSRX(){
   return m_leftFront;
 }
+//returning the right victor momtors
 public SpeedControllerGroup getRightControllerGroup(){
   return m_rightBack;
 }
+//returning the left victor motors
 public SpeedControllerGroup getLeftControllerGroup(){
   return m_leftBack;
 }
+//rotating the chassis in a certin speed
 public void rotate(double speed){
   m_leftBack.set(speed);
   m_leftFront.set(speed);
@@ -241,57 +226,23 @@ public void rotate(double speed){
   m_rightFront.set(-speed);
 }
 
-
+//moving the entire chassis with a specific speed 
   public void move(double speed){
     
-    leftBack.set(speed);
-    leftFront.set(speed);
-    rightBack.set(speed);
-    rightFront.set(speed);
+    m_leftBack.set(speed);
+    m_leftFront.set(speed);
+    m_rightBack.set(speed);
+    m_rightFront.set(speed);
   } 
+//moving the chassis with a specific speed for right and left motors
   public void drive(double speedR, double speedL){
-    leftBack.set(speedL);
-    leftFront.set(speedL);
-    rightFront.set(speedR);
-    rightBack.set(speedR);
+    m_leftBack.set(speedL);
+    m_leftFront.set(speedL);
+    m_rightFront.set(speedR);
+    m_rightBack.set(speedR);
   }
-  public void turnLeft(double setpoint){
-    anglePID.setSetpoint(setpoint);
-    anglePID.setTolerance(1);
-    rightFront.set();
-    rightBack.set(speed);
-  }
-  public void turnRight(double speed){
-    leftFront.set(speed);
-    leftBack.set(speed);
-  }
-  public double getAngleKp(){
-    return angleKp;
-  }
-  public double getAngleKi(){
-    return angleKi;
-  }
-  public double getAngleKd(){
-    return angleKd;
-  }
-  public double getVelocityKp(){
-    return velocityKp;
-  }
-  public double getVelocityKi(){
-    return velocityKi;
-  }
-  public double getVelocityKd(){
-    return velocityKd;
-  }
-  public double getDistanceKp(){
-    return distanceKp;
-  }
-  public double getDistanceKi(){
-    return distanceKi;
-  }
-  public double getDistanceKd(){
-    return distanceKd;
-  }
+ 
+  
   
   @Override
   public void periodic() {
