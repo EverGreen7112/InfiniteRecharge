@@ -1,4 +1,4 @@
-package com.evergreen.robot.everlib;
+package com.evergreen.robot;
 
 /**
  * A map mapping all the robot's elecronic component into integer ports.
@@ -16,8 +16,8 @@ public interface RobotMap {
             chassisRightBack = 2,
             chassisRightFront = 3,
             collector = 4, //TODO Change port when decided
-            climbingElevator = 5,
-            climbingPuller = 6,
+            climbUp = 5,
+            climbPull = 6,
             thrower = 8,
             aimer = 9;
 
@@ -53,7 +53,17 @@ public interface RobotMap {
         public static final int
             rightChasisJS = 0,
             leftChassisJS = 1,
-            buttonJS = 2;        
+            operatorJS = 2;        
+    }
+
+    //Detail the Buttons of each Joystick
+    public interface ButtonPorts {
+        public static final int 
+            operatorJSA = 3,
+            operatorJSB = 2,
+            operatorJSX = 0,
+            operatorJSY = 1;
+        
     }
     
     //Detail Cameras used
