@@ -1,10 +1,7 @@
 package com.evergreen.robot.wpilib.commands;
 
-<<<<<<< HEAD
-=======
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
->>>>>>> wpilib_chassis
 
 import com.evergreen.robot.wpilib.Chassis;
 

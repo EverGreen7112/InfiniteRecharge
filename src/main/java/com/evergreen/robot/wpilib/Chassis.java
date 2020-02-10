@@ -22,17 +22,13 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-<<<<<<< HEAD
 
-=======
->>>>>>> wpilib_chassis
 public class Chassis extends SubsystemBase {
   /**
    * Creates a new Chassis.
    */
 private static Chassis m_instance;
    //declaring the front speed controllers (talon)
-<<<<<<< HEAD
   private WPI_TalonSRX m_rightFront = new WPI_TalonSRX(MotorPorts.chassisRightFront);
   private WPI_TalonSRX m_leftFront = new WPI_TalonSRX(MotorPorts.chassisLeftFront);
   
@@ -63,7 +59,6 @@ private static Chassis m_instance;
     m_anglePID = new PIDController(ANGLE_KP, ANGLE_KI, ANGLE_KD),
     m_velocityPID = new PIDController(VELOCITY_KP, VELOCITY_KI, VELOCITY_KD),
     m_distancePID = new PIDController(DISTANCE_KP, DISTANCE_KI, DISTANCE_KD);
-=======
   private SpeedController rightFront = new WPI_TalonSRX(MotorPorts.chassisRightFront);
   private SpeedController leftFront = new WPI_TalonSRX(MotorPorts.chassisLeftFront);
   
@@ -78,13 +73,11 @@ private static Chassis m_instance;
   private PIDController anglePID = new PIDController(angleKp, angleKi, angleKd);
   private PIDController velocityPID = new PIDController(velocityKp, velocityKi, velocityKd);
   private PIDController distancePID = new PIDController(distanceKp, distanceKi, distanceKd);
->>>>>>> wpilib_chassis
   
   
 
   private Chassis() {
     //entering the PID componets into the prefernces
-<<<<<<< HEAD
     Preferences.getInstance().putDouble("Chassis/angle/KP", ANGLE_KP);
     Preferences.getInstance().putDouble("Chassis/angle/KI", ANGLE_KI);
     Preferences.getInstance().putDouble("Chassis/angle/KD", ANGLE_KD);
@@ -99,7 +92,6 @@ private static Chassis m_instance;
     Preferences.getInstance().putDouble("Chassis/distance/TOLERANCE", VELOCITY_TOLERANCE);
   }
 
-=======
     Preferences.getInstance().putDouble("Chassis/angle/KP", angleKp);
     Preferences.getInstance().putDouble("Chassis/angle/KI", angleKi);
     Preferences.getInstance().putDouble("Chassis/angle/KD", angleKd);
@@ -110,14 +102,11 @@ private static Chassis m_instance;
     Preferences.getInstance().putDouble("Chassis/distance/KI", distanceKi);
     Preferences.getInstance().putDouble("Chassis/distance/KD", distanceKd);
   }
->>>>>>> wpilib_chassis
   public static Chassis getInstance(){
     if (m_instance==null){
       m_instance = new Chassis();
     }
     return m_instance;
-  }
-<<<<<<< HEAD
 
   public void move(double speed){
     
@@ -253,7 +242,6 @@ public void rotate(double speed){
 }
 
 
-=======
   public void move(double speed){
     
     leftBack.set(speed);
@@ -304,7 +292,6 @@ public void rotate(double speed){
   public double getDistanceKd(){
     return distanceKd;
   }
->>>>>>> wpilib_chassis
   
   @Override
   public void periodic() {

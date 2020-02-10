@@ -1,10 +1,7 @@
 package com.evergreen.robot.wpilib.commands;
 
-<<<<<<< HEAD
 import com.evergreen.robot.wpilib.Chassis;
 
-=======
->>>>>>> wpilib_chassis
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 
 /**
@@ -12,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.PIDCommand;
  */
 public class MoveChassisTo extends PIDCommand {
 
-<<<<<<< HEAD
     double m_distance;
 
     public MoveChassisTo(double distance) {
@@ -25,9 +21,7 @@ public class MoveChassisTo extends PIDCommand {
         return ((getController().getPositionError())<=Chassis.getInstance().getPIDDistanceTolerance());
     }
 
-=======
     public MoveChassisTo(double distance) {
         super
     }
->>>>>>> wpilib_chassis
 }
