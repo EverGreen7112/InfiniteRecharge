@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package com.evergreen.robot.everlib;
+
 
 import com.evergreen.robot.everlib.Robot;
 
