@@ -16,12 +16,15 @@ import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.I2C.Port;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -30,8 +33,12 @@ public class Rolletta extends SubsystemBase {
   private static Rolletta m_instance;
   
   //General Constants
-  private double LIFT_SPEED; 
-  private boolean isLifting = true;
+   private double LIFT_SPEED;  
+   //45 degrees offset to make sure it's not too little
+   private double ROTATION_CONTROL_SETPOINT = 360 * 3 + 45; 
+   private double ROBOT_SENSOR_OFFSET = 90;
+   private boolean isLifting = true;
+
   //Color RGB constants
   private double 
     BLUE_R,
@@ -39,7 +46,7 @@ public class Rolletta extends SubsystemBase {
     BLUE_B,    
     GREEN_R,
     GREEN_G,
-    GREEN_B,
+    GREEN_B, //Add 60 degrees offset to make sure.
     RED_R,
     RED_G,
     RED_B,
@@ -57,7 +64,7 @@ public class Rolletta extends SubsystemBase {
   private SpeedController m_lifter = new WPI_VictorSPX(MotorPorts.lifter);
 
   //The encoder for the spinning motor
-  private Encoder m_spinner_encoder = new Encoder(DigitalPorts.rollettaA,DigitalPorts.rollettaB);
+  private Encoder m_spinnerEncoder = new Encoder(DigitalPorts.rollettaA,DigitalPorts.rollettaB);
 
   //The Color Sensor
   ColorSensorV3 m_colorSensor = new ColorSensorV3(Port.kMXP);
@@ -68,6 +75,8 @@ public class Rolletta extends SubsystemBase {
   //The switches to control the ifter motor
   private DigitalInput m_upperSwitch = new DigitalInput(DigitalPorts.rollettaUpperSwitch);
   private DigitalInput m_lowerSwitch = new DigitalInput(DigitalPorts.rollettaLowerSwitch);
+
+  private double m_currentOffset = 0;
 
   
   //Commands:
@@ -105,14 +114,14 @@ public class Rolletta extends SubsystemBase {
    */
   public CommandBase calibrateYellow = 
     new RunCommand(() -> calibrateYellow(), Rolletta.getInstance()).withTimeout(3.5);
-  
+
   /**
    * Creates a new Rolletta.
    */
   public Rolletta() {
     //Adds to the shuffleboard constatns, detected color, etc.
     Preferences.getInstance().putDouble("Rolletta/Lift Speed", LIFT_SPEED);
-    Preferences.getInstance().putString("Rolletta/Detected color", getColorString());
+    Preferences.getInstance().putString("Rolletta/Detected color", getCurrentColor());
     Preferences.getInstance().putDouble("Rolletta/Blue/R", BLUE_R);
     Preferences.getInstance().putDouble("Rolletta/Blue/G", BLUE_G);
     Preferences.getInstance().putDouble("Rolletta/Blue/B", BLUE_B);
@@ -124,7 +133,10 @@ public class Rolletta extends SubsystemBase {
     Preferences.getInstance().putDouble("Rolletta/Red/B", RED_B);
     Preferences.getInstance().putDouble("Rolletta/Yellow/R", YELLOW_R);
     Preferences.getInstance().putDouble("Rolletta/Yellow/G", YELLOW_G);
-    Preferences.getInstance().putDouble("Rolletta/Yellow/B", YELLOW_B);
+    Preferences.getInstance().putDouble("Rolleta/PID/kP", 0);
+    Preferences.getInstance().putDouble("Rolleta/PID/kI", 0);
+    Preferences.getInstance().putDouble("Rolleta/PID/kD", 0);
+    Preferences.getInstance().putDouble("Rolleta/PID/Tolerance", 0);
 
   }
   
@@ -153,21 +165,57 @@ public class Rolletta extends SubsystemBase {
 
   /**
    * <b>Rotation Control method:</b>
-   * <p> Spins the control panel between 3-5 times.
+   * <p> 
+   * Spins the control panel between 3-5 times.
    */
   public void rotationControl() {
-    
+    spinDegrees(ROTATION_CONTROL_SETPOINT); 
   }
 
   /**
    * <b>Position Control method:</b>
-   * <p> Spins the control panel to the color given from the FMS.
+   * <p>Spins the control panel to the color given from the FMS.
    */
   public void positionControl() {
-
+    spinTo(getTargetAngle());
   }
 
 
+  /**
+   * @return the kP constant for the rolleta spinning PID
+   */
+  private double GET_KP() {
+    return Preferences.getInstance().getDouble("Rolleta Spinner/PID/kP", 0);
+  }
+
+  /**
+   * @return The kI constant for the rolleta spinning PID 
+   */
+  private double GET_KI() {
+    return Preferences.getInstance().getDouble("Rolleta Spinner/PID/kI", 0);
+  }
+
+  /**
+   * @return the kD constant for the rolleta spinning PID
+   */
+  private double GET_KD() {
+    return Preferences.getInstance().getDouble("Rolleta Spinner/PID/kD", 0);
+  }
+
+  /**
+   * @return The tolerance constant for the rolleta spinning PID
+   */
+  private double GET_TOLERANCE() {
+    return Preferences.getInstance().getDouble("Rolleta Spinner/PID/Tolerance", 0);
+  }
+
+  /**
+   * @return The PID controller of the rolleta spin
+   */
+  private PIDController getController() {
+    return new PIDController(GET_KP(), GET_KI(), GET_KD());
+  }
+  
 
   // Color methods:
 
@@ -224,23 +272,55 @@ public class Rolletta extends SubsystemBase {
   /**
    * Gets the color String
    */
-  public String getColorString() {
-    String colorString;
+  public String getCurrentColor() {    
     ColorMatchResult match = m_colorMatcher.matchClosestColor(m_colorSensor.getColor());
 
-    if (match.color == BLUE) {
-      colorString = "Blue";
+    if (match.color == RED) {
+      return "R";
     } else if (match.color == GREEN) {
-      colorString = "Green";
-    } else if (match.color == RED) {
-      colorString = "Red";
+      return "G";
+    } else if (match.color == BLUE) {
+      return "B";
     } else if (match.color == YELLOW) {
-      colorString = "Yellow";
+      return "Y";
     } else {
-      colorString = "Unknown";
+      return "Unknown";
     }
-    return colorString;
   }
+
+
+  // Sensor Methods
+  
+  /**
+   * @return the angle we need to target, modulu 180 with RED=0.
+   */
+  public double getTargetAngle() {
+    return getColorAngle(DriverStation.getInstance().getGameSpecificMessage());
+  }
+
+  /**Resets the spinner encoder and the current offset according to current sensor input.*/
+  public void resetSensor() {
+    m_currentOffset = getColorAngle(getCurrentColor()) + ROBOT_SENSOR_OFFSET;
+    m_spinnerEncoder.reset();
+  }
+
+  /**
+   * @return The current angle according to the encoder within modulu 180.
+   **/
+  public double getTrimmedAngle() {
+    return getAccumelatedAngle() % 180;
+  }
+
+  /**
+   * @return The current angle according to the encoder, accumelated with each round since
+   * {@link #resetSensor()}
+   */
+  public double getAccumelatedAngle() {
+    return m_spinnerEncoder.getDistance() + m_currentOffset;
+  }
+
+  
+  
 
   /**
    * Gets the lifting speed constant from the shuffleboard.
@@ -249,6 +329,94 @@ public class Rolletta extends SubsystemBase {
     return Preferences.getInstance().getDouble("Rolletta/Lift Speed", LIFT_SPEED);
   }
 
+
+ 
+
+  /**
+   * Calculates the angle of a certain color on the control panel by its string 
+   * representation. Red is concidered 0 degrees, and each color advances the angle 
+   * by 45 degrees (as it is one eighth of the circle).
+   * 
+   * @param color - the string representation of the color to mesure the angle of 
+   * (e.g "R" for red, "B" for blue, etc.).
+   * 
+   * @return The angle of the input color on the control panel.
+   */
+  public double getColorAngle(String color) {
+    switch (color) {
+      case("R"):
+        return 0;
+      case("G"):
+        return 45;
+      case("B"):
+        return 90;
+      case("Y"):
+        return 135;
+      default:
+        return -1;
+    }
+  }
+
+  /**
+   * Utilises a PID loop to rotate to a certain angle on the control panel.
+   * 
+   * @param degrees - the angle to rotate to (As the colors repeat after half a circle, 
+   * this should be between 0 and 180).
+   */
+  public void spinTo(double degrees) {
+    resetSensor();
+    PIDController controller = getController();
+    controller.setTolerance(GET_TOLERANCE());
+    controller.setSetpoint(degrees);
+
+    while (Math.abs(controller.getPositionError()) > GET_TOLERANCE()) {
+      m_spinner.set(controller.calculate(getTrimmedAngle()));
+    }
+
+    m_spinner.set(0);
+  }
+
+  /**
+   * Utilises a PID loop to spin the control panel a certain amount of degrees. 
+   * @param degrees - the amount of degrees to rotate the control panel.
+   */
+  public void spinDegrees(double degrees) {
+    resetSensor();
+    PIDController controller = getController();
+    controller.setTolerance(GET_TOLERANCE());
+    controller.setSetpoint(degrees + m_currentOffset);
+
+    while (controller.getPositionError() > GET_TOLERANCE()) {
+      m_spinner.set(controller.calculate(getAccumelatedAngle()));
+    }
+
+    m_spinner.set(0);
+
+  }
+
+  /**
+   * @return A {@link CommandBase} representatoion of {@link #rotationControl()}
+   */
+  public PIDCommand getRotationControl() {
+    return new PIDCommand(
+      getController(), 
+      this::getAccumelatedAngle,
+      () -> ROTATION_CONTROL_SETPOINT, 
+      (output) -> m_spinner.set(output),
+      this);
+  }
+
+  /**
+   * @return A {@link CommandBase} representatoion of {@link #positionControl()}
+   */
+  public PIDCommand getPositionControl() {
+    return new PIDCommand(
+      getController(),
+      this::getTrimmedAngle, 
+      this::getTargetAngle,
+      (output) -> m_spinner.set(output), 
+      this);
+  }
 
   @Override
   public void periodic() {
