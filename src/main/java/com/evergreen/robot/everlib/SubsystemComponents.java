@@ -1,4 +1,4 @@
-package com.evergreen.robot;
+package com.evergreen.robot.everlib;
 
 import com.evergreen.everlib.subsystems.motors.subsystems.MotorController;
 import com.evergreen.everlib.subsystems.motors.subsystems.MotorController.ControllerType;
