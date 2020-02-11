@@ -36,7 +36,10 @@ public class Rolletta extends SubsystemBase {
    private double LIFT_SPEED;  
    //45 degrees offset to make sure it's not too little
    private double ROTATION_CONTROL_SETPOINT = 360 * 3 + 45; 
+<<<<<<< HEAD
    private double ROBOT_SENSOR_OFFSET = 90;
+=======
+>>>>>>> 135a6bf99e52ad4c1d863f2b31fddf9ed05fb3f8
    private boolean isLifting = true;
 
   //Color RGB constants
@@ -300,7 +303,11 @@ public class Rolletta extends SubsystemBase {
 
   /**Resets the spinner encoder and the current offset according to current sensor input.*/
   public void resetSensor() {
+<<<<<<< HEAD
     m_currentOffset = getColorAngle(getCurrentColor()) + ROBOT_SENSOR_OFFSET;
+=======
+    m_currentOffset = getColorAngle(getCurrentColor());
+>>>>>>> 135a6bf99e52ad4c1d863f2b31fddf9ed05fb3f8
     m_spinnerEncoder.reset();
   }
 
