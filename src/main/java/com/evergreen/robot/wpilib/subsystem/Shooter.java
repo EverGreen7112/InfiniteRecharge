@@ -1,8 +1,8 @@
 package com.evergreen.robot.wpilib.subsystem;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import com.evergreen.robot.everlib.RobotMap.EncoderPorts;
-import com.evergreen.robot.wpilib.RobotMap;
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import com.evergreen.robot.RobotMap;
 import com.evergreen.robot.wpilib.Utilites;
 
 import edu.wpi.first.wpilibj.SpeedController;
@@ -35,13 +35,13 @@ public class Shooter extends SubsystemBase implements RobotMap {
     /**
      * the part that aim the thrower
      */
-    public SpeedController m_aimer = new WPI_TalonSRX(MotorPorts.aimer);
+    public SpeedController m_aimer = new WPI_VictorSPX(MotorPorts.aimer);
     /**
      * the two wheels which shoot the power cell
      */
     public SpeedController m_thrower = new WPI_TalonSRX(MotorPorts.thrower);
-    public Encoder m_aimerEncoder = new Encoder(AnalogPorts.aimerA, AnalogPorts.aimerB);
-    public Encoder m_throwerEncoder = new Encoder(AnalogPorts.throwerA, AnalogPorts.throwerB);
+    public Encoder m_aimerEncoder = new Encoder(DigitalPorts.aimerEncoderA, DigitalPorts.aimerEncoderB);
+    public Encoder m_throwerEncoder = new Encoder(DigitalPorts.throwerEncoderA, DigitalPorts.throwerEncoderB);
     
     //////////////////////////////////////////////////////////////////////////
     
@@ -111,7 +111,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
     }
     
     ////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////encouders output/////////////////////////////////
+    ////////////////////////////encoders output/////////////////////////////////
     public double getAimerAngle() {
         return m_aimerEncoder.getDistance();
     }

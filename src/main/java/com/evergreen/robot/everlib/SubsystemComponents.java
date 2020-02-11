@@ -61,7 +61,7 @@ public interface SubsystemComponents extends RobotMap {
         public interface Thrower{
             //TODO: change to the correct type
             MotorController thrower = new MotorController(ControllerType.TALON_SRX, RobotMap.MotorPorts.thrower);
-            EncoderEG throwerEncouder = new EncoderEG(DigitalPorts.throwerEncouderA,DigitalPorts.throwerEncouderB);
+            EncoderEG throwerEncoder = new EncoderEG(DigitalPorts.throwerEncoderA,DigitalPorts.throwerEncoderB);
         }
         /**
          * the shooter subsystem aimer under the Shooter subsystem

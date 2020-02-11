@@ -7,6 +7,7 @@
 
 package com.evergreen.robot.wpilib;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.evergreen.robot.RobotMap.MotorPorts;
 
@@ -29,7 +30,7 @@ public class Climb extends SubsystemBase {
 
   //creates the speed controllers
   private SpeedController m_climbPull = new WPI_VictorSPX(MotorPorts.climbPull);
-  private SpeedController m_climbUp = new WPI_VictorSPX(MotorPorts.climbUp);
+  private SpeedController m_climbUp = new WPI_TalonSRX(MotorPorts.climbUp);
 
   /**
    * Lifts the hook elevator

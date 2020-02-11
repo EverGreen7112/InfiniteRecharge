@@ -20,6 +20,8 @@ public class Robot extends Tree {
 
     @Override
     protected void autoConfig() {
+        
+    }
 
     public void autonomousInit() {
         
