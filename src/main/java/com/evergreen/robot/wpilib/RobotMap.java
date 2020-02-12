@@ -13,5 +13,9 @@ public interface RobotMap {
             chassisRightFront = 4,
             chassisRightUp=5;
     }
-    
+    public interface JoystickPorts{
+        public static final int 
+        joystickLeft=0,
+        joystickRight =1;
+    }
 }
