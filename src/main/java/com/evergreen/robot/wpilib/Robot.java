@@ -1,43 +1,76 @@
 package com.evergreen.robot.wpilib;
 
+import com.evergreen.everlib.structure.Tree;
+import com.evergreen.robot.RobotMap.ButtonPorts;
+import com.evergreen.robot.RobotMap.JoystickPorts;
+
+import edu.wpi.first.wpilibj.Joystick;
+import com.evergreen.robot.wpilib.subsystem.Shooter;
+
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
  * Robot
  */
-public class Robot extends TimedRobot {
+public class Robot extends Tree {
     
+    //Creates JS objects
+    public Joystick operatorJS = new Joystick(JoystickPorts.operatorJS);
+
     @Override
+    protected void autoConfig() {
+        
+    }
+
     public void autonomousInit() {
+        
+    }
+
+    @Override
+    protected void bindButtons() {
+        //The robot elevates the hook while the button is held
+        new JoystickButton(operatorJS, ButtonPorts.operatorJSA).whenHeld(Climb.getInstance().m_up);
+        //The robot pulls itself upwards while the button is held
+        new JoystickButton(operatorJS, ButtonPorts.operatorJSB).whenHeld(Climb.getInstance().m_pull);
+
+        //The robot collects Power Cells while the button is held
+        new JoystickButton(operatorJS, ButtonPorts.operatorJSX).whenHeld(Collector.getInstance().collect);
+
+        //The robot passes a Power Cells to the Shooter when the button is pressed
+        new JoystickButton(operatorJS, ButtonPorts.operatorJSY).whenPressed(Storage.getInstance().passByTime);
+        //TODO check which passing command is the best - by time or by sensor
 
     }
+
     @Override
-    public void autonomousPeriodic() {
-        
+    protected void commandConfig() {
+
     }
+
     @Override
-    public void teleopInit() {
-        
+    protected void componentSetup() {
+
     }
+
     @Override
-    public void teleopPeriodic() {
-        
+    protected void log() {
+
     }
+
     @Override
-    public void testInit() {
-        
+    protected void teleopConfig() {
+
     }
+
     @Override
-    public void testPeriodic() {
-        
+    protected void test() {
+
     }
+
     @Override
-    public void disabledInit() {
-        
-    }
-    @Override
-    public void disabledPeriodic() {
-        
+    protected void whenEnabled() {
+
     }
     @Override
     public void robotInit() {
@@ -45,6 +78,7 @@ public class Robot extends TimedRobot {
     }
     @Override
     public void robotPeriodic() {
+        Shooter.getInstance().updatePassDistance();
         
     }
 
