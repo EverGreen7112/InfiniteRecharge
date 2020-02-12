@@ -48,7 +48,7 @@ public interface SubsystemComponents extends RobotMap {
         MotorController puller = 
             new MotorController(ControllerType.TALON_SRX, MotorPorts.climbPull);
         EncoderEG elevatorEncoder = 
-            new EncoderEG(EncoderPorts.climbingElevatorA, EncoderPorts.climbingElevatorB);
+            new EncoderEG(AnalogPorts.climbingElevatorA, AnalogPorts.climbingElevatorB);
     } // TODO: check to which controller types are the actual motors connected.
     /**
      * The Shooter is a subsystem which shoot power cells,
