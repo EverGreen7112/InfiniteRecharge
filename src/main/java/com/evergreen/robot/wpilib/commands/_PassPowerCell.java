@@ -26,8 +26,8 @@ class _PassPowerCell extends PIDCommand {
             Shooter.getInstance().getThrowController(),
             Shooter.getInstance()::getThrowerSpeed,
             () -> getMotorSpeed(distance) ,
-            Shooter.getInstance().m_thrower::set,
-            Shooter.getInstance() );
+            Shooter.getInstance().m_thrower.m_motor::set,
+            Shooter.getInstance().m_thrower );
             m_distance = distance;
     }
     /**

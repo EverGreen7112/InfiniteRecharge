@@ -1,13 +1,15 @@
 package com.evergreen.robot.wpilib.commands;
 
+import com.evergreen.robot.wpilib.Utilites;
 import com.evergreen.robot.wpilib.subsystem.Shooter;
 
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 /**
- * first aim down and then pass the power cell to the desierd distance
+ * fully (aim, accelerate, passToShooter) pass the power cell to the desierd distance
  */
-public class PassPowerCell extends SequentialCommandGroup {
+public class PassPowerCell extends ParallelCommandGroup {
     _PassPowerCell m_pass;
     /**
      * 
@@ -15,9 +17,9 @@ public class PassPowerCell extends SequentialCommandGroup {
      */
     public PassPowerCell(double distance) {
         m_pass = new _PassPowerCell(distance);
-        addCommands(
-            Shooter.getInstance().m_aimDown,
-            m_pass);
+        addCommands(Utilites.toFullShootingCommand(
+            new ParallelCommandGroup(Shooter.getInstance().getAimDown(),m_pass)
+        ));
         
     }
     public void setDistance(double distance) {

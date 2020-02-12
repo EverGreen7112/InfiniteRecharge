@@ -30,10 +30,6 @@ public interface RobotMap {
         
     }
     
-    //Detail Analog Components
-    public interface AnalogPorts {
-        
-    }
     
     //Detail Digital components
     public interface DigitalPorts {
@@ -45,10 +41,14 @@ public interface RobotMap {
     }
 
     //Declare Encoder
-    public interface EncoderPorts {
+    public interface AnalogPorts {
         public static final int 
             climbingElevatorA = 0,
-            climbingElevatorB = 1;
+            climbingElevatorB = 1,
+            aimerA = 2,
+            aimerB = 3,
+            throwerA = 4,
+            throwerB =5;
     }
     
     //Detail Joysticks used
