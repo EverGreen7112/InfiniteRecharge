@@ -3,6 +3,7 @@ package com.evergreen.robot.wpilib.subsystem;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.evergreen.robot.RobotMap;
+import com.evergreen.robot.wpilib.Storage;
 import com.evergreen.robot.wpilib.Utilites;
 
 import edu.wpi.first.wpilibj.SpeedController;
@@ -19,55 +20,64 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Preferences;
 import com.evergreen.robot.wpilib.commands.*;
-
 /**
- * Shooter subsystem, basically divided to two parts:
+ * Shooter subsystem, basically divided to two Subsystem:
  * <ul>
  * <li> <b>the aimer</b> - the part that aim the thrower</li>
  * <li> <b>the thrower</b> - the two wheels which shoot the power cell</li>
  * </ul>
  */
+
 public class Shooter extends SubsystemBase implements RobotMap {
-    
     private static Shooter m_shooter = new Shooter();
-    ////////////////////////compoments/////////////////////////////////////////
+    ////////////////////////sub Subsystem/////////////////////////////////////////
     // TODO:put correct SpeedController Type
+     /**
+     * the part that aim the thrower
+     */
+    public Aimer m_aimer = new Aimer();
+     /**
+     * the two wheels which shoot the power cell
+     */
+    public Thrower m_thrower = new Thrower();
+    
     /**
      * the part that aim the thrower
      */
-    public SpeedController m_aimer = new WPI_VictorSPX(MotorPorts.aimer);
+    public class Aimer extends SubsystemBase{
+        // TODO:put correct SpeedController Type
+        public SpeedController m_motor = new WPI_TalonSRX(MotorPorts.aimer);
+        public Encoder m_encoder = new Encoder(AnalogPorts.aimerA, AnalogPorts.aimerB);
+    }
+
     /**
      * the two wheels which shoot the power cell
      */
-    public SpeedController m_thrower = new WPI_TalonSRX(MotorPorts.thrower);
-    public Encoder m_aimerEncoder = new Encoder(DigitalPorts.aimerEncoderA, DigitalPorts.aimerEncoderB);
-    public Encoder m_throwerEncoder = new Encoder(DigitalPorts.throwerEncoderA, DigitalPorts.throwerEncoderB);
-    
+    public class Thrower extends SubsystemBase{
+        // TODO:put correct SpeedController Type
+        public SpeedController m_motor = new WPI_TalonSRX(MotorPorts.thrower);
+        public Encoder m_encoder = new Encoder(AnalogPorts.throwerA, AnalogPorts.throwerB);
+    }
     //////////////////////////////////////////////////////////////////////////
-    
     /**
      * shooter highet in cm
      */
-    public final double SHOOTER_HIGHET = 29;
+    public final double SHOOTER_HEIGHT = 29;
     /**
      * if the aimer is at the upper position return true if it at the lower position
      * return false if between return last position
      */
+    //TODO: find start position
     public boolean m_atUpperPosition = true;
-    /**
-     * if we are want to shoot to the inner port is true, else change it to false; 
-     */
-    public boolean shootToInner() {
-        return true;
-    } 
+    
     ////////////////////////tuneable values//////////////////////////////////////
     // TODO: tune the values
     public double aimingUpAngle() {
-        return Preferences.getInstance().getDouble("aimingUpAngle", 3);
+        return Preferences.getInstance().getDouble("aimingUpAngle", 30);
     }
 
     public double aimingDownAngle() {
-        return Preferences.getInstance().getDouble("aimingDownAngle", 3);
+        return Preferences.getInstance().getDouble("aimingDownAngle", 10);
     }
 
     public double aimerKp() {
@@ -113,11 +123,11 @@ public class Shooter extends SubsystemBase implements RobotMap {
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////encoders output/////////////////////////////////
     public double getAimerAngle() {
-        return m_aimerEncoder.getDistance();
+        return m_aimer.m_encoder.getDistance();
     }
 
     public double getThrowerSpeed() {
-        return m_throwerEncoder.getRate();
+        return m_thrower.m_encoder.getRate();
     }
     ////////////////////////////////////////////////////////////////////////////
     
@@ -140,73 +150,186 @@ public class Shooter extends SubsystemBase implements RobotMap {
     ////////////////////////////////////////////////////////////////////////////
 
     ///////////////////////////commands////////////////////////////////////////////////
-    public CommandBase m_aimUp = new PIDCommand(m_aimController, Shooter.getInstance()::getAimerAngle,
-            aimingUpAngle(), Shooter.getInstance().m_aimer::set, Shooter.getInstance()) {
+    
+    private CommandBase m_aimUp = new PIDCommand(m_aimController, Shooter.getInstance()::getAimerAngle,
+            aimingUpAngle(), Shooter.getInstance().m_aimer.m_motor::set, m_aimer) {
              @Override
             public void end(boolean interrupted){
                 super.end(interrupted);;
                 m_atUpperPosition = true;
             }
             };
-    public CommandBase m_aimDown = new PIDCommand(m_aimController, Shooter.getInstance()::getAimerAngle,
-            aimingDownAngle(), Shooter.getInstance().m_aimer::set, Shooter.getInstance()) {
+    private CommandBase m_aimDown = new PIDCommand(m_aimController, Shooter.getInstance()::getAimerAngle,
+            aimingDownAngle(), Shooter.getInstance().m_aimer.m_motor::set, m_aimer) {
             @Override
             public void end(boolean interrupted){
                super.end(interrupted);;
                 m_atUpperPosition =false;
             }
             };
-    public CommandBase m_aimToggle = new PIDCommand(m_aimController, Shooter.getInstance()::getAimerAngle,
+    private CommandBase m_aimToggle = new PIDCommand(m_aimController, Shooter.getInstance()::getAimerAngle,
            ()->{ 
                if(m_atUpperPosition){
                     return aimingDownAngle();
                 }
                 return aimingUpAngle();
-        },Shooter.getInstance().m_aimer::set, Shooter.getInstance()) {
+        },Shooter.getInstance().m_aimer.m_motor::set, m_aimer) {
             public void end(boolean interrupted){
                 super.end(interrupted);
                 m_atUpperPosition =!m_atUpperPosition;
             }
          };
-        
-        
-     /**
-     * throw the ball in the correct speed by pid, if aimer at upper shoot to inner/outer according to {@link #shootToInner()} 
-     * if aimer at the lower position shoot to the bootom.
+    /**
+     *  stops the thrower
+     */     
+    private CommandBase m_stopThrower = new InstantCommand(()-> m_thrower.m_motor.set(0),m_thrower);
+    /**
+     * accelerate for shooting to inner/outer according to {@link Utilites#isShootingToInnerWork()} .
+     * 
+     */    
+    private CommandBase m_accelerateUp = new PIDCommand(m_aimController, Shooter.getInstance()::getThrowerSpeed, () ->{
+             if(Utilites.isShootingToInnerWork()){
+                 return PowerPorts.INNER.motorSpeed;
+             }
+             return PowerPorts.OUTER.motorSpeed;
+            },
+         Shooter.getInstance().m_thrower.m_motor::set, m_thrower);
+    /**
+     * acccelerate for shooting to the bootom.
      */
-    public CommandBase m_throw = new PIDCommand(m_aimController, Shooter.getInstance()::getThrowerSpeed, () ->{
-   if(m_atUpperPosition){
-        if(shootToInner()){
-            return PowerPorts.INNER.motorSpeed;
+    private CommandBase m_accelerateBottom = new PIDCommand(m_aimController, Shooter.getInstance()::getThrowerSpeed, 
+         PowerPorts.BOTTOM.motorSpeed,
+         Shooter.getInstance().m_thrower.m_motor::set, m_thrower);
+     /**
+     * if aimer at upper accelerate for shooting to inner/outer according to {@link Utilites#isShootingToInnerWork()} 
+     * if aimer at the lower position acccelerate for shooting to the bootom.
+     */
+    private CommandBase m_accelerteTothrow = new PIDCommand(m_aimController, Shooter.getInstance()::getThrowerSpeed, () ->{
+        if (m_atUpperPosition) {
+
+                if (Utilites.isShootingToInnerWork()) {
+                    return PowerPorts.INNER.motorSpeed;
+                }
+
+                return PowerPorts.OUTER.motorSpeed;
         }
-        return PowerPorts.OUTER.motorSpeed;
-    
-    }
-    return PowerPorts.BOTTOM.motorSpeed;
+
+        return PowerPorts.BOTTOM.motorSpeed;
     }
     ,
-    Shooter.getInstance().m_thrower::set, Shooter.getInstance());
+    m_thrower.m_motor::set, m_thrower) ;
+
     /**
-    * aim and shoot to outer or inner port according to {@link #shootToInner()} 
+    * fully(aim while accelerate and then passToShooter) shoot to outer or inner port according
+    * to {@link Utilites#isShootingToInnerWork}
     */
-    public CommandBase shootToUpper =  m_aimUp.andThen(m_throw);
+    private CommandBase shootToUpper =  Utilites.toFullShootingCommand(new ParallelCommandGroup(m_aimUp,m_accelerateUp));
      /**
-     * aim and shoot to bottom port
+     * fully(aim while accelerate and then passToShooter) shoot to bottom port
      */
-    public CommandBase shootToBottom = m_aimDown.andThen(m_throw);
+    private CommandBase shootToBottom = Utilites.toFullShootingCommand( new ParallelCommandGroup(m_aimDown,m_accelerateBottom));
      /**
-      *  used to drop the ball and leave it for our aliince members.
+      * fully(aim while accelerate and then passToShooter) drop the ball and leave it for our aliince members.
       */  
-    public CommandBase drop = new InstantCommand(() -> m_thrower.set(droppingSpeed()),Shooter.getInstance()) {
+    private CommandBase drop =Utilites.toFullShootingCommand(new InstantCommand(() -> m_thrower.m_motor.set(droppingSpeed()),m_thrower) {
         public void end(boolean interrupted){
-            m_thrower.set(0);
+            m_thrower.m_motor.set(0);
         }
-    };
+    });
     /**
-     * used to pass the ball to our allience members
+     *fully (aim while accelerate and then passToShooter) pass the power cell to the desierd distance
      */
-    public PassPowerCell m_pass = new PassPowerCell(700);
+    public PassPowerCell m_pass =new PassPowerCell(700);
     /////////////////////////////////////////////////////////////////////////
+    
+    /////////////////////////commands getters///////////////////////////////
+    /**
+     * 
+     * @return {@link Shooter#m_aimUp} 
+     */
+    public CommandBase getAimUp(){
+        return m_aimUp;
+    }
+    /**
+     * 
+     * @return {@link Shooter#m_aimDown} 
+     */
+    public CommandBase getAimDown(){
+        return m_aimDown;
+    }
+    /**
+     * 
+     * @return {@link Shooter#m_aimToggle} 
+     */
+    public CommandBase getAimToggle(){
+        return m_aimToggle;
+    }
+    /**
+     * 
+     * @return {@link m_stopThrower} -
+     * stops the thrower
+     */
+    public CommandBase getStopThrower(){
+        return m_stopThrower;
+    }
+    /**
+     * 
+     * @return {@link Shooter#m_accelerateUp} - 
+     * accelerate for shooting to inner/outer according to {@link Utilites#isShootingToInnerWork()}
+     */
+    public CommandBase getAccelerateUp(){
+        return m_accelerateUp;
+    }
+    /**
+     * 
+     * @return {@link Shooter#m_accelerateBottom} - 
+     * acccelerate for shooting to the bootom  
+     */
+    public CommandBase getAccelerateBottom(){
+        return m_accelerateBottom;
+    }
+    /**
+     * 
+     * @return {@link Shooter#m_accelerteTothrow} - 
+     * if aimer at upper accelerate for shooting to inner/outer according to {@link Utilites#isShootingToInnerWork()} 
+     * if aimer at the lower position acccelerate for shooting to the bootom.
+     */
+    public CommandBase getAccelerateToThrow(){
+        return m_accelerteTothrow;
+    }
+    /**
+     * 
+     * @return {@link Shooter#shootToUpper} - 
+     * fully(aim while accelerate and then passToShooter) shoot to outer or inner port according to Utilites.isShootingToInnerWork
+     */
+    public CommandBase getShootToUpper(){
+        return shootToUpper;
+    }
+    /**
+     * 
+     * @return {@link Shooter#shootToBottom} - fully(aim while accelerate and then passToShooter) shoot to bottom port
+     */
+    public CommandBase getShootToBottom(){
+        return shootToBottom;
+    }
+    /**
+     * 
+     * @return {@link Shooter#drop} -
+     * fully(aim while accelerate and then passToShooter) drop the ball and leave it for our aliince members.
+     */
+    public CommandBase getDrop(){
+        return drop;
+    }
+    /**
+     * 
+     * @return {@link Shooter#m_pass} - 
+     * fully (aim while accelerate and then passToShooter) pass the power
+     *  cell to the desierd distance
+     */
+    public CommandBase getPass(){
+        return m_pass;
+    }
+    /////////////////////////////////////////////////////////////////
     /**
      * update the distance that we want to throw to
      */
@@ -229,8 +352,8 @@ public class Shooter extends SubsystemBase implements RobotMap {
         Preferences.getInstance().putDouble("aimer/anglePerPulse", 1);
         Preferences.getInstance().putDouble("thrower/distancePerPulse", 1);
         Preferences.getInstance().putDouble("thrower/droppingSpeed", 0.06);
-        m_aimerEncoder.setDistancePerPulse(aimerAnglePerPulse());
-        m_throwerEncoder.setDistancePerPulse(throwerDistancePerPulse());
+        m_aimer.m_encoder.setDistancePerPulse(aimerAnglePerPulse());
+        m_thrower.m_encoder.setDistancePerPulse(throwerDistancePerPulse());
 
     }
     
@@ -269,12 +392,12 @@ public class Shooter extends SubsystemBase implements RobotMap {
             // in PassPowerCell
             shootingTime =
            Math.sqrt((-2*Utilites.getDistanceFromPowerPort() * 
-           Math.tan(m_angle) + Shooter.getInstance().SHOOTER_HIGHET -HIGHT_GOAL) /Utilites.GRAVITY_CONSTANT);
+           Math.tan(m_angle) + Shooter.getInstance().SHOOTER_HEIGHT -HIGHT_GOAL) /Utilites.GRAVITY_CONSTANT);
             startXVelocity = 
             (-Utilites.getDistanceFromPowerPort())/shootingTime;
             
             startHightVelocity = 
-            (2*(HIGHT_GOAL - Shooter.getInstance().SHOOTER_HIGHET) - 
+            (2*(HIGHT_GOAL - Shooter.getInstance().SHOOTER_HEIGHT) - 
             Utilites.GRAVITY_CONSTANT*Math.pow(shootingTime, 2))
                                 /2*shootingTime;
             motorSpeed = Math.sqrt(Math.pow(startXVelocity, 2) + Math.pow(startHightVelocity, 2));

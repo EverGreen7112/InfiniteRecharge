@@ -26,8 +26,8 @@ class _PassPowerCell extends PIDCommand {
             Shooter.getInstance().getThrowController(),
             Shooter.getInstance()::getThrowerSpeed,
             () -> getMotorSpeed(distance) ,
-            Shooter.getInstance().m_thrower::set,
-            Shooter.getInstance() );
+            Shooter.getInstance().m_thrower.m_motor::set,
+            Shooter.getInstance().m_thrower);
             m_distance = distance;
     }
     /**
@@ -52,11 +52,11 @@ class _PassPowerCell extends PIDCommand {
         double angle = Shooter.getInstance().aimingDownAngle();
         double shootingTime =
         Math.sqrt((2*(-2*m_distance) * 
-           Math.tan(angle) + Shooter.getInstance().SHOOTER_HIGHET -0) /Utilites.GRAVITY_CONSTANT);
+           Math.tan(angle) + Shooter.getInstance().SHOOTER_HEIGHT -0) /Utilites.GRAVITY_CONSTANT);
         double startXVelocity = 
            -m_distance/shootingTime;
         double startHightVelocity = 
-    (2*(- Shooter.getInstance().SHOOTER_HIGHET) - 
+    (2*(- Shooter.getInstance().SHOOTER_HEIGHT) - 
     Utilites.GRAVITY_CONSTANT*Math.pow(shootingTime, 2))
                         /2*shootingTime;
 
@@ -75,11 +75,11 @@ class _PassPowerCell extends PIDCommand {
         double angle = Shooter.getInstance().aimingDownAngle();
         double shootingTime =
         Math.sqrt((2*(-2*distance) * 
-           Math.tan(angle) + Shooter.getInstance().SHOOTER_HIGHET -0) /Utilites.GRAVITY_CONSTANT);
+           Math.tan(angle) + Shooter.getInstance().SHOOTER_HEIGHT -0) /Utilites.GRAVITY_CONSTANT);
         double startXVelocity = 
            -distance/shootingTime;
         double startHightVelocity = 
-    (2*(- Shooter.getInstance().SHOOTER_HIGHET) - 
+    (2*(- Shooter.getInstance().SHOOTER_HEIGHT) - 
     Utilites.GRAVITY_CONSTANT*Math.pow(shootingTime, 2))
                         /2*shootingTime;
 
