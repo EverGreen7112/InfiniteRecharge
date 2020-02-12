@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+package com.evergreen.robot;
 
-
-import com.evergreen.robot.everlib.Robot;
+import com.evergreen.robot.wpilib.Robot;
 
 import edu.wpi.first.wpilibj.RobotBase;
 

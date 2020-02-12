@@ -1,5 +1,6 @@
 package com.evergreen.robot.everlib;
 
+import com.evergreen.robot.*;
 import com.evergreen.everlib.subsystems.motors.subsystems.MotorController;
 import com.evergreen.everlib.subsystems.motors.subsystems.MotorController.ControllerType;
 import com.evergreen.everlib.subsystems.sensors.EncoderEG;
@@ -43,9 +44,9 @@ public interface SubsystemComponents extends RobotMap {
      */
     public interface ClimbingComponents {
         MotorController elevator = 
-            new MotorController(ControllerType.TALON_SRX, MotorPorts.climbingElevator);
+            new MotorController(ControllerType.TALON_SRX, MotorPorts.climbUp);
         MotorController puller = 
-            new MotorController(ControllerType.TALON_SRX, MotorPorts.climbingPuller);
+            new MotorController(ControllerType.TALON_SRX, MotorPorts.climbPull);
         EncoderEG elevatorEncoder = 
             new EncoderEG(EncoderPorts.climbingElevatorA, EncoderPorts.climbingElevatorB);
     } // TODO: check to which controller types are the actual motors connected.
@@ -60,7 +61,7 @@ public interface SubsystemComponents extends RobotMap {
         public interface Thrower{
             //TODO: change to the correct type
             MotorController thrower = new MotorController(ControllerType.TALON_SRX, RobotMap.MotorPorts.thrower);
-            EncoderEG throwerEncouder = new EncoderEG(DigitalPorts.throwerEncouderA,DigitalPorts.throwerEncouderB);
+            EncoderEG throwerEncoder = new EncoderEG(DigitalPorts.throwerEncoderA,DigitalPorts.throwerEncoderB);
         }
         /**
          * the shooter subsystem aimer under the Shooter subsystem
