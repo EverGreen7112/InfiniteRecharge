@@ -1,7 +1,5 @@
 package com.evergreen.robot.wpilib;
 
-import com.evergreen.robot.wpilib.subsystem.Shooter;
-
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
