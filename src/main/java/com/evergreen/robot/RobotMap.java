@@ -18,10 +18,10 @@ public interface RobotMap {
         chassisRightMiddle = 1, //Talon
         chassisRightFront = 2, //victor
         collector = 4, //Victor
-        climbUp = 9, //Talon
+        climbUp = 8, //Talon
         climbPull = 13, //Victor
         thrower = 12, //Talon
-        aimer = 8, //Victor. Aims the shooter.
+        aimer = 9, //Victor. Aims the shooter.
         passer = 5; //Victor. The motor which passes a power cell from the storage to the shooter.
     }
     

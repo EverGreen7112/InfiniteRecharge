@@ -11,7 +11,8 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 /**
  * Utilites
  */
-public class Utilites {
+//TODO: add commands which shoot from angle
+ public class Utilites {
     public static final double GRAVITY_CONSTANT = 9.80665;
     /**
      * the time between acccelarate the shooter and pass the ball to the shooter in sec.
@@ -23,9 +24,35 @@ public class Utilites {
 
     private static NetworkTable m_table = NetworkTableInstance.getDefault().getTable("Vision");
        
-    public static double getDistanceFromPowerPort(){
+    public static double getXDistanceFromPowerPort(){
         //TODO: ask vision about key
-        return  m_table.getEntry("key").getDouble(0);
+        return m_table.getEntry("key").getDouble(0);
+    }
+    public static double getYDistanceFromPowerPort(){
+        //TODO: ask vision about key
+        return m_table.getEntry("key").getDouble(0);
+    }
+    
+    public static double getPowerPortAngle(){
+         //TODO: ask vision about key
+         return m_table.getEntry("key").getDouble(0);
+    }
+
+    public static boolean seePowerPort(){
+        //TODO: ask vision about key
+        return m_table.getEntry("key").getBoolean(false);
+    }
+    /**
+     * 
+     * @param dX delta x
+     * @param dY delta y
+     * @return calculating hypotenuse according to pitagurs formua
+     */
+    public static double Pitaguras(double dX, double dY){
+        return Math.sqrt(
+            Math.pow(dX, 2) +
+            Math.pow(dY, 2)
+        );
     }
     /**
      * 

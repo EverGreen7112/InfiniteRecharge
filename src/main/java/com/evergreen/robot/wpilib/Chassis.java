@@ -11,7 +11,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
-import com.evergreen.robot.wpilib.RobotMap.MotorPorts;
+import com.evergreen.robot.RobotMap.MotorPorts;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
@@ -36,8 +36,8 @@ private static Chassis m_instance;
   
 
   //declaring the other speed controllers
-  private SpeedControllerGroup m_rightBack = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisRightBack), new WPI_VictorSPX(MotorPorts.chassisRightUp));
-  private SpeedControllerGroup m_leftBack = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisLeftBack), new WPI_VictorSPX(MotorPorts.chassisLeftUp));
+  private SpeedControllerGroup m_rightBack = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisRightBack), new WPI_VictorSPX(MotorPorts.chassisRightFront));
+  private SpeedControllerGroup m_leftBack = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisLeftBack), new WPI_VictorSPX(MotorPorts.chassisLeftFront));
   //creating pid componets for angle velocity and distance
   private double 
     ANGLE_KP = 0,
@@ -220,6 +220,7 @@ public SpeedControllerGroup getLeftControllerGroup(){
 }
 //rotating the chassis in a certin speed
 public void rotate(double speed){
+  
   m_leftBack.set(speed);
   m_leftFront.set(speed);
   m_rightBack.set(-speed);
