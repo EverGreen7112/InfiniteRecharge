@@ -231,7 +231,8 @@ public class Shooter extends SubsystemBase implements RobotMap {
      /**
       * fully(aim while accelerate and then passToShooter) drop the ball and leave it for our aliince members.
       */  
-    private CommandBase drop =Utilites.toFullShootingCommand(new InstantCommand(() -> m_thrower.m_motor.set(droppingSpeed()),m_thrower) {
+    //TODO: find how many time take to the robot to drop
+      private CommandBase drop =Utilites.toFullShootingCommand(new InstantCommand(() -> m_thrower.m_motor.set(droppingSpeed()),m_thrower) {
         public void end(boolean interrupted){
             m_thrower.m_motor.set(0);
         }
@@ -391,10 +392,10 @@ public class Shooter extends SubsystemBase implements RobotMap {
             //FIXME: check if this formula is like the orignal, if change here change
             // in PassPowerCell
             shootingTime =
-           Math.sqrt((-2*Utilites.getDistanceFromPowerPort() * 
+           Math.sqrt((-2*Utilites.getXDistanceFromPowerPort() * 
            Math.tan(m_angle) + Shooter.getInstance().SHOOTER_HEIGHT -HIGHT_GOAL) /Utilites.GRAVITY_CONSTANT);
             startXVelocity = 
-            (-Utilites.getDistanceFromPowerPort())/shootingTime;
+            (-Utilites.getXDistanceFromPowerPort())/shootingTime;
             
             startHightVelocity = 
             (2*(HIGHT_GOAL - Shooter.getInstance().SHOOTER_HEIGHT) - 

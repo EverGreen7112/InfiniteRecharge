@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 
 public class RotateTo extends PIDCommand implements DoubleArgCommand {
 //rotating to a certin point with pid
+    //TODO: check if when we put negtive value it rotate left /right, opsite from positive values.
     public void setSetPoint(double setpoint){
         m_setpoint =()->setpoint;
     }
