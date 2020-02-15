@@ -36,10 +36,7 @@ public class Rolletta extends SubsystemBase {
    private double LIFT_SPEED;  
    //45 degrees offset to make sure it's not too little
    private double ROTATION_CONTROL_SETPOINT = 360 * 3 + 45; 
-<<<<<<< HEAD
    private double ROBOT_SENSOR_OFFSET = 90;
-=======
->>>>>>> 135a6bf99e52ad4c1d863f2b31fddf9ed05fb3f8
    private boolean isLifting = true;
 
   //Color RGB constants
@@ -79,7 +76,8 @@ public class Rolletta extends SubsystemBase {
   private DigitalInput m_upperSwitch = new DigitalInput(DigitalPorts.rollettaUpperSwitch);
   private DigitalInput m_lowerSwitch = new DigitalInput(DigitalPorts.rollettaLowerSwitch);
 
-  private double m_currentOffset = 0;
+  private double m_rightOffset = 0;
+  private double m_leftOffset = 0;
 
   
   //Commands:
@@ -180,7 +178,12 @@ public class Rolletta extends SubsystemBase {
    * <p>Spins the control panel to the color given from the FMS.
    */
   public void positionControl() {
-    spinTo(getTargetAngle());
+
+
+    if (toLeft(getTargetAngle()) - getLeftAngle() > getTargetAngle() - getRightAngle())
+      spinTo(getTargetAngle());
+    else
+      spinTo(toLeft(getTargetAngle()));
   }
 
 
@@ -303,27 +306,35 @@ public class Rolletta extends SubsystemBase {
 
   /**Resets the spinner encoder and the current offset according to current sensor input.*/
   public void resetSensor() {
-<<<<<<< HEAD
-    m_currentOffset = getColorAngle(getCurrentColor()) + ROBOT_SENSOR_OFFSET;
-=======
-    m_currentOffset = getColorAngle(getCurrentColor());
->>>>>>> 135a6bf99e52ad4c1d863f2b31fddf9ed05fb3f8
     m_spinnerEncoder.reset();
+    m_rightOffset = getColorAngle(getCurrentColor()) + ROBOT_SENSOR_OFFSET;
+    m_leftOffset = toLeft(getColorAngle(getCurrentColor())) - ROBOT_SENSOR_OFFSET;
   }
 
   /**
-   * @return The current angle according to the encoder within modulu 180.
+   * @return The current negative angle according 
+   * to the encoder within modulu 180, accounting for 
+   * offset in counter-clcokwise rotation.
    **/
-  public double getTrimmedAngle() {
-    return getAccumelatedAngle() % 180;
+  public double getLeftAngle() {
+    return toLeft(getRawAngle() + m_leftOffset);
+  }
+
+  /**
+   * @return The currentangle according 
+   * to the encoder within modulu 180, accounting for 
+   * offset in clcokwise rotation.
+   **/
+  public double getRightAngle() {
+    return (getRawAngle() + m_rightOffset) % 180;
   }
 
   /**
    * @return The current angle according to the encoder, accumelated with each round since
    * {@link #resetSensor()}
    */
-  public double getAccumelatedAngle() {
-    return m_spinnerEncoder.getDistance() + m_currentOffset;
+  public double getRawAngle() {
+    return m_spinnerEncoder.getDistance();
   }
 
   
@@ -377,7 +388,7 @@ public class Rolletta extends SubsystemBase {
     controller.setSetpoint(degrees);
 
     while (Math.abs(controller.getPositionError()) > GET_TOLERANCE()) {
-      m_spinner.set(controller.calculate(getTrimmedAngle()));
+      m_spinner.set(controller.calculate(getLeftAngle()));
     }
 
     m_spinner.set(0);
@@ -391,10 +402,10 @@ public class Rolletta extends SubsystemBase {
     resetSensor();
     PIDController controller = getController();
     controller.setTolerance(GET_TOLERANCE());
-    controller.setSetpoint(degrees + m_currentOffset);
+    controller.setSetpoint(degrees);
 
-    while (controller.getPositionError() > GET_TOLERANCE()) {
-      m_spinner.set(controller.calculate(getAccumelatedAngle()));
+    while (Math.abs(controller.getPositionError()) > GET_TOLERANCE()) {
+      m_spinner.set(controller.calculate(getRawAngle()));
     }
 
     m_spinner.set(0);
@@ -407,7 +418,7 @@ public class Rolletta extends SubsystemBase {
   public PIDCommand getRotationControl() {
     return new PIDCommand(
       getController(), 
-      this::getAccumelatedAngle,
+      this::getRawAngle,
       () -> ROTATION_CONTROL_SETPOINT, 
       (output) -> m_spinner.set(output),
       this);
@@ -417,12 +428,39 @@ public class Rolletta extends SubsystemBase {
    * @return A {@link CommandBase} representatoion of {@link #positionControl()}
    */
   public PIDCommand getPositionControl() {
-    return new PIDCommand(
-      getController(),
-      this::getTrimmedAngle, 
-      this::getTargetAngle,
-      (output) -> m_spinner.set(output), 
-      this);
+
+    resetSensor();
+
+    double currentLeft = getLeftAngle();
+    double currentRight = getRightAngle();
+    double target = getTargetAngle();
+    double rightError = target - currentRight;
+    double leftError = toLeft(target) - currentLeft;
+
+    if (rightError < leftError) {
+
+      return new PIDCommand(
+        getController(),
+        this::getRightAngle, 
+        this::getTargetAngle,
+        (output) -> m_spinner.set(output), 
+        this);
+    }
+
+    else {
+
+      return new PIDCommand(
+        getController(),
+        this::getLeftAngle,
+        () -> toLeft(getTargetAngle()),
+        (output) -> m_spinner.set(output), 
+        this);
+
+    }
+  }
+
+  private double toLeft(double rightAngle) {
+    return rightAngle % -180;
   }
 
   @Override
