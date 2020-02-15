@@ -8,15 +8,13 @@ import edu.wpi.first.wpilibj2.command.PIDCommand;
 
 public class CircularMotion extends CommandBase {
     private NetworkTable table = NetworkTableInstance.getDefault().getTable("vision");
-
+    //TODO: select if we want to make this class generic for every circular 
+    //movement or only for go to the powerPort. 
     private double m_time,m_distanceBetween;
     public CircularMotion (double time,double distanceBetween){
         m_time = time;
         m_distanceBetween = distanceBetween;
-        
-        
-
-    }
+        }
     private double m_arcsAngle = 180-2*getAngleBetween();
 
     private double getAngleBetween() {
