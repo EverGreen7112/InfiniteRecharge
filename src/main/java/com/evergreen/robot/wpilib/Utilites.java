@@ -45,13 +45,11 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
      * @return b angle, see whatsapp
      */
     public static double getPOwerPortToRobotAngle(){
-        //TODO: ask vision about key
-        return m_table.getEntry("key").getDouble(0);
+        return m_table.getEntry("Angle").getDouble(0);
     }
 
     public static boolean seePowerPort(){
-        //TODO: ask vision about key
-        return m_table.getEntry("key").getBoolean(false);
+        return m_table.getEntry("SeePowerPort").getBoolean(false);
     }
     /**
      * 
