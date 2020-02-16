@@ -9,6 +9,7 @@ import com.evergreen.robot.wpilib.commands.MoveChassisTo;
 import com.evergreen.robot.wpilib.commands.RotateTilSeePort;
 import com.evergreen.robot.wpilib.commands.RotateTo;
 import com.evergreen.robot.wpilib.commands.Stop;
+import com.evergreen.robot.wpilib.commands.TurnPowePortInfront;
 import com.evergreen.robot.wpilib.commands.WaitCommandEG;
 import com.evergreen.robot.wpilib.subsystem.Shooter;
 
@@ -32,8 +33,12 @@ public class Autonomous extends SequentialCommandGroup {
     private SendableChooser<CommandBase>[] m_options = new SendableChooser[OPTIONS_NUMBER];
     private Supplier<Double>[] m_arguments = new Supplier[OPTIONS_NUMBER];
     private CommandBase[] m_commands;
+    private static Autonomous m_instance = new Autonomous();
+    public static Autonomous getInstance(){
+        return m_instance;
+    }
     //add collect while moving,
-    public Autonomous() {
+    private Autonomous() {
         m_commands = new CommandBase[OPTIONS_NUMBER];
         for (int i = 0; i < OPTIONS_NUMBER; i++) {
             final int j = i;
@@ -48,7 +53,8 @@ public class Autonomous extends SequentialCommandGroup {
             //turn right by defualt if we want to turn left put negative value;
             m_options[i].addOption("rotate" + i, new RotateTo(m_arguments[i].get()));
             //turn right by defualt if we want to turn left put negative value;
-            m_options[i].addOption("turnTilSeePowerPort" +i, new RotateTilSeePort(true, m_arguments[i].get()));   
+            m_options[i].addOption("turnTilSeePowerPort" +i, new RotateTilSeePort(true, m_arguments[i].get()));
+            m_options[i].addOption("turn until the power port is infront"+i, TurnPowePortInfront.getInstance());  
             m_options[i].addOption("Stop"+i, new Stop());
             //TODO: add circular move;
             m_options[i].addOption("shootToUpper" +i, Shooter.getInstance().getShootToUpper());
@@ -59,7 +65,7 @@ public class Autonomous extends SequentialCommandGroup {
             SmartDashboard.putData(m_options[i]);
         }
     }
-   
+    
     @Override
     public void schedule() {
         addCommands(m_commands);

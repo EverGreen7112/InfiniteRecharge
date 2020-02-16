@@ -11,6 +11,7 @@ public interface RobotMap {
     //every time when you are change port in RobotMap change it in Robot Characterization python file!!!!!!!
     public interface MotorPorts {
         public static final int 
+        //TODO: invert 0,1,2
         chassisLeftBack = 3, //Victor
         chassisLeftMiddle = 15, //Talon
         chassisLeftFront = 14, //Victor
@@ -22,7 +23,10 @@ public interface RobotMap {
         climbPull = 13, //Victor
         thrower = 12, //Talon
         aimer = 9, //Victor. Aims the shooter.
-        passer = 5; //Victor. The motor which passes a power cell from the storage to the shooter.
+        passer = 5, //Victor. The motor which passes a power cell from the storage to the shooter.
+        //TODO: check correct ports
+        spiner =19,
+        lifter = 20;
     }
     
     //Detail Piston Components
@@ -40,7 +44,15 @@ public interface RobotMap {
         aimerEncoderA = 5,
         aimerEncoderB = 6,
         storageUltrasonicA = 3,
-        storageUltrasonicB = 4;       
+        storageUltrasonicB = 7,
+        //TODO: check ports
+        climbingElevatorA =5,
+        climbingElevatorB =6,
+        rollettaA = 9,
+        rollettaB = 10,
+        rollettaUpperSwitch = 11,
+        rollettaLowerSwitch =12;
+
     }
 
     //Declare Encoder

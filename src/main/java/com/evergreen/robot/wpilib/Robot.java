@@ -20,11 +20,11 @@ public class Robot extends Tree {
 
     @Override
     protected void autoConfig() {
-
-    public void autonomousInit() {
-        
+        Autonomous.getInstance().schedule();
     }
-
+    public void autonomousInit() {
+    
+    }
     @Override
     protected void bindButtons() {
         //The robot elevates the hook while the button is held
@@ -73,15 +73,18 @@ public class Robot extends Tree {
 
     @Override
     protected void update() {
-        
+        Shooter.getInstance().updatePassDistance();
+        Autonomous.getInstance().update();
     }
     @Override
     public void robotInit() {
         
     }
+    
     @Override
     public void robotPeriodic() {
         Shooter.getInstance().updatePassDistance();
+        
         
     }
 

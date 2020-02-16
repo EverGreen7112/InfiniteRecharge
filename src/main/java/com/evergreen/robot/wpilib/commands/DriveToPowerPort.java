@@ -30,7 +30,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
     public DriveToPowerPort(double distanceFromPPGoal){
         m_distanceFromPP = distanceFromPPGoal;
         m_xDistance = () ->Utilites.getXDistanceFromPowerPort() - m_distanceFromPP;
-        m_TurnningAngle = () -> (Utilites.getPowerPortAngle()* Math.atan(m_xDistance.get()/Utilites.getYDistanceFromPowerPort()));
+        m_TurnningAngle = () -> (Utilites.getPowerPortToAllinceStationAngle()* Math.atan(m_xDistance.get()/Utilites.getYDistanceFromPowerPort()));
     }
     public void setDistanceFromPPGoal(double distanceFromPPGoal){
         m_distanceFromPP = distanceFromPPGoal;
@@ -43,7 +43,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
        addCommands(
            new RotateTo(m_TurnningAngle.get())
             ,new MoveChassisTo(Utilites.Pitaguras(m_xDistance.get(), Utilites.getYDistanceFromPowerPort())),
-            new RotateTo(-1*(90 - Utilites.getPowerPortAngle() + m_TurnningAngle.get()))
+            new RotateTo(-1*(90 - Utilites.getPowerPortToAllinceStationAngle() + m_TurnningAngle.get()))
             );
 
         super.schedule();
@@ -53,7 +53,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
         addCommands(
             new RotateTo(m_TurnningAngle.get())
              ,new MoveChassisTo(Utilites.Pitaguras(m_xDistance.get(), Utilites.getYDistanceFromPowerPort())),
-             new RotateTo(-1*(90 - Utilites.getPowerPortAngle() + m_TurnningAngle.get()))
+             new RotateTo(-1*(90 - Utilites.getPowerPortToAllinceStationAngle() + m_TurnningAngle.get()))
              );
  
          super.schedule(interruptible);

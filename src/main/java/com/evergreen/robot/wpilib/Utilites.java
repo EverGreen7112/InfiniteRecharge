@@ -32,10 +32,21 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
         //TODO: ask vision about key
         return m_table.getEntry("key").getDouble(0);
     }
-    
-    public static double getPowerPortAngle(){
-         //TODO: ask vision about key
-         return m_table.getEntry("key").getDouble(0);
+    /**
+     * 
+     * @return a angle see whatsapp
+     */
+    public static double getPowerPortToAllinceStationAngle(){
+ 
+         return Math.atan(getXDistanceFromPowerPort()/getYDistanceFromPowerPort());
+    }
+    /**
+     * 
+     * @return b angle, see whatsapp
+     */
+    public static double getPOwerPortToRobotAngle(){
+        //TODO: ask vision about key
+        return m_table.getEntry("key").getDouble(0);
     }
 
     public static boolean seePowerPort(){
