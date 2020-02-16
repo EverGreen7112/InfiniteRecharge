@@ -42,7 +42,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
      * 
      * @return b angle, see whatsapp
      */
-    public static double getPOwerPortToRobotAngle(){
+    public static double getPowerPortToRobotAngle(){
         //TODO: ask vision about key
         return m_table.getEntry("key").getDouble(0);
     }

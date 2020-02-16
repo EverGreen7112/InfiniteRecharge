@@ -2,9 +2,11 @@ package com.evergreen.robot.wpilib;
 
 import java.util.function.Supplier;
 
+import com.evergreen.robot.wpilib.Chassis.TrajectoryOption;
 import com.evergreen.robot.wpilib.commands.CollectWhileMoving;
 import com.evergreen.robot.wpilib.commands.DriveToNoStop;
 import com.evergreen.robot.wpilib.commands.DriveToPowerPort;
+import com.evergreen.robot.wpilib.commands.FollowTrajectory;
 import com.evergreen.robot.wpilib.commands.MoveChassisTo;
 import com.evergreen.robot.wpilib.commands.RotateTilSeePort;
 import com.evergreen.robot.wpilib.commands.RotateTo;
@@ -42,10 +44,11 @@ public class Autonomous extends SequentialCommandGroup {
         m_commands = new CommandBase[OPTIONS_NUMBER];
         for (int i = 0; i < OPTIONS_NUMBER; i++) {
             final int j = i;
-            Preferences.getInstance().putDouble("arg" + i, 0);
+            Preferences.getInstance().putDouble("arg #" + i, 0);
             m_arguments[i] = () -> Preferences.getInstance().getDouble("arg" + j, 0);
+
             m_options[i] = new SendableChooser();
-            m_options[i].setDefaultOption("wait" +i, new WaitCommandEG(m_arguments[i].get()));
+            m_options[i].setDefaultOption("wait #" +i, new WaitCommandEG(m_arguments[i].get()));
             m_options[i].addOption("driveStraight" +i, new MoveChassisTo(m_arguments[i].get()));
             m_options[i].addOption("driveXdistanceWithoutStopping", new DriveToNoStop(m_arguments[i].get()));
             m_options[i].addOption("driveXdistanceWhileCollecting", new CollectWhileMoving(m_arguments[i].get()));
@@ -61,7 +64,12 @@ public class Autonomous extends SequentialCommandGroup {
             m_options[i].addOption("shootToBottom"+ i, Shooter.getInstance().getShootToBottom());
             m_options[i].addOption("drop" + i, Shooter.getInstance().getDrop());
             m_commands[i] = m_options[i].getSelected();
-
+            
+            for (TrajectoryOption trajectoryOption : Chassis.TrajectoryOption.values()) {
+                m_options[i].addOption("Move Trajectory \"" + trajectoryOption.getName() + "\"" + i,
+                new FollowTrajectory(trajectoryOption, m_arguments[i].get()));
+            }
+            
             SmartDashboard.putData(m_options[i]);
         }
     }

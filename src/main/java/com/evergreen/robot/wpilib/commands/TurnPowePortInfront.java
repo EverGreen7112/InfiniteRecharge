@@ -20,7 +20,7 @@ public class TurnPowePortInfront extends PIDCommand {
         return m_instance;
     }
     private TurnPowePortInfront() {
-        super(Chassis.getInstance().getAnglePID(), Utilites::getPOwerPortToRobotAngle, 0.0, Chassis.getInstance()::rotate, Shooter.getInstance());
+        super(Chassis.getInstance().getAnglePID(), Utilites::getPowerPortToRobotAngle, 0.0, Chassis.getInstance()::rotate, Shooter.getInstance());
         // TODO Auto-generated constructor stub
     }
 
