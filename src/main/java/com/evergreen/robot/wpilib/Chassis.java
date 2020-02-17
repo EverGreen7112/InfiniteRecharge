@@ -7,19 +7,29 @@
 
 package com.evergreen.robot.wpilib;
 
+import java.util.List;
+
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.evergreen.robot.RobotMap.MotorPorts;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Preferences;
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.RamseteController;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
@@ -28,16 +38,19 @@ public class Chassis extends SubsystemBase {
    * Creates a new Chassis.
    */
 private static Chassis m_instance;
-   //declaring the front speed controllers (talon)
+  
+  //declaring the front speed controllers (talon)
   private WPI_TalonSRX m_rightFront = new WPI_TalonSRX(MotorPorts.chassisRightFront);
   private WPI_TalonSRX m_leftFront = new WPI_TalonSRX(MotorPorts.chassisLeftFront);
+ 
   //declaring the gyro
   private Gyro m_gyro = new ADXRS450_Gyro();
   
 
   //declaring the other speed controllers
-  private SpeedControllerGroup m_rightBack = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisRightBack), new WPI_VictorSPX(MotorPorts.chassisRightFront));
-  private SpeedControllerGroup m_leftBack = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisLeftBack), new WPI_VictorSPX(MotorPorts.chassisLeftFront));
+  private SpeedControllerGroup m_rightBack = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisRightBack), new WPI_VictorSPX(MotorPorts.chassisRightMiddle));
+  private SpeedControllerGroup m_leftBack = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisLeftBack), new WPI_VictorSPX(MotorPorts.chassisLeftMiddle));
+  
   //creating pid componets for angle velocity and distance
   private double 
     ANGLE_KP = 0,
@@ -54,12 +67,32 @@ private static Chassis m_instance;
     DISTANCE_KI = 0,
     DISTANCE_KD = 0,
     DISTANCE_TOLERANCE = 1;
-//creating pid controllers for angle velocity and distance
+  
+  //creating pid controllers for angle velocity and distance
   private PIDController 
     m_anglePID = new PIDController(ANGLE_KP, ANGLE_KI, ANGLE_KD),
     m_velocityPID = new PIDController(VELOCITY_KP, VELOCITY_KI, VELOCITY_KD),
     m_distancePID = new PIDController(DISTANCE_KP, DISTANCE_KI, DISTANCE_KD);
+
+  //Declaring Motion Profiling constants
+  private final double 
+    CHASSIS_WIDTH = 0.54,
+    kS = 0,
+    kV = 0,
+    kA = 0,
+    MAX_VELOCITY = 0,
+    MAX_ACCELERATION = 0;  //m 
+  //TODO check
   
+  private DifferentialDriveKinematics m_kinematics = new DifferentialDriveKinematics(CHASSIS_WIDTH);
+
+  private DifferentialDriveOdometry m_odometry;
+
+  private SimpleMotorFeedforward m_feedorward = new SimpleMotorFeedforward(kS, kV, kA); 
+
+  private TrajectoryConfig m_trajectoryConfig = new TrajectoryConfig(MAX_VELOCITY, MAX_ACCELERATION);
+
+  private RamseteController m_ramseteController = new RamseteController();
  
   
   
@@ -167,9 +200,12 @@ private static Chassis m_instance;
    return m_leftFront.getSelectedSensorVelocity();
  }
  // returning the average speed
- private double getVelocity(){
-   return (getLeftVelocity()+getRightVelocity())/2;
+ private DifferentialDriveWheelSpeeds getVelocity() {
+   return new DifferentialDriveWheelSpeeds(
+     m_leftFront.getSelectedSensorVelocity(), 
+     m_rightFront.getSelectedSensorVelocity());
  }
+
  //returning the average distance from both sensors
  public double getDistance(){
    return (getLeftDistance()+getRightDistance())/2;
@@ -235,14 +271,45 @@ public void rotate(double speed){
     m_rightBack.set(speed);
     m_rightFront.set(speed);
   } 
-//moving the chassis with a specific speed for right and left motors
+  
+  //moving the chassis with a specific speed for right and left motors
   public void drive(double speedR, double speedL){
     m_leftBack.set(speedL);
     m_leftFront.set(speedL);
     m_rightFront.set(speedR);
     m_rightBack.set(speedR);
   }
+
+  //TODO call this
+  public void initOdometry(double x, double y) {
+    m_odometry = new DifferentialDriveOdometry(
+      getHeading(), new Pose2d(x, y, getHeading()));
+  }
+
+  public Rotation2d getHeading() {
+    return Rotation2d.fromDegrees(-m_gyro.getAngle());
+  }
  
+  public void setVoltage(double left, double right) {
+    drive(left / 12, right / 12);
+  }
+
+  public RamseteCommand follow(Pose2d... points) {
+    return
+      new RamseteCommand(
+        TrajectoryGenerator.generateTrajectory(List.of(points), m_trajectoryConfig), 
+        m_odometry::getPoseMeters, 
+        m_ramseteController, 
+        m_feedorward, 
+        m_kinematics, 
+        this::getVelocity,
+        new PIDController(getDistanceKp(), getDistanceKi(), getDistanceKd()), 
+        new PIDController(getDistanceKp(), getDistanceKi(), getDistanceKd()), 
+        this::setVoltage, 
+        this);
+
+    
+  }
   
   
   @Override

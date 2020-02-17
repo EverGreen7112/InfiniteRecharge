@@ -5,7 +5,6 @@ import com.evergreen.robot.wpilib.Utilites;
 import com.evergreen.robot.wpilib.subsystem.Shooter;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 /**
  * fully (aim, accelerate, passToShooter) pass the power cell to the desierd distance

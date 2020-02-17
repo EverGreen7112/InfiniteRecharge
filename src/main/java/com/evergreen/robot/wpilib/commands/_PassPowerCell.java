@@ -1,16 +1,9 @@
 package com.evergreen.robot.wpilib.commands;
 
-import java.util.function.DoubleConsumer;
-import java.util.function.DoubleSupplier;
-
-import com.evergreen.everlib.subsystems.sensors.DistanceSensor;
 import com.evergreen.robot.wpilib.Utilites;
 import com.evergreen.robot.wpilib.subsystem.Shooter;
 
-import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /**
  *pass the powecell to desierd {@link #m_distance} by using PID,
