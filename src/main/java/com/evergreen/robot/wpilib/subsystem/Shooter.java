@@ -146,7 +146,8 @@ public class Shooter extends SubsystemBase implements RobotMap {
 
     ///////////////////////////commands////////////////////////////////////////////////
     
-    private CommandBase m_aimUp = new PIDCommand(m_aimController, this::getAimerAngle,
+    private CommandBase m_aimUp() { 
+        return new PIDCommand(m_aimController, this::getAimerAngle,
             aimingUpAngle(), m_aimer.m_motor::set, m_aimer) {
              @Override
             public void end(boolean interrupted){
@@ -154,7 +155,9 @@ public class Shooter extends SubsystemBase implements RobotMap {
                 m_atUpperPosition = true;
             }
             };
-    private CommandBase m_aimDown = new PIDCommand(m_aimController, this::getAimerAngle,
+        }
+    private CommandBase m_aimDown() {
+        return new PIDCommand(m_aimController, this::getAimerAngle,
             aimingDownAngle(), m_aimer.m_motor::set, m_aimer) {
             @Override
             public void end(boolean interrupted){
@@ -162,7 +165,9 @@ public class Shooter extends SubsystemBase implements RobotMap {
                 m_atUpperPosition =false;
             }
             };
-    private CommandBase m_aimToggle = new PIDCommand(m_aimController, this::getAimerAngle,
+        }
+    private CommandBase m_aimToggle() {
+        return new PIDCommand(m_aimController, this::getAimerAngle,
            ()->{ 
                if(m_atUpperPosition){
                     return aimingDownAngle();
@@ -174,32 +179,40 @@ public class Shooter extends SubsystemBase implements RobotMap {
                 m_atUpperPosition =!m_atUpperPosition;
             }
          };
+        }
     /**
      *  stops the thrower
      */     
-    private CommandBase m_stopThrower = new InstantCommand(()-> m_thrower.m_motor.set(0),m_thrower);
+    private CommandBase m_stopThrower() {
+        return new InstantCommand(()-> m_thrower.m_motor.set(0),m_thrower);
+    }
     /**
      * accelerate for shooting to inner/outer according to {@link Utilites#isShootingToInnerWork()} .
      * 
      */    
-    private CommandBase m_accelerateUp = new PIDCommand(m_aimController, this::getThrowerSpeed, () ->{
+    private CommandBase m_accelerateUp() {
+        return new PIDCommand(m_aimController, this::getThrowerSpeed, () ->{
              if(Utilites.isShootingToInnerWork()){
                  return PowerPorts.INNER.motorSpeed;
              }
              return PowerPorts.OUTER.motorSpeed;
             },
          m_thrower.m_motor::set, m_thrower);
+        }
     /**
      * acccelerate for shooting to the bootom.
      */
-    private CommandBase m_accelerateBottom = new PIDCommand(m_aimController, this::getThrowerSpeed, 
+    private CommandBase m_accelerateBottom() {
+        return new PIDCommand(m_aimController, this::getThrowerSpeed, 
          PowerPorts.BOTTOM.motorSpeed,
          m_thrower.m_motor::set, m_thrower);
+    }
      /**
      * if aimer at upper accelerate for shooting to inner/outer according to {@link Utilites#isShootingToInnerWork()} 
      * if aimer at the lower position acccelerate for shooting to the bootom.
      */
-    private CommandBase m_accelerteTothrow = new PIDCommand(m_aimController, this::getThrowerSpeed, () ->{
+    private CommandBase m_accelerteTothrow() {
+        return new PIDCommand(m_aimController, this::getThrowerSpeed, () ->{
         if (m_atUpperPosition) {
 
                 if (Utilites.isShootingToInnerWork()) {
@@ -213,13 +226,14 @@ public class Shooter extends SubsystemBase implements RobotMap {
     }
     ,
     m_thrower.m_motor::set, m_thrower) ;
+}
 
     /**
     * fully(aim while accelerate and then passToShooter) shoot to outer or inner port according
     * to {@link Utilites#isShootingToInnerWork}
     */
     private CommandBase shootToUpper() {
-        return Utilites.toFullShootingCommand(m_accelerateUp,m_aimUp);
+        return Utilites.toFullShootingCommand(m_accelerateUp(),m_aimUp());
     }
 
      /**
@@ -227,7 +241,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
      */
     private CommandBase shootToBottom() {
         return Utilites.toFullShootingCommand(
-            m_accelerateBottom,m_aimDown);
+            m_accelerateBottom(),m_aimDown());
     }
 
      /**
@@ -252,21 +266,21 @@ public class Shooter extends SubsystemBase implements RobotMap {
      * @return {@link Shooter#m_aimUp} 
      */
     public CommandBase getAimUp(){
-        return m_aimUp;
+        return m_aimUp();
     }
     /**
      * 
      * @return {@link Shooter#m_aimDown} 
      */
     public CommandBase getAimDown(){
-        return m_aimDown;
+        return m_aimDown();
     }
     /**
      * 
      * @return {@link Shooter#m_aimToggle} 
      */
     public CommandBase getAimToggle(){
-        return m_aimToggle;
+        return m_aimToggle();
     }
     /**
      * 
@@ -274,7 +288,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
      * stops the thrower
      */
     public CommandBase getStopThrower(){
-        return m_stopThrower;
+        return m_stopThrower();
     }
     /**
      * 
@@ -282,7 +296,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
      * accelerate for shooting to inner/outer according to {@link Utilites#isShootingToInnerWork()}
      */
     public CommandBase getAccelerateUp(){
-        return m_accelerateUp;
+        return m_accelerateUp();
     }
     /**
      * 
@@ -290,7 +304,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
      * acccelerate for shooting to the bootom  
      */
     public CommandBase getAccelerateBottom(){
-        return m_accelerateBottom;
+        return m_accelerateBottom();
     }
     /**
      * 
@@ -299,7 +313,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
      * if aimer at the lower position acccelerate for shooting to the bootom.
      */
     public CommandBase getAccelerateToThrow(){
-        return m_accelerteTothrow;
+        return m_accelerteTothrow();
     }
     /**
      * 

@@ -117,6 +117,8 @@ private static Chassis m_instance;
 
   private Chassis() {
     //entering the PID componets into the prefernces
+    m_rightBack.setInverted(true);
+    m_rightFront.setInverted(true);
     Preferences.getInstance().putDouble("Chassis/angle/KP", ANGLE_KP);
     Preferences.getInstance().putDouble("Chassis/angle/KI", ANGLE_KI);
     Preferences.getInstance().putDouble("Chassis/angle/KD", ANGLE_KD);
@@ -139,7 +141,7 @@ private static Chassis m_instance;
   }
  
 //rotating chassis to a choosen set point with pid
-  public void rotateTo(double setpoint){
+  public void rotateTo(double setpoint){//TODO: check
     
     m_anglePID.setSetpoint(setpoint);
     m_anglePID.setTolerance(ANGLE_TOLERANCE);

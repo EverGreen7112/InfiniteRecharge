@@ -85,38 +85,39 @@ public class Rolletta extends SubsystemBase {
   /**
    * Lifting and Lowering the mechanism
    */
-  public CommandBase lift =  //TOOD return to normal
-    new RunCommand( () -> move(isLifting, isLifting ? m_upperSwitch : m_lowerSwitch), this) {
+  public CommandBase lift() { //TOOD return to normal
+    return new RunCommand( () -> move(isLifting, isLifting ? m_upperSwitch : m_lowerSwitch), this) {
     @Override
     public void end(boolean interrupted){
       m_lifter.set(0);
     }
-  };
+  };}
 
    /**
    * Calibrates the BLUE RBG components, ought to run on disabled
    */
-  public CommandBase calibrateBlue = 
-    new RunCommand(() -> calibrateBlue(), this).withTimeout(3.5);
+  public CommandBase m_calibrateBlue() {
+    return new RunCommand(() -> calibrateBlue(), this).withTimeout(3.5);
+  }
 
    /**
    * Calibrates the GREEN RBG components, ought to run on disabled
    */
-  public CommandBase calibrateGreen = 
-    new RunCommand(() -> calibrateGreen(), this).withTimeout(3.5);
-  
+  public CommandBase m_calibrateGreen() {
+    return new RunCommand(() -> calibrateGreen(), this).withTimeout(3.5);
+}
    /**
    * Calibrates the RED RBG components, ought to run on disabled
    */
-  public CommandBase calibrateRed = 
-    new RunCommand(() -> calibrateRed(), this).withTimeout(3.5);
-  
+  public CommandBase m_calibrateRed() {
+    return new RunCommand(() -> calibrateRed(), this).withTimeout(3.5);
+  }
    /**
    * Calibrates the YELLOW RBG components, ought to run on disabled
    */
-  public CommandBase calibrateYellow = 
-    new RunCommand(() -> calibrateYellow(), this).withTimeout(3.5);
-
+  public CommandBase m_calibrateYellow() {
+    return new RunCommand(() -> calibrateYellow(), this).withTimeout(3.5);
+  }
   /**
    * Creates a new Rolletta.
    */

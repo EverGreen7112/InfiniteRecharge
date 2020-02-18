@@ -30,12 +30,20 @@ public class Climb extends SubsystemBase {
 
   //creates the speed controllers
   private SpeedController m_climbPull = new WPI_VictorSPX(MotorPorts.climbPull);
+  public SpeedController getClimbPull(){
+    return m_climbPull;
+  }
   private SpeedController m_climbUp = new WPI_TalonSRX(MotorPorts.climbUp);
+  public SpeedController getClimbUp(){
+    return m_climbUp;
+  }
 
   /**
    * Lifts the hook elevator
    */
-  public CommandBase m_up = new RunCommand(() -> climbUp(getUpSpeed()), this) {
+  public CommandBase m_up(){
+
+   return new RunCommand(() -> climbUp(getUpSpeed()), this) {
     @Override
     public void end(boolean interrupted) {
       m_climbUp.set(getDescendSpeed());
@@ -47,22 +55,24 @@ public class Climb extends SubsystemBase {
       }
       m_climbUp.set(0.0);
     }
-  };
+  };}
 
   /**
    * Pulls up the robot
    */
-  public CommandBase m_pull = new RunCommand(() -> climbPull(getPullSpeed()), this) {
+  public CommandBase m_pull(){
+   return new RunCommand(() -> climbPull(getPullSpeed()), this) {
     @Override
     public void end(boolean interrupted) {
       m_climbPull.set(0.0);
     }
-  };
+  };}
 
   /** Climb Constructor:
    * Creates a new Climb.
    */
   private Climb() {
+    m_climbPull.setInverted(true);//positve values if pull.
     //uploads the speed constants to the shuffelboard
     Preferences.getInstance().putDouble("Climb/Elevator Speed", CLIMB_UP_SPEED);
     Preferences.getInstance().putDouble("Climb/Pull-Up Speed", CLIMB_PULL_SPEED);

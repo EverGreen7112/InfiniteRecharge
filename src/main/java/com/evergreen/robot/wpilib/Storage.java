@@ -38,24 +38,25 @@ public class Storage extends SubsystemBase {
   /**
    * Passes a Power Cell to the Shooter, stops after a fixed amount of time.
    */
-  public CommandBase passByTime = 
-    new RunCommand(() -> m_passByTime(getSpeed(), getTime()), this) {
+  public CommandBase passByTime() {
+    return new RunCommand(() -> m_passByTime(getSpeed(), getTime()), this) {
     @Override
     public void end(boolean interrupted) {
       m_passMotor.set(0);
     }
-  };
+  };}
 
   /**
    * Passes a Power Cell to the Shooter, stops by the Ultrasonic sensor signals.
    */
-  public CommandBase passBySensor = 
-    new RunCommand(() -> m_passBySensor(getSpeed(), getUltrasonicDistance()), this) {
+  public CommandBase passBySensor(){
+    return new RunCommand(() -> m_passBySensor(getSpeed(), getUltrasonicDistance()), this) {
     @Override 
     public void end(boolean interrupted) {
       m_passMotor.set(0);
     }
   };
+}
   
   /**
    * Creates a new Storage.

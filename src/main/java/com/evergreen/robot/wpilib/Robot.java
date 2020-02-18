@@ -29,15 +29,15 @@ public class Robot extends Tree {
     @Override
     protected void bindButtons() {
         //The robot elevates the hook while the button is held
-        new JoystickButton(operatorJS, ButtonPorts.operatorJSA).whenHeld(Climb.getInstance().m_up);
+        new JoystickButton(operatorJS, ButtonPorts.operatorJSA).whenHeld(Climb.getInstance().m_up());
         //The robot pulls itself upwards while the button is held
-        new JoystickButton(operatorJS, ButtonPorts.operatorJSB).whenHeld(Climb.getInstance().m_pull);
+        new JoystickButton(operatorJS, ButtonPorts.operatorJSB).whenHeld(Climb.getInstance().m_pull());
 
         //The robot collects Power Cells while the button is held
-        new JoystickButton(operatorJS, ButtonPorts.operatorJSX).whenHeld(Collector.getInstance().collect);
+        new JoystickButton(operatorJS, ButtonPorts.operatorJSX).whenHeld(Collector.getInstance().collect());
 
         //The robot passes a Power Cells to the Shooter when the button is pressed
-        new JoystickButton(operatorJS, ButtonPorts.operatorJSY).whenPressed(Storage.getInstance().passByTime);
+        new JoystickButton(operatorJS, ButtonPorts.operatorJSY).whenPressed(Storage.getInstance().passByTime());
         //TODO check which passing command is the best - by time or by sensor
 
     }
@@ -69,7 +69,8 @@ public class Robot extends Tree {
 
     @Override
     public void testPeriodic() {
-        Chassis.getInstance().move(0.3);
+        Chassis.getInstance().setLeftSpeed(0.25);
+        
         //Chassis.getInstance().drive(0.3, 0.3);
         //Climb.getInstance().climbUp(0.3);
         //Climb.getInstance().climbPull(0.3);
@@ -90,10 +91,10 @@ public class Robot extends Tree {
     
     @Override
     public void disabledInit() {
-        new JoystickButton(operatorJS, ButtonPorts.operatorJSA).whenPressed(Rolletta.getInstance().calibrateGreen);
-        new JoystickButton(operatorJS, ButtonPorts.operatorJSB).whenPressed(Rolletta.getInstance().calibrateRed);
-        new JoystickButton(operatorJS, ButtonPorts.operatorJSX).whenPressed(Rolletta.getInstance().calibrateBlue);
-        new JoystickButton(operatorJS, ButtonPorts.operatorJSY).whenPressed(Rolletta.getInstance().calibrateYellow);
+        new JoystickButton(operatorJS, ButtonPorts.operatorJSA).whenPressed(Rolletta.getInstance().m_calibrateGreen());
+        new JoystickButton(operatorJS, ButtonPorts.operatorJSB).whenPressed(Rolletta.getInstance().m_calibrateRed());
+        new JoystickButton(operatorJS, ButtonPorts.operatorJSX).whenPressed(Rolletta.getInstance().m_calibrateBlue());
+        new JoystickButton(operatorJS, ButtonPorts.operatorJSY).whenPressed(Rolletta.getInstance().m_calibrateYellow()); 
     }
 
     @Override

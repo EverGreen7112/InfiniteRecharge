@@ -22,7 +22,9 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
     //TODO: tune
     //may cause recursive
     public static final double TIME_TIL_SHOOTING = 0.3;
-    public static CommandBase waitForShooting = new WaitCommand(TIME_TIL_SHOOTING);
+    public static CommandBase waitForShooting() {
+       return new WaitCommand(TIME_TIL_SHOOTING);
+    }
     //TODO: check
     public static final Pose2d POWER_PORT_POSE2D = new Pose2d(0, 2.38415,new Rotation2d(0));
     //TODO: fix ready for shoot, vison work angle getting
@@ -132,13 +134,13 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
             return new SequentialCommandGroup (
                 aimCommand,
                 accelerateCommand, 
-                waitForShooting,
-                Storage.getInstance().passBySensor);
+                waitForShooting(),
+                Storage.getInstance().passBySensor());
         }
 
         return new SequentialCommandGroup(
                 accelerateCommand,
-                waitForShooting,
-                Storage.getInstance().passByTime);
+                waitForShooting(),
+                Storage.getInstance().passByTime());
     }
 }

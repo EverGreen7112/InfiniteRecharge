@@ -22,7 +22,7 @@ public class PassPowerCell extends SequentialCommandGroup implements DoubleArgCo
     public PassPowerCell(double distance) {
         m_pass = new _PassPowerCell(distance);
         
-        addCommands(m_pass,Shooter.getInstance().getAimDown(),Utilites.waitForShooting,Storage.getInstance().passBySensor);
+        addCommands(m_pass,Shooter.getInstance().getAimDown(),Utilites.waitForShooting(),Storage.getInstance().passBySensor());
        
     
     }

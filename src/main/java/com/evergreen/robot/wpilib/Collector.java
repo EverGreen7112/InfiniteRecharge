@@ -30,12 +30,13 @@ public class Collector extends SubsystemBase {
   /**
    * Collects Power Cells (by setting a speed to the collecting mechanism)
    */
-  public CommandBase collect = new RunCommand(() -> collect(getSpeed()), this) {
+  public CommandBase collect(){
+    return new RunCommand(() -> collect(getSpeed()), this) {
     @Override
     public void end(boolean interrupted) {
       collect(0);
     }
-  };
+  };}
 
   /**
    * Creates a new Collector.
