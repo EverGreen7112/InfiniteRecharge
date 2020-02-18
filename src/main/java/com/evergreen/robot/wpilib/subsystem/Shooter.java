@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 /**
  * Shooter subsystem, basically divided to two Subsystem:
  * <ul>
@@ -218,8 +219,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
     * to {@link Utilites#isShootingToInnerWork}
     */
     private CommandBase shootToUpper() {
-        return Utilites.toFullShootingCommand(
-            new ParallelCommandGroup(m_aimUp,m_accelerateUp));
+        return Utilites.toFullShootingCommand(m_accelerateUp,m_aimUp);
     }
 
      /**
@@ -227,28 +227,28 @@ public class Shooter extends SubsystemBase implements RobotMap {
      */
     private CommandBase shootToBottom() {
         return Utilites.toFullShootingCommand(
-            new ParallelCommandGroup(m_aimDown,m_accelerateBottom));
+            m_accelerateBottom,m_aimDown);
     }
 
      /**
       * fully(aim while accelerate and then passToShooter) drop the ball and leave it for our aliince members.
       */  
-
-      
-
-
-    //TODO: find how many time take to the robot to drop
-      private CommandBase drop =Utilites.toFullShootingCommand(new InstantCommand(() -> m_thrower.m_motor.set(droppingSpeed()),m_thrower) {
-        public void end(boolean interrupted){
-            m_thrower.m_motor.set(0);
-        }
-    });
+     //TODO: find how many time take to the robot to dropm_thrower
+      private CommandBase drop =Utilites.toFullShootingCommand(
+          new InstantCommand(
+            () -> m_thrower.m_motor.set(droppingSpeed()))
+                {
+                    public void end(boolean interrupted){
+                        m_thrower.m_motor.set(0);
+                    }
+            }, 
+            new WaitUntilCommand(0));
 
     /////////////////////////////////////////////////////////////////////////
     
     /////////////////////////commands getters///////////////////////////////
     /**
-     * 
+     * s
      * @return {@link Shooter#m_aimUp} 
      */
     public CommandBase getAimUp(){

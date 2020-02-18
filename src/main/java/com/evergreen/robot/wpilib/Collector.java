@@ -30,10 +30,10 @@ public class Collector extends SubsystemBase {
   /**
    * Collects Power Cells (by setting a speed to the collecting mechanism)
    */
-  public CommandBase collect = new RunCommand(() -> m_collect(getSpeed()), this) {
+  public CommandBase collect = new RunCommand(() -> collect(getSpeed()), this) {
     @Override
     public void end(boolean interrupted) {
-      m_collect(0);
+      collect(0);
     }
   };
 
@@ -53,7 +53,7 @@ public class Collector extends SubsystemBase {
   }
 
   //collection method
-  public void m_collect(double m_speed) {
+  public void collect(double m_speed) {
     m_collectorMotor.set(m_speed);
   }
 

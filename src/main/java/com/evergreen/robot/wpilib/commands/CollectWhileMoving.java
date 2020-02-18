@@ -16,10 +16,9 @@ public class CollectWhileMoving extends ParallelDeadlineGroup implements DoubleA
     
     private MoveChassisTo m_move;
     public CollectWhileMoving(double distance) {
-        super(new MoveChassisTo(distance), Collector.getInstance().collect);
+        super(Collector.getInstance().collect);
         m_move = new MoveChassisTo(distance);
         setDeadline(m_move);
-        
     }
     /**
      * 

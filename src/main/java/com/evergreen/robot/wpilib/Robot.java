@@ -21,9 +21,11 @@ public class Robot extends Tree {
     protected void autoConfig() {
         Autonomous.getInstance().schedule();
     }
+    
     public void autonomousInit() {
     
     }
+
     @Override
     protected void bindButtons() {
         //The robot elevates the hook while the button is held
@@ -62,7 +64,16 @@ public class Robot extends Tree {
 
     @Override
     protected void test() {
+        
+    }
 
+    @Override
+    public void testPeriodic() {
+        Chassis.getInstance().move(0.3);
+        //Chassis.getInstance().drive(0.3, 0.3);
+        //Climb.getInstance().climbUp(0.3);
+        //Climb.getInstance().climbPull(0.3);
+        //Collector.getInstance().collect(0.3);
     }
 
     @Override
@@ -75,29 +86,18 @@ public class Robot extends Tree {
         Shooter.getInstance().updatePassDistance();
         Autonomous.getInstance().update();
     }
-    @Override
-    public void robotInit() {
-        
-    }
+
     
     @Override
-    public void robotPeriodic() {
-        Shooter.getInstance().updatePassDistance();
-        
-        
-    }
-
-    @Override
     public void disabledInit() {
-
-    }
-
-    @Override
-    public void disabledPeriodic() {
         new JoystickButton(operatorJS, ButtonPorts.operatorJSA).whenPressed(Rolletta.getInstance().calibrateGreen);
         new JoystickButton(operatorJS, ButtonPorts.operatorJSB).whenPressed(Rolletta.getInstance().calibrateRed);
         new JoystickButton(operatorJS, ButtonPorts.operatorJSX).whenPressed(Rolletta.getInstance().calibrateBlue);
         new JoystickButton(operatorJS, ButtonPorts.operatorJSY).whenPressed(Rolletta.getInstance().calibrateYellow);
+    }
+
+    @Override
+    public void disabledPeriodic() {
         
     }
 

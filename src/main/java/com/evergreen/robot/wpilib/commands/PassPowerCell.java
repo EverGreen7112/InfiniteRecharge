@@ -1,27 +1,32 @@
 package com.evergreen.robot.wpilib.commands;
 
 import com.evergreen.robot.wpilib.DoubleArgCommand;
+import com.evergreen.robot.wpilib.Storage;
 import com.evergreen.robot.wpilib.Utilites;
 import com.evergreen.robot.wpilib.subsystem.Shooter;
 
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 /**
  * fully (aim, accelerate, passToShooter) pass the power cell to the desierd distance
  */
-public class PassPowerCell extends ParallelCommandGroup implements DoubleArgCommand{
-    _PassPowerCell m_pass;
+public class PassPowerCell extends SequentialCommandGroup implements DoubleArgCommand{
+   private _PassPowerCell m_pass;
+    private CommandBase m_Command;
     /**
      * 
      * @param distance desierd distance for throwing cm 
     */
     public PassPowerCell(double distance) {
         m_pass = new _PassPowerCell(distance);
-        addCommands(Utilites.toFullShootingCommand(
-            new ParallelCommandGroup(Shooter.getInstance().getAimDown(),m_pass)
-    ));
         
+        addCommands(m_pass,Shooter.getInstance().getAimDown(),Utilites.waitForShooting,Storage.getInstance().passBySensor);
+       
+    
     }
+
     /**
      * 
      * @param distance desierd distance for throwing cm 
