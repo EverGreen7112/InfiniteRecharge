@@ -7,6 +7,8 @@
 
 package com.evergreen.robot.wpilib;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -15,6 +17,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.evergreen.robot.RobotMap.MotorPorts;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.controller.PIDController;
@@ -29,6 +32,7 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -93,7 +97,21 @@ private static Chassis m_instance;
   private TrajectoryConfig m_trajectoryConfig = new TrajectoryConfig(MAX_VELOCITY, MAX_ACCELERATION);
 
   private RamseteController m_ramseteController = new RamseteController();
- 
+  public DifferentialDriveKinematics getKinematics() {
+    return m_kinematics;
+  }
+  public DifferentialDriveOdometry getOdometry(){
+    return m_odometry;
+  }
+  public SimpleMotorFeedforward getFeedForword(){
+    return m_feedorward;
+  }
+  public TrajectoryConfig getTrajectoryConfig(){
+    return m_trajectoryConfig;
+  }
+  public RamseteController getRamseteController(){
+    return m_ramseteController;
+  }
   
   
 
@@ -200,7 +218,7 @@ private static Chassis m_instance;
    return m_leftFront.getSelectedSensorVelocity();
  }
  // returning the average speed
- private DifferentialDriveWheelSpeeds getVelocity() {
+ public DifferentialDriveWheelSpeeds getVelocity() {
    return new DifferentialDriveWheelSpeeds(
      m_leftFront.getSelectedSensorVelocity(), 
      m_rightFront.getSelectedSensorVelocity());
@@ -294,10 +312,10 @@ public void rotate(double speed){
     drive(left / 12, right / 12);
   }
 
-  public RamseteCommand follow(Pose2d... points) {
+  public RamseteCommand follow(TrajectoryOption trajectory) throws IOException {
     return
       new RamseteCommand(
-        TrajectoryGenerator.generateTrajectory(List.of(points), m_trajectoryConfig), 
+        trajectory.getTrajectory(), 
         m_odometry::getPoseMeters, 
         m_ramseteController, 
         m_feedorward, 
@@ -309,6 +327,27 @@ public void rotate(double speed){
         this);
 
     
+  }
+
+
+  public static enum TrajectoryOption {
+    MOCK("Mock");
+
+    String m_name;
+
+    private TrajectoryOption(String name) {
+      m_name = name;
+    }
+
+    public String getName() {
+      return m_name;
+    }
+
+    public Trajectory getTrajectory() throws IOException {
+      Path trajectoryJson = Filesystem.getDeployDirectory().toPath().resolve("paths/" + m_name + ".wpilib.json");
+      return TrajectoryUtil.fromPathweaverJson(trajectoryJson);
+      
+    }
   }
   
   
