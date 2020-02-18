@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
     public static final double TIME_TIL_SHOOTING = 0.3;
     private static CommandBase waitForShooting = new WaitCommand(TIME_TIL_SHOOTING);
     //TODO: check
-    public static final Pose2d POWER_PORT_POSE2D = new Pose2d(0, 0,new Rotation2d(0));
+    public static final Pose2d POWER_PORT_POSE2D = new Pose2d(0, 2.38415,new Rotation2d(0));
     //TODO: fix ready for shoot, vison work angle getting
     private static NetworkTable m_table = NetworkTableInstance.getDefault().getTable("Vision");
        
