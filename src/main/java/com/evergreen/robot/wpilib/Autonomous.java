@@ -33,8 +33,10 @@ public class Autonomous extends SequentialCommandGroup {
     private SendableChooser<CommandBase>[] m_options = new SendableChooser[OPTIONS_NUMBER];
     private Supplier<Double>[] m_arguments = new Supplier[OPTIONS_NUMBER];
     private CommandBase[] m_commands;
-    private static Autonomous m_instance = new Autonomous();
-    public static Autonomous getInstance(){
+    private static Autonomous m_instance;
+
+    public static synchronized Autonomous getInstance() {
+        if (m_instance == null) m_instance = new Autonomous();
         return m_instance;
     }
     //add collect while moving,

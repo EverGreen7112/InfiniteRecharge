@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
      */
     //TODO: tune
     public static final double TIME_TIL_SHOOTING = 0.3;
-    private static CommandBase waitForShooting = new WaitCommand(TIME_TIL_SHOOTING);
+    private static final CommandBase waitForShooting = new WaitCommand(TIME_TIL_SHOOTING);
 
 
     private static NetworkTable m_table = NetworkTableInstance.getDefault().getTable("Vision");
@@ -57,7 +57,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
      * @param dY delta y
      * @return calculating hypotenuse according to pitagurs formua
      */
-    public static double Pitaguras(double dX, double dY){
+    public static double Pythagoras(double dX, double dY){
         return Math.sqrt(
             Math.pow(dX, 2) +
             Math.pow(dY, 2)
@@ -68,7 +68,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
      * @return if we checked the passBySensor command and it work.
      */
     //TODO: check
-    public static boolean isPassBySensorWork(){
+    public static boolean shouldPassBySensorWork(){
         return true;
     }
     /**
@@ -83,12 +83,16 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
      * @return new command that first acelerate and then pass the ball to the shooter
      */
     public static CommandBase toFullShootingCommand(CommandBase accelerateCommand){
-        if(isPassBySensorWork()){
-            return new SequentialCommandGroup(
-                accelerateCommand,waitForShooting,Storage.getInstance().passBySensor);
+        if (shouldPassBySensorWork()) {
+            return new SequentialCommandGroup (
+                accelerateCommand, 
+                waitForShooting,
+                Storage.getInstance().passBySensor);
         }
+
         return new SequentialCommandGroup(
-                accelerateCommand,waitForShooting,Storage.getInstance().passByTime);
+                accelerateCommand,
+                waitForShooting,
+                Storage.getInstance().passByTime);
     }
-    
 }

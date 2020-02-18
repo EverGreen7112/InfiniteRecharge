@@ -35,7 +35,7 @@ public class Climb extends SubsystemBase {
   /**
    * Lifts the hook elevator
    */
-  public CommandBase m_up = new RunCommand(() -> climbUp(getUpSpeed()), Climb.getInstance()) {
+  public CommandBase m_up = new RunCommand(() -> climbUp(getUpSpeed()), this) {
     @Override
     public void end(boolean interrupted) {
       m_climbUp.set(getDescendSpeed());
@@ -52,7 +52,7 @@ public class Climb extends SubsystemBase {
   /**
    * Pulls up the robot
    */
-  public CommandBase m_pull = new RunCommand(() -> climbPull(getPullSpeed()), Climb.getInstance()) {
+  public CommandBase m_pull = new RunCommand(() -> climbPull(getPullSpeed()), this) {
     @Override
     public void end(boolean interrupted) {
       m_climbPull.set(0.0);
@@ -71,7 +71,7 @@ public class Climb extends SubsystemBase {
   }
 
   //creates get instance method
-  public static Climb getInstance() {
+  public static synchronized Climb getInstance() {
     if (m_instance == null) m_instance = new Climb();
     return m_instance;
   }

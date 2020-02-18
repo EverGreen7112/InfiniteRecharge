@@ -30,7 +30,7 @@ public class Collector extends SubsystemBase {
   /**
    * Collects Power Cells (by setting a speed to the collecting mechanism)
    */
-  public CommandBase collect = new RunCommand(() -> m_collect(getSpeed()), Collector.getInstance()) {
+  public CommandBase collect = new RunCommand(() -> m_collect(getSpeed()), this) {
     @Override
     public void end(boolean interrupted) {
       m_collect(0);
@@ -47,7 +47,7 @@ public class Collector extends SubsystemBase {
   /**
    * The get instance method for the collector instance.
    * */ 
-  public static Collector getInstance() {
+  public static synchronized Collector getInstance() {
     if (m_instance == null) m_instance = new Collector();
     return m_instance;
   }

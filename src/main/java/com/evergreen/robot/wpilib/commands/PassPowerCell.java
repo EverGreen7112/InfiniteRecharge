@@ -15,12 +15,12 @@ public class PassPowerCell extends ParallelCommandGroup implements DoubleArgComm
     /**
      * 
      * @param distance desierd distance for throwing cm 
-     */
+    */
     public PassPowerCell(double distance) {
         m_pass = new _PassPowerCell(distance);
         addCommands(Utilites.toFullShootingCommand(
             new ParallelCommandGroup(Shooter.getInstance().getAimDown(),m_pass)
-        ));
+    ));
         
     }
     /**

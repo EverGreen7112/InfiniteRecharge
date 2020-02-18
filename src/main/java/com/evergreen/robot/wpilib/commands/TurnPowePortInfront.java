@@ -16,7 +16,8 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
  */
 public class TurnPowePortInfront extends PIDCommand {
     private static TurnPowePortInfront m_instance = new TurnPowePortInfront();
-    public static TurnPowePortInfront getInstance(){
+    
+    public static TurnPowePortInfront getInstance() {
         return m_instance;
     }
     private TurnPowePortInfront() {

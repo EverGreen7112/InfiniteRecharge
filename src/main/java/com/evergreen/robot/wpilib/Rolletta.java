@@ -60,21 +60,22 @@ public class Rolletta extends SubsystemBase {
     private Color YELLOW = ColorMatch.makeColor(YELLOW_R, YELLOW_G, YELLOW_B);
     
   //The speed controllers
-  private SpeedController m_spinner = new WPI_TalonSRX(MotorPorts.spiner);
+  private WPI_TalonSRX m_spinner = new WPI_TalonSRX(MotorPorts.spiner);
   private SpeedController m_lifter = new WPI_VictorSPX(MotorPorts.lifter);
 
   //The encoder for the spinning motor
-  private Encoder m_spinnerEncoder = new Encoder(DigitalPorts.rollettaA,DigitalPorts.rollettaB);
+  //private Encoder m_spinnerEncoder = new Encoder(DigitalPorts.rollettaA,DigitalPorts.rollettaB);
 
   //The Color Sensor
-  ColorSensorV3 m_colorSensor = new ColorSensorV3(Port.kMXP);
+  private final ColorSensorV3 m_colorSensor = new ColorSensorV3(Port.kMXP);
   //The color matcher - detects known colors
   private final ColorMatch m_colorMatcher = new ColorMatch();
 
 
   //The switches to control the ifter motor
-  private DigitalInput m_upperSwitch = new DigitalInput(DigitalPorts.rollettaUpperSwitch);
-  private DigitalInput m_lowerSwitch = new DigitalInput(DigitalPorts.rollettaLowerSwitch);
+  //TODO fix ports
+  private DigitalInput m_upperSwitch = new DigitalInput(9);
+  private DigitalInput m_lowerSwitch = new DigitalInput(10);
 
   private double m_rightOffset = 0;
   private double m_leftOffset = 0;
@@ -84,8 +85,8 @@ public class Rolletta extends SubsystemBase {
   /**
    * Lifting and Lowering the mechanism
    */
-  public CommandBase lift = 
-    new RunCommand( () -> move(isLifting, isLifting ? m_upperSwitch : m_lowerSwitch), Rolletta.getInstance()){
+  public CommandBase lift =  //TOOD return to normal
+    new RunCommand( () -> move(isLifting, isLifting ? m_upperSwitch : m_lowerSwitch), this) {
     @Override
     public void end(boolean interrupted){
       m_lifter.set(0);
@@ -96,25 +97,25 @@ public class Rolletta extends SubsystemBase {
    * Calibrates the BLUE RBG components, ought to run on disabled
    */
   public CommandBase calibrateBlue = 
-    new RunCommand(() -> calibrateBlue(), Rolletta.getInstance()).withTimeout(3.5);
+    new RunCommand(() -> calibrateBlue(), this).withTimeout(3.5);
 
    /**
    * Calibrates the GREEN RBG components, ought to run on disabled
    */
   public CommandBase calibrateGreen = 
-    new RunCommand(() -> calibrateGreen(), Rolletta.getInstance()).withTimeout(3.5);
+    new RunCommand(() -> calibrateGreen(), this).withTimeout(3.5);
   
    /**
    * Calibrates the RED RBG components, ought to run on disabled
    */
   public CommandBase calibrateRed = 
-    new RunCommand(() -> calibrateRed(), Rolletta.getInstance()).withTimeout(3.5);
+    new RunCommand(() -> calibrateRed(), this).withTimeout(3.5);
   
    /**
    * Calibrates the YELLOW RBG components, ought to run on disabled
    */
   public CommandBase calibrateYellow = 
-    new RunCommand(() -> calibrateYellow(), Rolletta.getInstance()).withTimeout(3.5);
+    new RunCommand(() -> calibrateYellow(), this).withTimeout(3.5);
 
   /**
    * Creates a new Rolletta.
@@ -144,7 +145,7 @@ public class Rolletta extends SubsystemBase {
   /**
    * Returns the single instance
    */
-  public static Rolletta getInstance() {
+  public static synchronized Rolletta getInstance() {
     if (m_instance == null) m_instance = new Rolletta();
     return m_instance;
   }
@@ -306,7 +307,7 @@ public class Rolletta extends SubsystemBase {
 
   /**Resets the spinner encoder and the current offset according to current sensor input.*/
   public void resetSensor() {
-    m_spinnerEncoder.reset();
+    m_spinner.setSelectedSensorPosition(0);
     m_rightOffset = getColorAngle(getCurrentColor()) + ROBOT_SENSOR_OFFSET;
     m_leftOffset = toLeft(getColorAngle(getCurrentColor())) - ROBOT_SENSOR_OFFSET;
   }
@@ -334,7 +335,7 @@ public class Rolletta extends SubsystemBase {
    * {@link #resetSensor()}
    */
   public double getRawAngle() {
-    return m_spinnerEncoder.getDistance();
+    return m_spinner.getSelectedSensorPosition();
   }
 
   

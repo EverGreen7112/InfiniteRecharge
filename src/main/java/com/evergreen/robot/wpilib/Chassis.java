@@ -82,10 +82,8 @@ private static Chassis m_instance;
 
 
   // creating a chassis object
-  public static Chassis getInstance(){
-    if (m_instance==null){
-      m_instance = new Chassis();
-    }
+  public static synchronized Chassis getInstance(){
+    if (m_instance==null) m_instance = new Chassis();
     return m_instance;
   }
  

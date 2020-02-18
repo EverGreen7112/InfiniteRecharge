@@ -8,6 +8,7 @@
 package com.evergreen.robot.wpilib;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import com.evergreen.robot.RobotMap.AnalogPorts;
 import com.evergreen.robot.RobotMap.DigitalPorts;
 import com.evergreen.robot.RobotMap.MotorPorts;
 
@@ -31,14 +32,14 @@ public class Storage extends SubsystemBase {
 
   //New speed controller and ultrasonic sensor for passing the power cells.
   private SpeedController m_passMotor = new WPI_VictorSPX(MotorPorts.passer);
-  private Ultrasonic ultrasonic = 
-    new Ultrasonic(DigitalPorts.storageUltrasonicA, DigitalPorts.storageUltrasonicB);
-
+   private Ultrasonic ultrasonic = 
+     new Ultrasonic(11, 12);
+  // TODO Y 2 ports needed
   /**
    * Passes a Power Cell to the Shooter, stops after a fixed amount of time.
    */
   public CommandBase passByTime = 
-    new RunCommand(() -> m_passByTime(getSpeed(), getTime()), Storage.getInstance()) {
+    new RunCommand(() -> m_passByTime(getSpeed(), getTime()), this) {
     @Override
     public void end(boolean interrupted) {
       m_passMotor.set(0);
@@ -49,7 +50,7 @@ public class Storage extends SubsystemBase {
    * Passes a Power Cell to the Shooter, stops by the Ultrasonic sensor signals.
    */
   public CommandBase passBySensor = 
-    new RunCommand(() -> m_passBySensor(getSpeed(), getUltrasonicDistance()), Storage.getInstance()) {
+    new RunCommand(() -> m_passBySensor(getSpeed(), getUltrasonicDistance()), this) {
     @Override 
     public void end(boolean interrupted) {
       m_passMotor.set(0);
@@ -69,7 +70,7 @@ public class Storage extends SubsystemBase {
   /**
    * Gets the Storage single instance.
    */
-  public static Storage getInstance() {
+  public static synchronized Storage getInstance() {
     if (m_instance == null)
       m_instance = new Storage();
     return m_instance;
@@ -117,7 +118,7 @@ public class Storage extends SubsystemBase {
   /**
    * Gets the Ultrasonic value (in mm).
    */
-  public double getUltrasonicDistance() {
+   public double getUltrasonicDistance() {
     return ultrasonic.getRangeMM();
   }
 
