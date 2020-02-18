@@ -7,7 +7,6 @@ import com.evergreen.robot.RobotMap.JoystickPorts;
 import edu.wpi.first.wpilibj.Joystick;
 import com.evergreen.robot.wpilib.subsystem.Shooter;
 
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**

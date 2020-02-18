@@ -1,10 +1,13 @@
 package com.evergreen.robot.wpilib;
 
+import java.io.IOException;
 import java.util.function.Supplier;
 
+import com.evergreen.robot.wpilib.Chassis.TrajectoryOption;
 import com.evergreen.robot.wpilib.commands.CollectWhileMoving;
 import com.evergreen.robot.wpilib.commands.DriveToNoStop;
 import com.evergreen.robot.wpilib.commands.DriveToPowerPort;
+import com.evergreen.robot.wpilib.commands.FollowTrajectory;
 import com.evergreen.robot.wpilib.commands.MoveChassisTo;
 import com.evergreen.robot.wpilib.commands.RotateTilSeePort;
 import com.evergreen.robot.wpilib.commands.RotateTo;
@@ -63,9 +66,19 @@ public class Autonomous extends SequentialCommandGroup {
             m_options[i].addOption("shootToBottom"+ i, Shooter.getInstance().getShootToBottom());
             m_options[i].addOption("drop" + i, Shooter.getInstance().getDrop());
             m_commands[i] = m_options[i].getSelected();
+            for (TrajectoryOption option : TrajectoryOption.values()) {
+            
+            try {
+                m_options[i].addOption("follow " + option.getName() + i, new FollowTrajectory(option,m_arguments[i].get()));
+            }
+
+            catch (IOException e) {
+                m_options[i].addOption("trajectory name NOT FOUND", new WaitCommand(0));
+            }
 
             SmartDashboard.putData(m_options[i]);
         }
+    }
     }
     
     @Override
