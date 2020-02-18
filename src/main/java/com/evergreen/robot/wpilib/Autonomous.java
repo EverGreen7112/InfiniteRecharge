@@ -50,9 +50,9 @@ public class Autonomous extends SequentialCommandGroup {
             m_options[i] = new SendableChooser();
             m_options[i].setDefaultOption("wait" +i, new WaitCommandEG(m_arguments[i].get()));
             m_options[i].addOption("driveStraight" +i, new MoveChassisTo(m_arguments[i].get()));
-            m_options[i].addOption("driveXdistanceWithoutStopping", new DriveToNoStop(m_arguments[i].get()));
-            m_options[i].addOption("driveXdistanceWhileCollecting", new CollectWhileMoving(m_arguments[i].get()));
-            m_options[i].addOption("riveXDistanceFromPowerPort"+i, new DriveToPowerPort(m_arguments[i].get()) );         
+            m_options[i].addOption("driveXdistanceWithoutStopping" + i, new DriveToNoStop(m_arguments[i].get()));
+            m_options[i].addOption("driveXdistanceWhileCollecting" + i, new CollectWhileMoving(m_arguments[i].get()));
+            m_options[i].addOption("driveXDistanceFromPowerPort"+i, new DriveToPowerPort(m_arguments[i].get()) );         
             //turn right by defualt if we want to turn left put negative value;
             m_options[i].addOption("rotate" + i, new RotateTo(m_arguments[i].get()));
             //turn right by defualt if we want to turn left put negative value;
