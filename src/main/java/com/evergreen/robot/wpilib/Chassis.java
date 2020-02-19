@@ -312,7 +312,7 @@ public void rotate(double speed){
     drive(left / 12, right / 12);
   }
 
-  public RamseteCommand follow(TrajectoryOption trajectory) throws IOException {
+  public RamseteCommand follow(TrajectoryOption trajectory) throws IOException {//have Not check yet
     return
       new RamseteCommand(
         trajectory.getTrajectory(), 

@@ -95,8 +95,8 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
      * @return if we checked the passBySensor command and it work.
      */
     //TODO: check
-    public static boolean shouldPassBySensorWork(){
-        return true;
+    public static boolean isPassBySensorWork(){
+        return false;
     }
     /**
      * @return we are want to shoot to the inner  true, else change it to false; 
@@ -130,7 +130,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
      * @return new command that first acelerate and then pass the ball to the shooter
      */
     public static CommandBase toFullShootingCommand(CommandBase accelerateCommand,CommandBase aimCommand){
-        if (shouldPassBySensorWork()) {
+        if (isPassBySensorWork()) {
             return new SequentialCommandGroup (
                 aimCommand,
                 accelerateCommand, 

@@ -101,7 +101,7 @@ public class Rolletta extends SubsystemBase {
   /**
    * Lifting and Lowering the mechanism
    */
-  public CommandBase lift() { 
+  public CommandBase toggle() { 
     return  new CommandBase() {
 
       @Override
@@ -111,7 +111,9 @@ public class Rolletta extends SubsystemBase {
 
       @Override
       public boolean isFinished() {
-        return move(m_isLifting);
+        boolean done = move(m_isLifting);
+        SmartDashboard.putBoolean("Hit Switch", m_isLifting);
+        return done;
       }
 
       @Override
@@ -200,10 +202,10 @@ public class Rolletta extends SubsystemBase {
   public boolean move(boolean lifting) {
     double liftSpeed = lifting ? GET_SPEED() : -GET_SPEED();
     Supplier<Boolean> untilHit = lifting ? this::isUp : this::isDown;
-
-    if (!untilHit.get()) {
+    SmartDashboard.putBoolean("Hit", untilHit.get());
+    
+    while (!untilHit.get()) {
       m_lifter.set(liftSpeed);
-      return false;
     }
     
     return true;

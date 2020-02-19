@@ -25,7 +25,7 @@ public class Storage extends SubsystemBase {
   private static Storage m_instance;
 
   // The passing speed, time and minimum empty distance constants
-  private double PASS_SPEED = 0.5;
+  private double PASS_SPEED = 0.18;
   private long PASS_TIME = 2000; //Notice the time is in milliseconds
   private double MIN_EMPTY_DIST; //Minimum Distance in which Storage is Empty, in mm
   //TODO: find the correct value of minimum distance
@@ -39,19 +39,37 @@ public class Storage extends SubsystemBase {
    * Passes a Power Cell to the Shooter, stops after a fixed amount of time.
    */
   public CommandBase passByTime() {
-    return new RunCommand(() -> m_passByTime(getSpeed(), getTime()), this) {
-    @Override
-    public void end(boolean interrupted) {
-      m_passMotor.set(0);
-    }
-  };}
+    return new CommandBase() {
+      @Override
+        public void initialize() {
+          m_passMotor.set(getSpeed());
+        }
+      @Override
+        public boolean isFinished() {
+          try {
+            Thread.sleep(getTime());
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+          }
+          return true;
+        }
+          @Override
+        public void end(boolean interrupted) {
+          m_passMotor.set(0);
+        }
+        };
+      
+  };
+  
 
   /**
    * Passes a Power Cell to the Shooter, stops by the Ultrasonic sensor signals.
    */
   public CommandBase passBySensor(){
     return new RunCommand(() -> m_passBySensor(getSpeed(), getUltrasonicDistance()), this) {
-    @Override 
+    
+      @Override 
     public void end(boolean interrupted) {
       m_passMotor.set(0);
     }
@@ -82,7 +100,7 @@ public class Storage extends SubsystemBase {
    * 
    * @throws InterruptedException
    */
-  public void m_passByTime(double m_speed, long m_time) {
+  public void passByTime(double m_speed, long m_time) {
     m_passMotor.set(m_speed);
     try {
       Thread.sleep(m_time);
