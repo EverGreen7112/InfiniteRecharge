@@ -22,7 +22,7 @@ public class Collector extends SubsystemBase {
   private static Collector m_instance;
 
   //motor speed constat
-  private double COLLECTOR_SPEED = 0.5; 
+  private double COLLECTOR_SPEED = 0.7; 
 
   //creates the speed controllers for the system
   private SpeedController m_collectorMotor = new WPI_VictorSPX(MotorPorts.collector);
@@ -30,13 +30,50 @@ public class Collector extends SubsystemBase {
   /**
    * Collects Power Cells (by setting a speed to the collecting mechanism)
    */
-  public CommandBase collect(){
-    return new RunCommand(() -> collect(getSpeed()), this) {
+  public CommandBase collectCmd(){
+    return new RunCommand(() -> collectCmd(getSpeed()), this) {
     @Override
     public void end(boolean interrupted) {
-      collect(0);
+      collectCmd(0);
     }
+    
   };}
+  public CommandBase collectCmd(double speed){
+    return new RunCommand(() -> collect(speed), this) {
+      @Override
+      public void end(boolean interrupted) {
+        collectCmd(0);
+      };
+  };
+}
+  /**
+   * 
+   * @param time in seconds
+   * @return
+   */
+  public CommandBase collectForTime(long time){
+    return new CommandBase() {
+      @Override
+      public void initialize() {
+        collectCmd(COLLECTOR_SPEED);
+      }
+      @Override
+        public boolean isFinished() {
+          try {
+            Thread.sleep(time*1000);
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+          }
+          return true;
+        }
+      @Override
+        public void end(boolean interrupted) {
+          collectCmd(0);
+        }
+        };
+    }
+  
 
   /**
    * Creates a new Collector.
