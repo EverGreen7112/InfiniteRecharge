@@ -5,8 +5,11 @@ import com.evergreen.robot.RobotMap.ButtonPorts;
 import com.evergreen.robot.RobotMap.JoystickPorts;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import com.evergreen.robot.wpilib.subsystem.Shooter;
 
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
@@ -14,16 +17,16 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
  */
 public class Robot extends Tree {
     
+    boolean m_lifting = false;
+
     //Creates JS objects
     public Joystick operatorJS = new Joystick(JoystickPorts.operatorJS);
+
+    
 
     @Override
     protected void autoConfig() {
         Autonomous.getInstance().schedule();
-    }
-    
-    public void autonomousInit() {
-    
     }
 
     @Override
@@ -49,7 +52,7 @@ public class Robot extends Tree {
 
     @Override
     protected void componentSetup() {
-
+        Autonomous.getInstance();
     }
 
     @Override
@@ -62,24 +65,28 @@ public class Robot extends Tree {
 
     }
 
+    // boolean start;
+
     @Override
     protected void test() {
-        
-        Rolletta.getInstance().move(
-            false, Rolletta.getInstance().getLowerSwitch());
+        Rolletta.getInstance().lift().schedule();
     }
+
+
 
     @Override
     public void testPeriodic() {
+        // Rolletta.getInstance().
+        // move(Rolletta.getInstance().isLifting());
+        // if (Rolletta.getInstance().isUp() != start)
+        
+        // else Rolletta.getInstance().m_lifter.set(0);
 
-        if (!Rolletta.getInstance().getLowerSwitch().get())
-            Rolletta.getInstance().m_lifter.set(-0.3);
-        // Chassis.getInstance().drive(0.4, -0.4);
-        else Rolletta.getInstance().m_lifter.set(0);
-        //Chassis.getInstance().drive(0.3, 0.3);
-        //Climb.getInstance().climbUp(0.3);
-        //Climb.getInstance().climbPull(0.3);
-        //Collector.getInstance().collect(0.3);
+        SmartDashboard.putBoolean("Up", Rolletta.getInstance().isUp());
+        SmartDashboard.putBoolean("Down", Rolletta.getInstance().isDown());
+        SmartDashboard.putBoolean("lifting", m_lifting);
+        CommandScheduler.getInstance().run();
+
     }
 
     @Override
@@ -87,12 +94,14 @@ public class Robot extends Tree {
         
     }
 
+
     @Override
-    protected void update() {
+    public void robotPeriodic() {
         Shooter.getInstance().updatePassDistance();
         Autonomous.getInstance().update();
+        CommandScheduler.getInstance().run();
     }
-
+    
     
     @Override
     public void disabledInit() {
@@ -101,12 +110,21 @@ public class Robot extends Tree {
         new JoystickButton(operatorJS, ButtonPorts.operatorJSX).whenPressed(Rolletta.getInstance().m_calibrateBlue());
         new JoystickButton(operatorJS, ButtonPorts.operatorJSY).whenPressed(Rolletta.getInstance().m_calibrateYellow()); 
     }
-
+    
     @Override
     public void disabledPeriodic() {
-        
+        CommandScheduler.getInstance().run();    
+    }
+    
+    @Override
+    public void autonomousPeriodic() {
+        CommandScheduler.getInstance().run();
     }
 
+    @Override
+    public void teleopPeriodic() {
+        CommandScheduler.getInstance().run();
+    }
     
 }   
 

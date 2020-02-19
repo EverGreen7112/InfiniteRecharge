@@ -7,8 +7,12 @@
 
 package com.evergreen.robot.wpilib;
 
+import java.util.Set;
+import java.util.function.Supplier;
+
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import com.evergreen.everlib.shuffleboard.loggables.DashboardStreams;
 import com.evergreen.robot.RobotMap.DigitalPorts;
 import com.evergreen.robot.RobotMap.MotorPorts;
 import com.revrobotics.ColorMatch;
@@ -22,10 +26,13 @@ import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Rolletta extends SubsystemBase {
@@ -33,13 +40,13 @@ public class Rolletta extends SubsystemBase {
   private static Rolletta m_instance;
   
   //General Constants
-   private double LIFT_SPEED;  
+   private double LIFT_SPEED = 0.3;  
    //45 degrees offset to make sure it's not too little
    private double ROTATION_CONTROL_SETPOINT = 360 * 3 + 45; 
    private double ROBOT_SENSOR_OFFSET = 90;
-   private boolean isLifting = true;
+   private boolean m_isLifting ;
 
-  //Color RGB constants
+  //Color RGB constants][
   private double 
     BLUE_R,
     BLUE_G,
@@ -74,29 +81,49 @@ public class Rolletta extends SubsystemBase {
 
   //The switches to control the ifter motor
   //TODO fix ports
-  private DigitalInput m_upperSwitch = new DigitalInput(9);
-  private DigitalInput m_lowerSwitch = new DigitalInput(10);
-  public DigitalInput getUpperSwitch(){
-    return m_upperSwitch;
-  }
-  public DigitalInput getLowerSwitch(){
-    return m_lowerSwitch;
-  }
+  private DigitalInput m_upperSwitch = new DigitalInput(DigitalPorts.rolletaMicroSwitchUp);
+  private DigitalInput m_lowerSwitch = new DigitalInput(DigitalPorts.rolletaMicroSwitchDown);
+
+
   private double m_rightOffset = 0;
   private double m_leftOffset = 0;
 
   
+  public boolean isDown() {
+    return !m_lowerSwitch.get();
+  }
+
+  public boolean isUp() {
+    return m_upperSwitch.get();
+  }
+
   //Commands:
   /**
    * Lifting and Lowering the mechanism
    */
-  public CommandBase lift() { //TOOD return to normal
-    return new RunCommand( () -> move(isLifting, isLifting ? m_upperSwitch : m_lowerSwitch), this) {
-    @Override
-    public void end(boolean interrupted){
-      m_lifter.set(0);
-    }
-  };}
+  public CommandBase lift() { 
+    return  new CommandBase() {
+
+      @Override
+      public void initialize() {
+          addRequirements(Rolletta.getInstance());
+      }
+
+      @Override
+      public boolean isFinished() {
+        return move(m_isLifting);
+      }
+
+      @Override
+      public void end(boolean interrupted) {
+        m_isLifting = !m_isLifting;
+        m_lifter.set(0);        
+      }
+
+
+    };
+    
+  };
 
    /**
    * Calibrates the BLUE RBG components, ought to run on disabled
@@ -123,11 +150,19 @@ public class Rolletta extends SubsystemBase {
   public CommandBase m_calibrateYellow() {
     return new RunCommand(() -> calibrateYellow(), this).withTimeout(3.5);
   }
+
+  public boolean isLifting() {
+    return m_isLifting;
+  }
+
   /**
    * Creates a new Rolletta.
    */
   public Rolletta() {
     //Adds to the shuffleboard constatns, detected color, etc.
+    m_lifter.setInverted(true);
+    m_isLifting= !isUp();
+
     Preferences.getInstance().putDouble("Rolletta/Lift Speed", LIFT_SPEED);
     Preferences.getInstance().putString("Rolletta/Detected color", getCurrentColor());
     Preferences.getInstance().putDouble("Rolletta/Blue/R", BLUE_R);
@@ -162,13 +197,19 @@ public class Rolletta extends SubsystemBase {
    * @param lifting
    * @param untilHit
    */
-  public void move(boolean lifting, DigitalInput untilHit) {
-    double liftSpeed = lifting ? GET_SPEED() : -GET_SPEED();    
-    if (untilHit.get()) {
-      m_lifter.set(0);
-      isLifting = !isLifting;
+  public boolean move(boolean lifting) {
+    double liftSpeed = lifting ? GET_SPEED() : -GET_SPEED();
+    Supplier<Boolean> untilHit = lifting ? this::isUp : this::isDown;
+
+    if (!untilHit.get()) {
+      m_lifter.set(liftSpeed);
+      return false;
     }
-    else  m_lifter.set(liftSpeed);
+    
+    return true;
+
+
+    
   }
 
   /**
@@ -472,6 +513,8 @@ public class Rolletta extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    SmartDashboard.putBoolean("Rolleta/isLifting", m_isLifting);
+    SmartDashboard.putNumber("Rolleta/Lifter Speed", m_lifter.get());
+    SmartDashboard.putNumber("Rolleta/Spinner Speed", m_spinner.get());
   }
 }

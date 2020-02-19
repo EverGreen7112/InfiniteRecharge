@@ -32,7 +32,7 @@ public class Autonomous extends SequentialCommandGroup {
     /**
      * the number of options that we wish to have.
      */
-    public static final int OPTIONS_NUMBER = 20;
+    public static final int OPTIONS_NUMBER = 1;
     private SendableChooser<CommandBase>[] m_options = new SendableChooser[OPTIONS_NUMBER];
     private Supplier<Double>[] m_arguments = new Supplier[OPTIONS_NUMBER];
     private CommandBase[] m_commands;

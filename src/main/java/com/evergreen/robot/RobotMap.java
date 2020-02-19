@@ -42,7 +42,7 @@ public interface RobotMap {
     public interface DigitalPorts {
         public static final int 
         leftChassisEncoderA = 0,
-        leftChassisEncoderB =1,
+        leftChassisEncoderB = 1,
         throwerEncoderB = 2,
         throwerEncoderA = 3,
         rolletaMicroSwitchDown = 4,
