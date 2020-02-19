@@ -65,12 +65,17 @@ public class Robot extends Tree {
     @Override
     protected void test() {
         
+        Rolletta.getInstance().move(
+            false, Rolletta.getInstance().getLowerSwitch());
     }
 
     @Override
     public void testPeriodic() {
-        Chassis.getInstance().drive(0.3, 0.2);
-        
+
+        if (!Rolletta.getInstance().getLowerSwitch().get())
+            Rolletta.getInstance().m_lifter.set(-0.3);
+        // Chassis.getInstance().drive(0.4, -0.4);
+        else Rolletta.getInstance().m_lifter.set(0);
         //Chassis.getInstance().drive(0.3, 0.3);
         //Climb.getInstance().climbUp(0.3);
         //Climb.getInstance().climbPull(0.3);

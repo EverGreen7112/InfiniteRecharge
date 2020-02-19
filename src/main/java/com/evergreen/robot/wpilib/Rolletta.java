@@ -60,8 +60,8 @@ public class Rolletta extends SubsystemBase {
     private Color YELLOW = ColorMatch.makeColor(YELLOW_R, YELLOW_G, YELLOW_B);
     
   //The speed controllers
-  private WPI_TalonSRX m_spinner = new WPI_TalonSRX(MotorPorts.spiner);
-  private SpeedController m_lifter = new WPI_VictorSPX(MotorPorts.lifter);
+  private WPI_TalonSRX m_spinner = new WPI_TalonSRX(MotorPorts.spinner);
+  public SpeedController m_lifter = new WPI_VictorSPX(MotorPorts.lifter);
 
   //The encoder for the spinning motor
   //private Encoder m_spinnerEncoder = new Encoder(DigitalPorts.rollettaA,DigitalPorts.rollettaB);
