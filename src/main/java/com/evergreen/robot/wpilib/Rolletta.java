@@ -76,7 +76,12 @@ public class Rolletta extends SubsystemBase {
   //TODO fix ports
   private DigitalInput m_upperSwitch = new DigitalInput(9);
   private DigitalInput m_lowerSwitch = new DigitalInput(10);
-
+  public DigitalInput getUpperSwitch(){
+    return m_upperSwitch;
+  }
+  public DigitalInput getLowerSwitch(){
+    return m_lowerSwitch;
+  }
   private double m_rightOffset = 0;
   private double m_leftOffset = 0;
 

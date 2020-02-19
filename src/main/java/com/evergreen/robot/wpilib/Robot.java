@@ -69,7 +69,7 @@ public class Robot extends Tree {
 
     @Override
     public void testPeriodic() {
-        Chassis.getInstance().setLeftSpeed(0.25);
+        Chassis.getInstance().drive(0.3, 0.2);
         
         //Chassis.getInstance().drive(0.3, 0.3);
         //Climb.getInstance().climbUp(0.3);
