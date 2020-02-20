@@ -46,7 +46,8 @@ public interface RobotMap {
         throwerEncoderB = 2,
         throwerEncoderA = 3,
         rolletaMicroSwitchDown = 4,
-        rolletaMicroSwitchUp = 5;
+        rolletaMicroSwitchUp = 5,
+        aimerSwitch = 6;
 
     }
     public interface AnalogPorts{

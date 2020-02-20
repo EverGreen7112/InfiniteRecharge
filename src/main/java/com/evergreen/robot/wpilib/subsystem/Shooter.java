@@ -5,6 +5,7 @@ import com.evergreen.robot.RobotMap;
 import com.evergreen.robot.wpilib.Utilites;
 import com.evergreen.robot.wpilib.commands.PassPowerCell;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.SpeedController;
@@ -41,7 +42,9 @@ public class Shooter extends SubsystemBase implements RobotMap {
      */
     public class Aimer extends SubsystemBase{
         // TODO:put correct SpeedController Type
+        
         public WPI_TalonSRX m_motor = new WPI_TalonSRX(MotorPorts.aimer);
+        public DigitalInput m_downSwitch = new DigitalInput(DigitalPorts.aimerSwitch);
         
     }
 
@@ -157,14 +160,23 @@ public class Shooter extends SubsystemBase implements RobotMap {
             };
         }
     private CommandBase m_aimDown() {
-        return new PIDCommand(m_aimController, this::getAimerAngle,
-            aimingDownAngle(), m_aimer.m_motor::set, m_aimer) {
+        return new CommandBase() {
+           
             @Override
-            public void end(boolean interrupted){
-               super.end(interrupted);;
-                m_atUpperPosition =false;
+            public void execute() {
+                m_aimer.m_motor.set(-0.3);
             }
-            };
+
+            @Override
+            public boolean isFinished() {
+                return m_aimer.m_downSwitch.get();
+            }
+
+            @Override
+            public void end(boolean interrupted) {
+                m_aimer.m_motor.set(0);
+            }
+        };
         }
     private CommandBase m_aimToggle() {
         return new PIDCommand(m_aimController, this::getAimerAngle,
@@ -212,13 +224,12 @@ public class Shooter extends SubsystemBase implements RobotMap {
      * if aimer at the lower position acccelerate for shooting to the bootom.
      */
     private CommandBase m_accelerteTothrow() {
-        return new PIDCommand(m_aimController, this::getThrowerSpeed, () ->{
+        return new PIDCommand(m_aimController, this::getThrowerSpeed,()->{ 
         if (m_atUpperPosition) {
+            if(Utilites.isShootingToInnerWork()){
 
-                if (Utilites.isShootingToInnerWork()) {
-                    return PowerPorts.INNER.motorSpeed;
-                }
-
+            return  PowerPorts.INNER.motorSpeed;
+            }
                 return PowerPorts.OUTER.motorSpeed;
         }
 
@@ -361,6 +372,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
      * Construct new Shooter and at the values to the shufflBoard
      */
     private Shooter() {
+        m_aimer.m_motor.setInverted(true);
         Preferences.getInstance().putDouble("aimingUpAngle", 30);
         Preferences.getInstance().putDouble("aimingDownAngle", 15);
         Preferences.getInstance().putDouble("aimerKp", 0);
