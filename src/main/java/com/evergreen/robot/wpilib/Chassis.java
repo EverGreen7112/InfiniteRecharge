@@ -33,7 +33,10 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
@@ -54,6 +57,14 @@ private static Chassis m_instance;
   //declaring the other speed controllers
   private SpeedControllerGroup m_rightBack = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisRightBack), new WPI_VictorSPX(MotorPorts.chassisRightMiddle));
   private SpeedControllerGroup m_leftBack = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisLeftBack), new WPI_VictorSPX(MotorPorts.chassisLeftMiddle));
+  
+  private Command m_defaultDrive = new RunCommand(
+    () -> drive(-Robot.getRightJoystick() * getSpeedModifier(), -Robot.getLeftJoystick() * getSpeedModifier()), 
+    this);
+
+  public Command getDefaultDrive() {
+    return m_defaultDrive;
+  }
   
   //creating pid componets for angle velocity and distance
   private double 
@@ -87,7 +98,7 @@ private static Chassis m_instance;
     MAX_VELOCITY = 0,
     MAX_ACCELERATION = 0;  //m 
   //TODO check
-  
+
   private DifferentialDriveKinematics m_kinematics = new DifferentialDriveKinematics(CHASSIS_WIDTH);
 
   private DifferentialDriveOdometry m_odometry;
@@ -97,18 +108,23 @@ private static Chassis m_instance;
   private TrajectoryConfig m_trajectoryConfig = new TrajectoryConfig(MAX_VELOCITY, MAX_ACCELERATION);
 
   private RamseteController m_ramseteController = new RamseteController();
+
   public DifferentialDriveKinematics getKinematics() {
     return m_kinematics;
   }
+
   public DifferentialDriveOdometry getOdometry(){
     return m_odometry;
   }
+
   public SimpleMotorFeedforward getFeedForword(){
     return m_feedorward;
   }
+
   public TrajectoryConfig getTrajectoryConfig(){
     return m_trajectoryConfig;
   }
+
   public RamseteController getRamseteController(){
     return m_ramseteController;
   }
@@ -119,6 +135,7 @@ private static Chassis m_instance;
     //entering the PID componets into the prefernces
     m_rightBack.setInverted(true);
     m_rightFront.setInverted(true);
+    m_gyro.calibrate();
     Preferences.getInstance().putDouble("Chassis/angle/KP", ANGLE_KP);
     Preferences.getInstance().putDouble("Chassis/angle/KI", ANGLE_KI);
     Preferences.getInstance().putDouble("Chassis/angle/KD", ANGLE_KD);
@@ -131,6 +148,7 @@ private static Chassis m_instance;
     Preferences.getInstance().putDouble("Chassis/distance/KI", DISTANCE_KI);
     Preferences.getInstance().putDouble("Chassis/distance/KD", DISTANCE_KD);
     Preferences.getInstance().putDouble("Chassis/distance/TOLERANCE", VELOCITY_TOLERANCE);
+    Preferences.getInstance().putDouble("Chassis/Speed", 0.5);
   }
 
 
@@ -349,10 +367,16 @@ public void rotate(double speed){
       
     }
   }
+
+  public double getSpeedModifier() {
+    return Preferences.getInstance().getDouble("Chassis/Speed", 0.5);
+  }
   
   
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    // System.out.println(
+    //   "LEFT JS: " + Rob
+    //   "RIGHT JS: " + Robot.getRightJoystick());
   }
 }

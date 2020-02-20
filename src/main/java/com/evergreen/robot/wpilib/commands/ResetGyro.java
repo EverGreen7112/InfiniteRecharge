@@ -12,5 +12,10 @@ public class ResetGyro extends CommandBase {
 public void initialize() {
     Chassis.getInstance().getGyro().reset();
 }
+@Override
+public boolean isFinished() {
+    // TODO Auto-generated method stub
+    return true;
+}
     
 }

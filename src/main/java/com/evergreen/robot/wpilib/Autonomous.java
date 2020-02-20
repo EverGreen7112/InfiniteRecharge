@@ -49,7 +49,7 @@ public class Autonomous extends SequentialCommandGroup {
             final int j = i;
             Preferences.getInstance().putDouble("arg" + i, 0);
             m_arguments[i] = () -> Preferences.getInstance().getDouble("arg" + j, 0);
-            m_options[i] = new SendableChooser();
+            m_options[i] = new SendableChooser<CommandBase>();
             m_options[i].setDefaultOption("wait" +i, new WaitCommandEG(m_arguments[i].get()));
             m_options[i].addOption("driveStraight" +i, new MoveChassisTo(m_arguments[i].get()));
             m_options[i].addOption("driveXdistanceWithoutStopping", new DriveToNoStop(m_arguments[i].get()));

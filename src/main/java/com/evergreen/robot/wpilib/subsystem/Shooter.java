@@ -104,7 +104,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
     }
     
     public double throwerDistancePerPulse() {
-        return Preferences.getInstance().getDouble("thrower/distancePerPulse", 0.1);
+        return 0.5 *Math.PI;
     }
     
     /**

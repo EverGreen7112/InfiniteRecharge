@@ -31,18 +31,19 @@ public class Collector extends SubsystemBase {
    * Collects Power Cells (by setting a speed to the collecting mechanism)
    */
   public CommandBase collectCmd(){
-    return new RunCommand(() -> collectCmd(getSpeed()), this) {
+    return new RunCommand(() -> collect(getSpeed()), this) {
     @Override
     public void end(boolean interrupted) {
-      collectCmd(0);
-    }
-    
+      collect(0);
+    }  
   };}
+
+  
   public CommandBase collectCmd(double speed){
     return new RunCommand(() -> collect(speed), this) {
       @Override
       public void end(boolean interrupted) {
-        collectCmd(0);
+        collect(0);
       };
   };
 }
@@ -55,7 +56,7 @@ public class Collector extends SubsystemBase {
     return new CommandBase() {
       @Override
       public void initialize() {
-        collectCmd(COLLECTOR_SPEED);
+        collect(COLLECTOR_SPEED);
       }
       @Override
         public boolean isFinished() {
@@ -69,7 +70,7 @@ public class Collector extends SubsystemBase {
         }
       @Override
         public void end(boolean interrupted) {
-          collectCmd(0);
+          collect(0);
         }
         };
     }

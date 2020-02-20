@@ -12,6 +12,7 @@ import com.evergreen.robot.RobotMap.AnalogPorts;
 import com.evergreen.robot.RobotMap.DigitalPorts;
 import com.evergreen.robot.RobotMap.MotorPorts;
 
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Ultrasonic;
@@ -32,8 +33,8 @@ public class Storage extends SubsystemBase {
 
   //New speed controller and ultrasonic sensor for passing the power cells.
   private SpeedController m_passMotor = new WPI_VictorSPX(MotorPorts.passer);
-   private Ultrasonic ultrasonic = 
-     new Ultrasonic(11, 12);
+   private AnalogInput ultrasonic = 
+     new AnalogInput(AnalogPorts.storageUltrasonic);
   // TODO Y 2 ports needed
   /**
    * Passes a Power Cell to the Shooter, stops after a fixed amount of time.
@@ -66,8 +67,8 @@ public class Storage extends SubsystemBase {
   /**
    * Passes a Power Cell to the Shooter, stops by the Ultrasonic sensor signals.
    */
-  public CommandBase passBySensor(){
-    return new RunCommand(() -> m_passBySensor(getSpeed(), getUltrasonicDistance()), this) {
+  public CommandBase passBySensorCmd(){
+    return new RunCommand(() -> passBySensor(getSpeed(), getUltrasonicDistance()), this) {
     
       @Override 
     public void end(boolean interrupted) {
@@ -100,10 +101,10 @@ public class Storage extends SubsystemBase {
    * 
    * @throws InterruptedException
    */
-  public void passByTime(double m_speed, long m_time) {
-    m_passMotor.set(m_speed);
+  public void passByTime(double speed, long time) {
+    m_passMotor.set(speed);
     try {
-      Thread.sleep(m_time);
+      Thread.sleep(time);
     } catch (InterruptedException e) {
       e.printStackTrace();
       throw new RuntimeException();
@@ -111,7 +112,7 @@ public class Storage extends SubsystemBase {
     m_passMotor.set(0);
   }
   //TODO: check if work
-  public void m_passBySensor(double m_speed, double dist) {
+  public void passBySensor(double m_speed, double dist) {
     if ((dist <= MIN_EMPTY_DIST) && (dist != 0)) {
       m_passMotor.set(m_speed);
     }
@@ -138,7 +139,7 @@ public class Storage extends SubsystemBase {
    * Gets the Ultrasonic value (in mm).
    */
    public double getUltrasonicDistance() {
-    return ultrasonic.getRangeMM();
+    return ultrasonic.getVoltage();
   }
 
   /**

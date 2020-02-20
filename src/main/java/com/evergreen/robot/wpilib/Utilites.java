@@ -121,7 +121,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
     }
     //TODO: check
     public static boolean isVisonWork(){
-        return m_table.getEntry("CameraInput").getBoolean(true);
+        return false;
     }
     /////////////////////////////////////////////////////////////////
     /**
@@ -135,7 +135,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
                 aimCommand,
                 accelerateCommand, 
                 waitForShooting(),
-                Storage.getInstance().passBySensor());
+                Storage.getInstance().passBySensorCmd());
         }
 
         return new SequentialCommandGroup(
