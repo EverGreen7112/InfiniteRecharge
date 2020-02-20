@@ -111,6 +111,18 @@ public class Storage extends SubsystemBase {
     }
     m_passMotor.set(0);
   }
+  public CommandBase getPass(){
+    return new CommandBase() {
+      @Override
+      public void initialize() {
+        m_passMotor.set(getSpeed());
+      }
+      @Override
+        public void end(boolean interrupted) {
+          m_passMotor.set(0);
+        }
+    };
+  }
   //TODO: check if work
   public void passBySensor(double m_speed, double dist) {
     if ((dist <= MIN_EMPTY_DIST) && (dist != 0)) {

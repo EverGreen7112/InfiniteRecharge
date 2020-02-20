@@ -148,7 +148,7 @@ private static Chassis m_instance;
     Preferences.getInstance().putDouble("Chassis/distance/KI", DISTANCE_KI);
     Preferences.getInstance().putDouble("Chassis/distance/KD", DISTANCE_KD);
     Preferences.getInstance().putDouble("Chassis/distance/TOLERANCE", VELOCITY_TOLERANCE);
-    Preferences.getInstance().putDouble("Chassis/Speed", 0.5);
+    Preferences.getInstance().putDouble("Chassis/Speed", 0.8);
   }
 
 
@@ -369,9 +369,10 @@ public void rotate(double speed){
   }
 
   public double getSpeedModifier() {
-    return Preferences.getInstance().getDouble("Chassis/Speed", 0.5);
+    return 0.85;
   }
   
+
   
   @Override
   public void periodic() {

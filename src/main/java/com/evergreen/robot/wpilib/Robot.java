@@ -31,8 +31,8 @@ public class Robot extends TimedRobot {
     boolean m_activate = true;
     boolean m_lifting = false;
     public static Joystick 
-        m_leftJoystick = new Joystick(0),
-        m_righJoystick = new Joystick(1),
+        m_leftJoystick = new Joystick(JoystickPorts.leftChassisJS),
+        m_righJoystick = new Joystick(JoystickPorts.rightChasisJS),
         m_operatorJoystick = new Joystick(2);
 
     private static Button buttonX = 
@@ -113,22 +113,45 @@ public class Robot extends TimedRobot {
     }
     
     @Override
+    public void autonomousInit() {
+        Chassis.getInstance().move(0.3);
+        try {
+            Thread.sleep(1500);
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+          }
+          Chassis.getInstance().move(0);
+    }
+    
+    @Override
     public void autonomousPeriodic() {
         // CommandScheduler.getInstance().run();
 
+        
     }
+    
 
     @Override
     public void teleopPeriodic() {
         // CommandScheduler.getInstance().run();
+        
     }
       
     @Override
     public void teleopInit() {
-        Chassis.getInstance().setDefaultCommand(
-            Chassis.getInstance().getDefaultDrive());
-        buttonX.whenPressed(new ResetGyro());
-        buttonA.whenPressed(Chassis.);
+        Chassis.getInstance().getDefaultDrive().schedule();//checed
+        // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSLT).whileHeld(Shooter.getInstance().getAccelerateToThrow());
+        // new JoystickButton(m_operatorJoystick,ButtonPorts.operatorJSRT).whileHeld(Storage.getInstance().getPass());
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSLB).whileHeld(Climb.getInstance().m_up());
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSRB).whileHeld(Climb.getInstance().getClimbDown());
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSB).whileHeld(Climb.getInstance().m_pull());
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSRS).whenPressed(Rolletta.getInstance().toggle());
+        // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSStart).whenPressed(Rolletta.getInstance().getRotationControl());
+        // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSBack).whenPressed(Rolletta.getInstance().getPositionControl());
+        //TODO: add climb down on RB
+        
+       
     };
     
 }   

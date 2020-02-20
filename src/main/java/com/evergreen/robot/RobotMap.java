@@ -71,9 +71,17 @@ public interface RobotMap {
     public interface ButtonPorts {
         public static final int 
             operatorJSX = 1,
-            operatorJSY = 2,
+            operatorJSY = 4,
             operatorJSB = 3,
-            operatorJSA = 4;
+            operatorJSA = 2,
+            operatorJSLB = 5,
+            operatorJSRB = 6,
+            operatorJSLT = 7,
+            operatorJSRT = 8,
+            operatorJSBack = 9,
+            operatorJSStart = 10,
+            operatorJSRS =12,
+            operatorJSLeftS = 11;
     }
     
     //Detail Cameras used

@@ -24,8 +24,8 @@ public class Climb extends SubsystemBase {
 
   //creates speed constants
   private double CLIMB_UP_SPEED = 0.5;
-  private double CLIMB_PULL_SPEED = 0.5; 
-  private double ELEVATOR_DESCEND_SPEED = -0.5;
+  private double CLIMB_PULL_SPEED = 1; 
+  private double ELEVATOR_DESCEND_SPEED = -0.55;
   private long DESCEND_TIME = 2000;
 
   //creates the speed controllers
@@ -46,16 +46,9 @@ public class Climb extends SubsystemBase {
    return new RunCommand(() -> climbUp(getUpSpeed()), this) {
     @Override
     public void end(boolean interrupted) {
-      m_climbUp.set(getDescendSpeed());
-      try {
-        Thread.sleep(getDescendTime());
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-        throw new RuntimeException();
-      }
-      m_climbUp.set(0.0);
-    }
-  };}
+      m_climbUp.set(0);
+      
+  }};}
 
   /**
    * Pulls up the robot
@@ -67,12 +60,21 @@ public class Climb extends SubsystemBase {
       m_climbPull.set(0.0);
     }
   };}
+  public CommandBase getClimbDown(){
+    return new RunCommand(() -> climbUp(getDescendSpeed()), this) {
+      @Override
+      public void end(boolean interrupted) {
+        m_climbUp.set(0.0);
+      }
+    };
+  }
 
   /** Climb Constructor:
    * Creates a new Climb.
    */
   private Climb() {
     m_climbPull.setInverted(true);//positve values if pull.
+    m_climbUp.setInverted(true);
     //uploads the speed constants to the shuffelboard
     Preferences.getInstance().putDouble("Climb/Elevator Speed", CLIMB_UP_SPEED);
     Preferences.getInstance().putDouble("Climb/Pull-Up Speed", CLIMB_PULL_SPEED);
