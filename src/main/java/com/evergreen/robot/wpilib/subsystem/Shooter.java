@@ -489,12 +489,13 @@ public class Shooter extends SubsystemBase implements RobotMap {
         SmartDashboard.putNumber("VOLTAGE", voltage);
         return voltage / 12; // Percentage
     }
-            public CommandBase getShooterSpeed() {
-                return new CommandBase() {
-                    @Override
-                    public void initialize() {
-                        m_throwerMotor.set(shooterSpeedToPercentage(0.5, 0));
-                    }
-                };
+    
+    public CommandBase getShooterSpeedControl() {
+        return new CommandBase() {
+            @Override
+            public void initialize() {
+                m_throwerMotor.set(shooterSpeedToPercentage(0.5, 0));
             }
+        };
+    }
 }
