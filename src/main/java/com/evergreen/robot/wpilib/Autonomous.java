@@ -59,7 +59,7 @@ public class Autonomous extends SequentialCommandGroup {
             m_options[i].addOption("rotate" + i, new RotateTo(m_arguments[i].get()));
             //turn right by defualt if we want to turn left put negative value;
             m_options[i].addOption("turnTilSeePowerPort" +i, new RotateTilSeePort(true, m_arguments[i].get()));
-            m_options[i].addOption("turn until the power port is infront"+i, TurnPowePortInfront.getInstance());  
+            // m_options[i].addOption("turn until the power port is infront"+i, TurnPowePortInfront.getInstance());  
             m_options[i].addOption("Stop"+i, new Stop());
             //TODO: add circular move;
             m_options[i].addOption("shootToUpper" +i, Shooter.getInstance().getShootToUpper());

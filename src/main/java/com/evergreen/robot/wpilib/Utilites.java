@@ -4,8 +4,10 @@ import com.evergreen.robot.wpilib.subsystem.Shooter;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -28,7 +30,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
     //TODO: check
     public static final Pose2d POWER_PORT_POSE2D = new Pose2d(0, 2.38415,new Rotation2d(0));
     //TODO: fix ready for shoot, vison work angle getting
-    private static NetworkTable m_table = NetworkTableInstance.getDefault().getTable("Vision");
+    private static NetworkTable m_table = NetworkTableInstance.getDefault().getTable("SmartDashboard");
        
     public static double getXDistanceFromPowerPort(){
         if(isVisionDistanceWork()&&isVisonAngleWork()){
@@ -65,10 +67,9 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
      * @return b angle, see whatsapp
      */
     public static double getPOwerPortToRobotAngle(){ 
-        if(isVisonAngleWork()){
-        return m_table.getEntry("Angle").getDouble(0);
-        }
-        return Chassis.getInstance().getGyro().getAngle()- Math.atan(getYDistanceFromPowerPort()/getXDistanceFromPowerPort());
+        Preferences.getInstance().putDouble("another angle",SmartDashboard.getNumber("Angle", 0.3) );
+        return SmartDashboard.getNumber("Angle", 0.3);
+       
     }
     
     public static boolean seePowerPort(){
@@ -114,14 +115,12 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
     }
     //TODO: check
     public static boolean isVisonAngleWork(){
-        if(isVisonWork()){
+       
             return true;
-            }
-            return false;
     }
     //TODO: check
     public static boolean isVisonWork(){
-        return false;
+        return true;
     }
     public static boolean isThrowerPIDWork(){
         return true;

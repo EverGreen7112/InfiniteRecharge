@@ -8,15 +8,19 @@ import com.evergreen.robot.RobotMap.JoystickPorts;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.evergreen.robot.wpilib.commands.ResetGyro;
+import com.evergreen.robot.wpilib.commands.TurnPowePortInfront;
 import com.evergreen.robot.wpilib.subsystem.Shooter;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -79,11 +83,12 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         // new PrintCommand("CHECK").schedule();
+        Preferences.getInstance().putDouble("AAAaAAAAa", Utilites.getPOwerPortToRobotAngle());
         CommandScheduler.getInstance().run();
         // System.out.println("TEST");
 
-        System.out.println("REFLECTIVE CENTER " +
-            SmartDashboard.getNumber("Distance", -2));
+        // System.out.println("REFLECTIVE CENTER " +
+        //     SmartDashboard.getNumber("Distance", -2));
     }
     
 
@@ -141,24 +146,26 @@ public class Robot extends TimedRobot {
       
     @Override
     public void teleopInit() {
-        Chassis.getInstance().getDefaultDrive().schedule();//checed
+        Chassis.getInstance().setDefaultCommand(Chassis.getInstance().getDefaultDrive()); //checed
 
         new JoystickButton(m_operatorJoystick,ButtonPorts.operatorJSY).whenPressed(Shooter.getInstance().getAimUp());
         new JoystickButton(m_operatorJoystick,ButtonPorts.operatorJSA).whenPressed(Shooter.getInstance().getAimDown());
-        // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSLT).whileHeld(Shooter.getInstance().getAccelerateToThrow());
-        // new JoystickButton(m_operatorJ]\[oystick,ButtonPorts.operatorJSRT).whileHeld(Storage.getInstance().getPass());
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSLT).whileHeld(Shooter.getInstance().getAccelerateToThrow());
+        new JoystickButton(m_operatorJoystick,ButtonPorts.operatorJSRT).whileHeld(Storage.getInstance().getPass());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSLB).whileHeld(Climb.getInstance().m_up());
-        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSX).whileHeld(Collector.getInstance().collectCmd());
-        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSA).whenPressed(Shooter.getInstance().getAimDown());
-        
-        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSRB).whileHeld(Climb.getInstance().getClimbDown());
+        // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSX).whileHeld(Collector.getInstance().collectCmd());
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSX).whenPressed(new PIDCommand(new PIDController(Chassis.getInstance().getAngleKp(),Chassis.getInstance().getAngleKi(), Chassis.getInstance().getAngleKd()),
+        Utilites::getPOwerPortToRobotAngle, 0.0, Chassis.getInstance()::rotate, Chassis.getInstance()) );
+
+        // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSA).whenPressed(Shooter.getInstance().getAimDown());
+    
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSB).whileHeld(Climb.getInstance().m_pull());
         // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSRS).whenPressed(Rolletta.getInstance().toggle());
         // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSStart).whenPressed(Rolletta.getInstance().getRotationControl());
         // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSBack).whenPressed(Rolletta.getInstance().getPositionControl());
         //TODO: add climb down on RB
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSLT).whenPressed(Shooter.getInstance().getShooterSpeed());
-        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSX).whileHeld(Collector.getInstance().collectCmd());
+        // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSX).whileHeld(Collector.getInstance().collectCmd());
 
        
     };

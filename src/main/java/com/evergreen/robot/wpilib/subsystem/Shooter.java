@@ -1,6 +1,7 @@
 package com.evergreen.robot.wpilib.subsystem;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.evergreen.robot.RobotMap;
 import com.evergreen.robot.wpilib.Utilites;
 import com.evergreen.robot.wpilib.commands.PassPowerCell;
@@ -15,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 /**
@@ -54,7 +56,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
      */
     public class Thrower extends SubsystemBase{
         // TODO:put correct SpeedController Type
-        public SpeedController m_motor = new WPI_TalonSRX(MotorPorts.thrower);
+        public SpeedController m_motor = new WPI_VictorSPX(MotorPorts.thrower);
         public Encoder m_encoder = new Encoder(DigitalPorts.throwerEncoderA, DigitalPorts.throwerEncoderB);
     }
 
@@ -156,12 +158,12 @@ public class Shooter extends SubsystemBase implements RobotMap {
         return new CommandBase() {
             @Override
             public void execute() {
-                m_aimer.m_motor.set(0.3);
+                m_aimer.m_motor.set(0.7);
             }
             @Override
             public boolean isFinished() {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(200);
                   } catch (InterruptedException e) {
                     e.printStackTrace();
                     throw new RuntimeException();
@@ -191,7 +193,14 @@ public class Shooter extends SubsystemBase implements RobotMap {
 
             @Override
             public void end(boolean interrupted) {
-                m_aimer.m_motor.set(0);
+                m_aimer.m_motor.set(0.7);
+                try {
+                Thread.sleep(50);
+              } catch (InterruptedException e) {
+                e.printStackTrace();
+                throw new RuntimeException();
+              }
+              m_aimer.m_motor.set(0);
             }
         };
         }
@@ -346,7 +355,17 @@ public class Shooter extends SubsystemBase implements RobotMap {
      *         position acccelerate for shooting to the bootom.
      */
     public CommandBase getAccelerateToThrow() {
-        return m_accelerteTothrow();
+        return new CommandBase() {
+            @Override
+            public void execute() {
+                m_thrower.m_motor.set(1);
+            }
+
+            @Override
+            public void end(boolean interrupted) {
+                m_thrower.m_motor.set(0);
+            }
+        };
     }
 
     /**

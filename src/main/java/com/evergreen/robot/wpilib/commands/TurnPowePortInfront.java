@@ -3,6 +3,7 @@ package com.evergreen.robot.wpilib.commands;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 
+import com.evergreen.everlib.utils.PIDSettings;
 import com.evergreen.robot.wpilib.Chassis;
 import com.evergreen.robot.wpilib.Utilites;
 import com.evergreen.robot.wpilib.subsystem.Shooter;
@@ -17,11 +18,10 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 public class TurnPowePortInfront extends PIDCommand {
     private static TurnPowePortInfront m_instance = new TurnPowePortInfront();
     
-    public static TurnPowePortInfront getInstance() {
-        return m_instance;
-    }
-    private TurnPowePortInfront() {
-        super(Chassis.getInstance().getAnglePID(), Utilites::getPOwerPortToRobotAngle, 0.0, Chassis.getInstance()::rotate, Shooter.getInstance());
+    
+    public TurnPowePortInfront() {
+        super(new PIDController(Chassis.getInstance().getAngleKp(),Chassis.getInstance().getAngleKi(), Chassis.getInstance().getAngleKd()),
+         Utilites::getPOwerPortToRobotAngle, 0.0, Chassis.getInstance()::rotate, Shooter.getInstance());
         // TODO Auto-generated constructor stub
     }
 
