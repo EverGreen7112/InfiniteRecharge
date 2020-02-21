@@ -74,7 +74,7 @@ public class Rolletta extends SubsystemBase {
   //private Encoder m_spinnerEncoder = new Encoder(DigitalPorts.rollettaA,DigitalPorts.rollettaB);
 
   //The Color Sensor
-  private final ColorSensorV3 m_colorSensor = new ColorSensorV3(Port.kMXP);
+  private final ColorSensorV3 m_colorSensor = new ColorSensorV3(Port.kOnboard);
   //The color matcher - detects known colors
   private final ColorMatch m_colorMatcher = new ColorMatch();
 
@@ -118,7 +118,9 @@ public class Rolletta extends SubsystemBase {
 
       @Override
       public void end(boolean interrupted) {
-        m_isLifting = !m_isLifting;
+        if (!interrupted){
+          m_isLifting = !m_isLifting;
+        }
         m_lifter.set(0);        
       }
 
