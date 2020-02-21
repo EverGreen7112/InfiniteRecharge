@@ -100,6 +100,7 @@ public class Robot extends TimedRobot {
     
     @Override
     public void disabledPeriodic() {
+        
         // CommandScheduler.getInstance().run();
        
     
@@ -115,6 +116,9 @@ public class Robot extends TimedRobot {
            Rolletta.getInstance(),
            Storage.getInstance()
        );
+
+
+    //    Shooter.getInstance().m_thrower.m_motor.set(0.4);
         
     }
     
