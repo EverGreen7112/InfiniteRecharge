@@ -96,6 +96,7 @@ public class Robot extends TimedRobot {
     @Override
     public void disabledPeriodic() {
         // CommandScheduler.getInstance().run();
+       
     
     }
 
@@ -134,16 +135,16 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        // Shooter.getInstance().m_aimer.m_motor.set(-0.2);
-        
         CommandScheduler.getInstance().run();
-       
-        
+          
     }
       
     @Override
     public void teleopInit() {
         Chassis.getInstance().getDefaultDrive().schedule();//checed
+
+        new JoystickButton(m_operatorJoystick,ButtonPorts.operatorJSY).whenPressed(Shooter.getInstance().getAimUp());
+        new JoystickButton(m_operatorJoystick,ButtonPorts.operatorJSA).whenPressed(Shooter.getInstance().getAimDown());
         // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSLT).whileHeld(Shooter.getInstance().getAccelerateToThrow());
         // new JoystickButton(m_operatorJ]\[oystick,ButtonPorts.operatorJSRT).whileHeld(Storage.getInstance().getPass());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSLB).whileHeld(Climb.getInstance().m_up());
@@ -155,8 +156,10 @@ public class Robot extends TimedRobot {
         // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSRS).whenPressed(Rolletta.getInstance().toggle());
         // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSStart).whenPressed(Rolletta.getInstance().getRotationControl());
         // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSBack).whenPressed(Rolletta.getInstance().getPositionControl());
-        
-        
+        //TODO: add climb down on RB
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSLT).whenPressed(Shooter.getInstance().getShooterSpeed());
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSX).whileHeld(Collector.getInstance().collectCmd());
+
        
     };
     
