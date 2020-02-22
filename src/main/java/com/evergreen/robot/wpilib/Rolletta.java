@@ -90,7 +90,7 @@ public class Rolletta extends SubsystemBase {
 
   
   public boolean isDown() {
-    return !m_lowerSwitch.get();
+    return m_lowerSwitch.get();
   }
 
   public boolean isUp() {
@@ -202,7 +202,7 @@ public class Rolletta extends SubsystemBase {
    * @param untilHit
    */
   public boolean move(boolean lifting) {
-    double liftSpeed = lifting ? GET_SPEED() : -GET_SPEED();
+    double liftSpeed = lifting ? GET_SPEED() : -GET_SPEED()*0.5;
     Supplier<Boolean> untilHit = lifting ? this::isUp : this::isDown;
     SmartDashboard.putBoolean("Hit", untilHit.get());
     
@@ -344,6 +344,10 @@ public class Rolletta extends SubsystemBase {
     } else {
       return "Unknown";
     }
+  }
+
+  public ColorSensorV3 getColorSensor() {
+    return m_colorSensor;
   }
 
 

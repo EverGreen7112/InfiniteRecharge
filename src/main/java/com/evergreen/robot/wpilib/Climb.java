@@ -25,6 +25,7 @@ public class Climb extends SubsystemBase {
   //creates speed constants
   private double CLIMB_UP_SPEED = 0.5;
   private double CLIMB_PULL_SPEED = 1; 
+  private double CLIMB_PUSH_SPEED = -0.7; 
   private double ELEVATOR_DESCEND_SPEED = -0.55;
   private long DESCEND_TIME = 2000;
 
@@ -43,12 +44,26 @@ public class Climb extends SubsystemBase {
    */
   public CommandBase m_up(){
 
-   return new RunCommand(() -> climbUp(getUpSpeed()), this) {
-    @Override
-    public void end(boolean interrupted) {
-      m_climbUp.set(0);
-      
-  }};}
+    return new RunCommand(() -> climbUp(getUpSpeed()), this) {
+      @Override
+      public void end(boolean interrupted) {
+        m_climbUp.set(0);
+        
+      }
+    };
+  }
+
+
+  public CommandBase getPush() {
+    return 
+      new RunCommand(() -> climbPull(CLIMB_PUSH_SPEED), this) {
+        @Override
+        public void end(boolean interrupted) {
+          m_climbPull.set(0);
+        }
+      };
+  }
+  
 
   /**
    * Pulls up the robot

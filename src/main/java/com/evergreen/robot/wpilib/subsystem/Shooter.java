@@ -156,26 +156,37 @@ public class Shooter extends SubsystemBase implements RobotMap {
 
     private CommandBase m_aimUp() {
         return new CommandBase() {
+            double m_start;
+            double m_difference;
+
+            public void initialize() {
+                m_start = System.currentTimeMillis();
+            }
+
             @Override
             public void execute() {
                 m_aimer.m_motor.set(0.7);
+                SmartDashboard.putNumber("START", m_start);
+
+                SmartDashboard.putNumber(
+                    "CURRENT", System.currentTimeMillis());
+                
+                m_difference = System.currentTimeMillis() - m_start;
+                
+                SmartDashboard.putNumber("DIFFERENCE", m_difference);
             }
+
             @Override
             public boolean isFinished() {
-                try {
-                    Thread.sleep(200);
-                  } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException();
-                  }
-                  return true;
-                }
-                @Override
-                public void end(boolean interrupted) {
-                    m_aimer.m_motor.set(0);
-                }
-            };
-        }
+                return m_difference >= 190;    
+            }
+
+            @Override
+            public void end(boolean interrupted) {
+                m_aimer.m_motor.set(0);
+            }
+        };
+    }
     
 
     private CommandBase m_aimDown() {
@@ -193,14 +204,15 @@ public class Shooter extends SubsystemBase implements RobotMap {
 
             @Override
             public void end(boolean interrupted) {
-                m_aimer.m_motor.set(0.7);
-                try {
-                Thread.sleep(50);
-              } catch (InterruptedException e) {
-                e.printStackTrace();
-                throw new RuntimeException();
-              }
-              m_aimer.m_motor.set(0);
+            // Created weird bang bang
+            //     m_aimer.m_motor.set(0.7);
+            //     try {
+            //     Thread.sleep(50);
+            //    } catch (InterruptedException e) {
+            //      e.printStackTrace();
+            //      throw new RuntimeException();
+            //   }
+                m_aimer.m_motor.set(0);
             }
         };
         }
@@ -358,7 +370,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
         return new CommandBase() {
             @Override
             public void execute() {
-                m_thrower.m_motor.set(1);
+                m_thrower.m_motor.set(0.75);
             }
 
             @Override
@@ -497,5 +509,10 @@ public class Shooter extends SubsystemBase implements RobotMap {
                 m_throwerMotor.set(shooterSpeedToPercentage(0.5, 0));
             }
         };
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("TICKS", m_aimer.m_motor.getSelectedSensorPosition());
     }
 }

@@ -20,6 +20,7 @@ import com.evergreen.robot.wpilib.subsystem.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -71,10 +72,12 @@ public class Robot extends TimedRobot {
         // System.out.println("PRINTING WHY");
         // Command cmd  
         CommandScheduler.getInstance().run();
+        Rolletta.getInstance().m_lifter.set(-0.2);
     }
-
+    
     @Override
     public void testPeriodic() {
+        Rolletta.getInstance().m_lifter.set(0.3);
         // new PrintCommand("message").schedule();
     }
     
@@ -95,14 +98,46 @@ public class Robot extends TimedRobot {
     
     @Override
     public void disabledInit() {
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSB)
+            .whenPressed(
+                new InstantCommand(Rolletta.getInstance()::calibrateRed)
+            );
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSA)
+            .whenPressed(
+                new InstantCommand(Rolletta.getInstance()::calibrateGreen)
+            );
+
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSX)
+            .whenPressed(
+                new InstantCommand(Rolletta.getInstance()::calibrateBlue)
+            );
+
+        
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSX)
+        .whenPressed(
+            new InstantCommand(Rolletta.getInstance()::calibrateYellow)
+        );
+            
        
     }
     
     @Override
     public void disabledPeriodic() {
         
-        // CommandScheduler.getInstance().run();
-       
+        SmartDashboard.putNumber(
+           "BLUE",
+           Rolletta.getInstance().getColorSensor().getBlue()
+        ); 
+
+        SmartDashboard.putNumber(
+            "GREEN",
+            Rolletta.getInstance().getColorSensor().getGreen()
+        ); 
+        
+        SmartDashboard.putNumber(
+            "RED",
+            Rolletta.getInstance().getColorSensor().getRed()
+        ); 
     
     }
 
@@ -152,16 +187,20 @@ public class Robot extends TimedRobot {
     public void teleopInit() {
         Chassis.getInstance().setDefaultCommand(Chassis.getInstance().getDefaultDrive()); //checed
 
-        new JoystickButton(m_operatorJoystick,ButtonPorts.operatorJSY).whenPressed(Shooter.getInstance().getAimUp());
-        new JoystickButton(m_operatorJoystick,ButtonPorts.operatorJSA).whenPressed(Shooter.getInstance().getAimDown());
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSY).whenPressed(Shooter.getInstance().getAimUp());
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSA).whenPressed(Shooter.getInstance().getAimDown());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSLT).whileHeld(Shooter.getInstance().getAccelerateToThrow());
-        new JoystickButton(m_operatorJoystick,ButtonPorts.operatorJSRT).whileHeld(Storage.getInstance().getPass());
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSRT).whileHeld(Storage.getInstance().getPass());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSLB).whileHeld(Climb.getInstance().m_up());
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSRB).whileHeld(Climb.getInstance().getClimbDown());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSX).whileHeld(Collector.getInstance().collectCmd());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSB).whileHeld(Climb.getInstance().m_pull());
-        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSA).whenPressed(Shooter.getInstance().getAimDown());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSRS).whenPressed(Rolletta.getInstance().toggle());
-        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSLT).whileHeld(Shooter.getInstance().getShooterSpeedControl());
+
+        // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSLT).whileHeld(Shooter.getInstance().getShooterSpeedControl());
+        // new JoystickButton(m_righJoystick, 8).whileHeld(new InstantCommand(() -> CommandScheduler.getInstance().cancelAll()));
+        // new JoystickButton(m_leftJoystick, 8).whileHeld(new InstantCommand(() -> CommandScheduler.getInstance().cancelAll()));
+        
         
         
         

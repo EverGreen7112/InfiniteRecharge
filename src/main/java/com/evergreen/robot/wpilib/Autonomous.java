@@ -42,6 +42,7 @@ public class Autonomous extends SequentialCommandGroup {
         if (m_instance == null) m_instance = new Autonomous();
         return m_instance;
     }
+    
     //add collect while moving,
     private Autonomous() {
         m_commands = new CommandBase[OPTIONS_NUMBER];
@@ -50,13 +51,13 @@ public class Autonomous extends SequentialCommandGroup {
             Preferences.getInstance().putDouble("arg" + i, 0);
             m_arguments[i] = () -> Preferences.getInstance().getDouble("arg" + j, 0);
             m_options[i] = new SendableChooser<CommandBase>();
-            m_options[i].setDefaultOption("wait" +i, new WaitCommandEG(m_arguments[i].get()));
-            m_options[i].addOption("driveStraight" +i, new MoveChassisTo(m_arguments[i].get()));
-            m_options[i].addOption("driveXdistanceWithoutStopping", new DriveToNoStop(m_arguments[i].get()));
-            m_options[i].addOption("driveXdistanceWhileCollecting", new CollectWhileMoving(m_arguments[i].get()));
-            m_options[i].addOption("riveXDistanceFromPowerPort"+i, new DriveToPowerPort(m_arguments[i].get()) );         
+            m_options[i].setDefaultOption("wait #" + i, new WaitCommandEG(m_arguments[i].get()));
+            m_options[i].addOption("driveStraight #" + i, new MoveChassisTo(m_arguments[i].get()));
+            m_options[i].addOption("driveXdistanceWithoutStopping #", new DriveToNoStop(m_arguments[i].get()));
+            m_options[i].addOption("driveXdistanceWhileCollecting #", new CollectWhileMoving(m_arguments[i].get()));
+            m_options[i].addOption("riveXDistanceFromPowerPort #"+ i, new DriveToPowerPort(m_arguments[i].get()) );         
             //turn right by defualt if we want to turn left put negative value;
-            m_options[i].addOption("rotate" + i, new RotateTo(m_arguments[i].get()));
+            m_options[i].addOption("rotate #" + i, new RotateTo(m_arguments[i].get()));
             //turn right by defualt if we want to turn left put negative value;
             m_options[i].addOption("turnTilSeePowerPort" +i, new RotateTilSeePort(true, m_arguments[i].get()));
             // m_options[i].addOption("turn until the power port is infront"+i, TurnPowePortInfront.getInstance());  
