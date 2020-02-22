@@ -71,14 +71,20 @@ public class Robot extends TimedRobot {
 
         // System.out.println("PRINTING WHY");
         // Command cmd  
-        CommandScheduler.getInstance().run();
-        Rolletta.getInstance().m_lifter.set(-0.2);
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSY).whenPressed(Rolletta.getInstance().m_calibrateYellow());
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSB).whenPressed(Rolletta.getInstance().m_calibrateRed());
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSX).whenPressed(Rolletta.getInstance().m_calibrateBlue());
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSA).whenPressed(Rolletta.getInstance().m_calibrateGreen());
+       
+        
     }
     
     @Override
     public void testPeriodic() {
         Rolletta.getInstance().m_lifter.set(0.3);
         // new PrintCommand("message").schedule();
+        CommandScheduler.getInstance().run();
+
     }
     
     
@@ -167,12 +173,12 @@ public class Robot extends TimedRobot {
             throw new RuntimeException();
           }
           Chassis.getInstance().move(0);
+
     }
     
     @Override
     public void autonomousPeriodic() {
         // CommandScheduler.getInstance().run();
-
         
     }
     //
@@ -196,6 +202,26 @@ public class Robot extends TimedRobot {
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSX).whileHeld(Collector.getInstance().collectCmd());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSB).whileHeld(Climb.getInstance().m_pull());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSRS).whenPressed(Rolletta.getInstance().toggle());
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSStart).whenPressed(Rolletta.getInstance().getRotationControl());
+        
+
+
+
+
+
+
+
+
+        // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSY).whenPressed(Rolletta.getInstance().m_calibrateYellow());
+        // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSB).whenPressed(Rolletta.getInstance().m_calibrateRed());
+        // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSX).whenPressed(Rolletta.getInstance().m_calibrateBlue());
+        // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSA).whenPressed(Rolletta.getInstance().m_calibrateGreen());
+        // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSStart).whenPressed(new RunCommand(() -> Rolletta.getInstance().addAllColors(), Rolletta.getInstance()).withTimeout(3.5));
+        
+
+
+
+
 
         // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSLT).whileHeld(Shooter.getInstance().getShooterSpeedControl());
         // new JoystickButton(m_righJoystick, 8).whileHeld(new InstantCommand(() -> CommandScheduler.getInstance().cancelAll()));
@@ -205,19 +231,20 @@ public class Robot extends TimedRobot {
         
         
         
-        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSX).whenPressed(
-            new PIDCommand(
-                new PIDController(
-                    Chassis.getInstance().getAngleKp(),
-                    Chassis.getInstance().getAngleKi(),
-                    Chassis.getInstance().getAngleKd()
-                ),
-                Utilites::getPowerPortToRobotAngle, 
-                0.0, 
-                Chassis.getInstance()::rotate, 
-                Chassis.getInstance()
-            )
-        );
+        // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSX).whenPressed(
+        //     new PIDCommand(
+        //         new PIDController(
+        //             Chassis.getInstance().getAngleKp(),
+        //             Chassis.getInstance().getAng
+        //             leKi(),
+        //             Chassis.getInstance().getAngleKd()
+        //         ),
+        //         Utilites::getPowerPortToRobotAngle, 
+        //         0.0, 
+        //         Chassis.getInstance()::rotate, 
+        //         Chassis.getInstance()
+        //     )
+        // );
 
     
         // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSStart).whenPressed(Rolletta.getInstance().getRotationControl());

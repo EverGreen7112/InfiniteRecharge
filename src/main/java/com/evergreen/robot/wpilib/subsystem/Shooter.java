@@ -178,7 +178,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
 
             @Override
             public boolean isFinished() {
-                return m_difference >= 190;    
+                return m_difference >= 160;    
             }
 
             @Override
@@ -205,13 +205,13 @@ public class Shooter extends SubsystemBase implements RobotMap {
             @Override
             public void end(boolean interrupted) {
             // Created weird bang bang
-            //     m_aimer.m_motor.set(0.7);
-            //     try {
-            //     Thread.sleep(50);
-            //    } catch (InterruptedException e) {
-            //      e.printStackTrace();
-            //      throw new RuntimeException();
-            //   }
+                m_aimer.m_motor.set(0.7);
+                try {
+                Thread.sleep(70);
+               } catch (InterruptedException e) {
+                 e.printStackTrace();
+                 throw new RuntimeException();
+              }
                 m_aimer.m_motor.set(0);
             }
         };
@@ -370,7 +370,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
         return new CommandBase() {
             @Override
             public void execute() {
-                m_thrower.m_motor.set(0.75);
+                m_thrower.m_motor.set(0.8);
             }
 
             @Override

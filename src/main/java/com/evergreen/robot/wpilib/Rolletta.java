@@ -471,13 +471,42 @@ public class Rolletta extends SubsystemBase {
   /**
    * @return A {@link CommandBase} representatoion of {@link #rotationControl()}
    */
-  public PIDCommand getRotationControl() {
-    return new PIDCommand(
-      getController(), 
-      this::getRawAngle,
-      () -> ROTATION_CONTROL_SETPOINT, 
-      (output) -> m_spinner.set(output),
-      this);
+  public CommandBase getRotationControl() {
+    // return new PIDCommand(
+    //   getController(), 
+    //   this::getRawAngle,
+    //   () -> ROTATION_CONTROL_SETPOINT, 
+    //   (output) -> m_spinner.set(output),
+    //   this);
+    return new CommandBase() {
+      @Override
+      public void initialize() {
+        m_spinner.set(0.4);
+      }
+      @Override
+        public boolean isFinished() {
+          try {
+            Thread.sleep(6700);
+           } catch (InterruptedException e) {
+             e.printStackTrace();
+             throw new RuntimeException();
+          }
+          return true;
+        }
+      @Override
+        public void end(boolean interrupted) {
+          m_spinner.set(-0.6);
+          try {
+            Thread.sleep(500);
+           } catch (InterruptedException e) {
+             e.printStackTrace();
+             throw new RuntimeException();
+          }
+          m_spinner.set(0);
+         
+        }
+       
+    };
   }
 
   /**
@@ -524,5 +553,5 @@ public class Rolletta extends SubsystemBase {
     SmartDashboard.putBoolean("Rolleta/isLifting", m_isLifting);
     SmartDashboard.putNumber("Rolleta/Lifter Speed", m_lifter.get());
     SmartDashboard.putNumber("Rolleta/Spinner Speed", m_spinner.get());
-  }
-}
+    Preferences.getInstance().putString("Rolletta/Detected color", getCurrentColor());
+}}
