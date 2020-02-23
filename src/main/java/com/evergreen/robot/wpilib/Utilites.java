@@ -69,14 +69,14 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
     public static double getPowerPortToRobotAngle(){ 
         if(isVisonAngleWork()){
         Preferences.getInstance().putDouble("another angle",SmartDashboard.getNumber("Angle", 0.3) );
-        return SmartDashboard.getNumber("Angle", 0.3);
+        return SmartDashboard.getNumber("Angle", 360);
         }
         return Chassis.getInstance().getGyro().getAngle()- Math.atan(getYDistanceFromPowerPort()/getXDistanceFromPowerPort());
        
     }
     
     public static boolean seePowerPort(){
-        return m_table.getEntry("SeePowerPort").getBoolean(false);
+        return SmartDashboard.getBoolean("SeePowerPort", false);
     }
     public static Pose2d getPose(){
         return Chassis.getInstance().getOdometry().getPoseMeters();

@@ -22,7 +22,7 @@ public class Collector extends SubsystemBase {
   private static Collector m_instance;
 
   //motor speed constat
-  private double COLLECTOR_SPEED = 0.7; 
+  private double COLLECTOR_SPEED = 0.8; 
 
   //creates the speed controllers for the system
   private SpeedController m_collectorMotor = new WPI_VictorSPX(MotorPorts.collector);

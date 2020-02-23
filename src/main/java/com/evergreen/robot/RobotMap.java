@@ -87,7 +87,8 @@ public interface RobotMap {
     
     //Detail Cameras used
     public interface CameraPorts {
-    
+        public static int 
+        backCamera = 0;
         
     }
 }
