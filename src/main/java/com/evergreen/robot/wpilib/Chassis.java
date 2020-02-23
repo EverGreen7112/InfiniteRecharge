@@ -29,12 +29,15 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -50,7 +53,7 @@ private static Chassis m_instance;
   private WPI_TalonSRX m_rightFront = new WPI_TalonSRX(MotorPorts.chassisRightFront);
   private WPI_TalonSRX m_leftFront = new WPI_TalonSRX(MotorPorts.chassisLeftFront);
  
-  //declaring the gyro
+  //declaring the gyro 
   private Gyro m_gyro = new ADXRS450_Gyro();
   
 
@@ -82,6 +85,10 @@ private static Chassis m_instance;
     DISTANCE_KI = 0,
     DISTANCE_KD = 0,
     DISTANCE_TOLERANCE = 1;
+
+  private double 
+    MIN_THROW_DISTANCE = 2.2,
+    MAX_THROW_DISTANCE = 2.7;
   
   //creating pid controllers for angle velocity and distance
   private PIDController 
@@ -132,10 +139,12 @@ private static Chassis m_instance;
   
 
   private Chassis() {
-    //entering the PID componets into the prefernces
+    
     m_rightBack.setInverted(true);
     m_rightFront.setInverted(true);
     m_gyro.calibrate();
+
+    //entering the PID componets into the prefernces
     Preferences.getInstance().putDouble("Chassis/angle/KP", ANGLE_KP);
     Preferences.getInstance().putDouble("Chassis/angle/KI", ANGLE_KI);
     Preferences.getInstance().putDouble("Chassis/angle/KD", ANGLE_KD);
@@ -181,6 +190,33 @@ private static Chassis m_instance;
   public void setRightSpeed(double speed){
     m_rightBack.set(speed);
     m_rightFront.set(speed);
+  }
+
+  public CommandBase getMoveByTime() {
+    return new CommandBase() {
+      double m_start;
+
+      @Override
+      public void initialize() {
+        m_start = System.currentTimeMillis();  
+      }
+
+      @Override
+      public void execute() {
+        move(0.7);
+      }
+
+      @Override
+      public boolean isFinished() {
+        return System.currentTimeMillis() - m_start > 2000;
+      }
+
+      @Override
+      public void end(boolean interrupted) {
+        move(0);
+      }
+
+    };
   }
   
 //returning the angle kp
@@ -372,12 +408,34 @@ public void rotate(double speed){
     return 0.85;
   }
   
-
+  public CommandBase turnToPPCmd() {
+    return new PIDCommand(
+      new PIDController(0.073,0.008,0.03),
+      Utilites::getPowerPortToRobotAngle,
+      0.0,
+      Chassis.getInstance()::rotate,
+      Chassis.getInstance()
+    ) {    
+          @Override
+          public void execute() {
+            super.execute();
+            Rolletta.getInstance().m_lifter.set(Rolletta.getInstance().GET_SPEED());
+          }
+          public boolean isFinished(){
+              return (Robot.m_righJoystick.getRawButtonPressed(6) || !Utilites.seePowerPort());
+          }
+          
+          public void end(boolean Interrupted) {
+              Chassis.getInstance().drive(0, 0);
+          }
+      };
+  }
   
   @Override
   public void periodic() {
-    // System.out.println(
-    //   "LEFT JS: " + Rob
-    //   "RIGHT JS: " + Robot.getRightJoystick());
+    SmartDashboard.putBoolean(
+      "CanThrow", 
+      Utilites.getDirectDistanceFromPowerPort() < MAX_THROW_DISTANCE
+        && Utilites.getDirectDistanceFromPowerPort() > MIN_THROW_DISTANCE);
   }
 }

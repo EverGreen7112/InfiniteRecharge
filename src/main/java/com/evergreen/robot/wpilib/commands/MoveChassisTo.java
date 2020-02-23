@@ -13,7 +13,7 @@ public class MoveChassisTo extends PIDCommand implements DoubleArgCommand {
     private double m_distance;
     public void setDistance(double distance){
         m_setpoint = () -> (distance);
-        m_distance =distance;
+        m_distance = distance;
     }
     public double getDistance(){
         return m_distance;

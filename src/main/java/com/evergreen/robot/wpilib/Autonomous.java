@@ -29,10 +29,12 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
  * turnTilSeePowerPort unless we sure that the robot is in front of the power port
  */
 public class Autonomous extends SequentialCommandGroup {
+    
     /**
      * the number of options that we wish to have.
      */
-    public static final int OPTIONS_NUMBER = 1;
+    public static final int OPTIONS_NUMBER = 10;
+    private SequentialCommandGroup m_wrapped = new SequentialCommandGroup();
     private SendableChooser<CommandBase>[] m_options = new SendableChooser[OPTIONS_NUMBER];
     private Supplier<Double>[] m_arguments = new Supplier[OPTIONS_NUMBER];
     private CommandBase[] m_commands;
@@ -48,49 +50,50 @@ public class Autonomous extends SequentialCommandGroup {
         m_commands = new CommandBase[OPTIONS_NUMBER];
         for (int i = 0; i < OPTIONS_NUMBER; i++) {
             final int j = i;
-            Preferences.getInstance().putDouble("arg" + i, 0);
-            m_arguments[i] = () -> Preferences.getInstance().getDouble("arg" + j, 0);
+            Preferences.getInstance().putDouble("arg #" + i, 0);
+
+            m_arguments[i] = () -> Preferences.getInstance().getDouble("arg #" + j, 0);
             m_options[i] = new SendableChooser<CommandBase>();
             m_options[i].setDefaultOption("wait #" + i, new WaitCommandEG(m_arguments[i].get()));
-            m_options[i].addOption("driveStraight #" + i, new MoveChassisTo(m_arguments[i].get()));
-            m_options[i].addOption("driveXdistanceWithoutStopping #", new DriveToNoStop(m_arguments[i].get()));
-            m_options[i].addOption("driveXdistanceWhileCollecting #", new CollectWhileMoving(m_arguments[i].get()));
-            m_options[i].addOption("riveXDistanceFromPowerPort #"+ i, new DriveToPowerPort(m_arguments[i].get()) );         
+            // m_options[i].addOption("driveStraight #" + i, new MoveChassisTo(m_arguments[i].get()));
+            // m_options[i].addOption("driveXdistanceWithoutStopping #", new DriveToNoStop(m_arguments[i].get()));
+            // m_options[i].addOption("driveXdistanceWhileCollecting #", new CollectWhileMoving(m_arguments[i].get()));
+            m_options[i].addOption("DriveForTime", Chassis.getInstance().getMoveByTime());
+            // m_options[i].addOption("driveXDistanceFromPowerPort #" + i, 
+            //     new DriveToPowerPort(m_arguments[i].get()));
+            m_options[i].addOption("TurnToPowerPort", Chassis.getInstance().turnToPPCmd());
             //turn right by defualt if we want to turn left put negative value;
-            m_options[i].addOption("rotate #" + i, new RotateTo(m_arguments[i].get()));
-            //turn right by defualt if we want to turn left put negative value;
-            m_options[i].addOption("turnTilSeePowerPort" +i, new RotateTilSeePort(true, m_arguments[i].get()));
+            // m_options[i].addOption("rotate #" + i, new RotateTo(m_arguments[i].get()));
+            // turn right by defualt if we want to turn left put negative value;
+            m_options[i].addOption("turnTilSeePowerPort #" + i, 
+                new RotateTilSeePort(true, m_arguments[i].get()));
             // m_options[i].addOption("turn until the power port is infront"+i, TurnPowePortInfront.getInstance());  
-            m_options[i].addOption("Stop"+i, new Stop());
+            m_options[i].addOption("Stop #"+ i, new Stop());
             //TODO: add circular move;
-            m_options[i].addOption("shootToUpper" +i, Shooter.getInstance().getShootToUpper());
-            m_options[i].addOption("shootToBottom"+ i, Shooter.getInstance().getShootToBottom());
-            m_options[i].addOption("drop" + i, Shooter.getInstance().getDrop());
+            m_options[i].addOption("shootToUpper #" + i, Shooter.getInstance().getAccelerateToThrow());
+            m_options[i].addOption("shootToBottom #" + i, Shooter.getInstance().getShootToBottom());
+            m_options[i].addOption("Drop #" + i, Shooter.getInstance().getDrop());
             m_commands[i] = m_options[i].getSelected();
-            for (TrajectoryOption option : TrajectoryOption.values()) {
-            
-            try {
-                m_options[i].addOption("follow " + option.getName() + i, new FollowTrajectory(option,m_arguments[i].get()));
-            }
 
-            catch (IOException e) {
-                m_options[i].addOption("trajectory name NOT FOUND", new WaitCommand(0));
-            }
+            //  for (TrajectoryOption option : TrajectoryOption.values()) {
+            //  try {
+            //      m_options[i].addOption("follow " + option.getName() + i, new FollowTrajectory(option,m_arguments[i].get()));
+            //   }
+            //
+            //  catch (IOException e) {
+            //      m_options[i].addOption("trajectory name NOT FOUND", new WaitCommand(0));
+            //  }
+            // }
 
             SmartDashboard.putData(m_options[i]);
         }
     }
-    }
+    
     
     @Override
-    public void schedule() {
-        addCommands(m_commands);
-        super.schedule();
-    }
-    @Override
-    public void schedule(boolean interruptible) {
-        addCommands(m_commands);
-        super.schedule(interruptible);
+    public void schedule(boolean interruptible) {        
+        m_wrapped = new SequentialCommandGroup(m_commands);
+        m_wrapped.schedule(interruptible);
     }
     
     public void update() {

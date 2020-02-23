@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 public class CollectWhileMoving extends ParallelDeadlineGroup implements DoubleArgCommand {
     
     private MoveChassisTo m_move;
+    
     public CollectWhileMoving(double distance) {
         super(Collector.getInstance().collectCmd());
         m_move = new MoveChassisTo(distance);

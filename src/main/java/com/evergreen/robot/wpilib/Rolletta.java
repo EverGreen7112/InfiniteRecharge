@@ -34,13 +34,14 @@ import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Rolletta extends SubsystemBase {
   //Creates the single Rolletta instance
   private static Rolletta m_instance;
   
   //General Constants
-   private double LIFT_SPEED = 0.5;  
+   private double LIFT_SPEED = 0.35;  
    //45 degrees offset to make sure it's not too little
    private double ROTATION_CONTROL_SETPOINT = 360 * 3 + 45; 
    private double ROBOT_SENSOR_OFFSET = 90;
@@ -248,7 +249,7 @@ public class Rolletta extends SubsystemBase {
    * <b>Rotation Control method:</b>
    * <p> 
    * Spins the control panel between 3-5 times.
-   */
+  */
   private void rotationControl() {
     spinDegrees(ROTATION_CONTROL_SETPOINT); 
   }
@@ -258,8 +259,6 @@ public class Rolletta extends SubsystemBase {
    * <p>Spins the control panel to the color given from the FMS.
    */
   public void positionControl() {
-
-
     if (toLeft(getTargetAngle()) - getLeftAngle() > getTargetAngle() - getRightAngle())
       spinTo(getTargetAngle());
     else
@@ -483,6 +482,7 @@ public class Rolletta extends SubsystemBase {
     }
 
     m_spinner.set(0);
+
   }
 
   /**
@@ -605,6 +605,16 @@ public class Rolletta extends SubsystemBase {
 
   private double toLeft(double rightAngle) {
     return rightAngle % -180;
+  }
+  
+  private Trigger liftTrigger = new Trigger() {
+    public boolean get() {
+      return (Robot.m_operatorJoystick.getPOV() != -1);
+    };
+  };
+ 
+  public Trigger getLiftTrigger() {
+    return liftTrigger;
   }
 
   @Override
