@@ -151,12 +151,16 @@ public class Robot extends TimedRobot {
         }
         Chassis.getInstance().move(0);
 
+          }
+          Chassis.getInstance().move(0);
+
     }
 
     @Override
     public void autonomousPeriodic() {
         // CommandScheduler.getInstance().run();
 
+        
     }
     //
 
