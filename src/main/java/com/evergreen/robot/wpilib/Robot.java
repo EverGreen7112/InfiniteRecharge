@@ -221,7 +221,7 @@ public class Robot extends TimedRobot {
          .whenPressed(Rolletta.getInstance().getPositionControl());
         new JoystickButton(m_righJoystick, 5)
          .whenPressed(Chassis.getInstance().turnToPPCmd());
-        new JoystickButton(m_righJoystick, 1).whenHeld(new CommandBase() {
+        new JoystickButton(m_righJoystick, 1).whileHeld(new CommandBase() {
             @Override
             public void initialize() {
                 Chassis.getInstance().SpeedModifier = 1;
