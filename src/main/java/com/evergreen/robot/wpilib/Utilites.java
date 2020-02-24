@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 //Reset when at zero zero
  public class Utilites {
     public static final double GRAVITY_CONSTANT = -9.80665;
+    
     /**
      * the time between acccelarate the shooter and pass the ball to the shooter in sec.
      */
@@ -45,12 +46,10 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
        return getPose().getTranslation().getY()-POWER_PORT_POSE2D.getTranslation().getY();
     }
     public static double getDirectDistanceFromPowerPort(){
-       if(isVisionDistanceWork()){
-        return m_table.getEntry("Distance").getDouble(0);
-       }
        
-       return getPose().getTranslation().getDistance(POWER_PORT_POSE2D.getTranslation());
-       
+
+        return SmartDashboard.getNumber("Distance", 0) +0.25;
+      
     }
     
     /**
@@ -111,10 +110,8 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
     }
     //TODO: check
     public static boolean isVisionDistanceWork(){
-        if(isVisonWork()){
+       
         return true;
-        }
-        return false;
     }
     //TODO: check
     public static boolean isVisonAngleWork(){

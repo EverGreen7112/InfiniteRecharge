@@ -521,7 +521,7 @@ public class Rolletta extends SubsystemBase {
       @Override
         public boolean isFinished() {
           try {
-            Thread.sleep(6700);
+            Thread.sleep(6800);
            } catch (InterruptedException e) {
              e.printStackTrace();
              throw new RuntimeException();
@@ -533,6 +533,7 @@ public class Rolletta extends SubsystemBase {
              e.printStackTrace();
              throw new RuntimeException();
           }
+          
           return true;
         }
       @Override

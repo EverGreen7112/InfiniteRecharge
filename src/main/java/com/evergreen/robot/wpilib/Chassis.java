@@ -159,6 +159,7 @@ private static Chassis m_instance;
     Preferences.getInstance().putDouble("Chassis/distance/TOLERANCE", VELOCITY_TOLERANCE);
     Preferences.getInstance().putDouble("Chassis/Speed", 0.8);
   }
+  public double SpeedModifier = 0.85;
 
 
   // creating a chassis object
@@ -405,7 +406,7 @@ public void rotate(double speed){
   }
 
   public double getSpeedModifier() {
-    return 0.85;
+    return SpeedModifier;
   }
   
   public CommandBase turnToPPCmd() {

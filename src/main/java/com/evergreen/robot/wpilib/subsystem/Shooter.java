@@ -178,7 +178,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
 
             @Override
             public boolean isFinished() {
-                return m_difference >= 160;    
+                return m_difference >= 190;    
             }
 
             @Override
