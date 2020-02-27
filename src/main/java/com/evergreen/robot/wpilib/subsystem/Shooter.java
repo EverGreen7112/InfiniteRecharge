@@ -160,6 +160,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
             double m_difference;
 
             public void initialize() {
+                addRequirements(m_aimer);
                 m_start = System.currentTimeMillis();
             }
 
@@ -178,9 +179,9 @@ public class Shooter extends SubsystemBase implements RobotMap {
 
             @Override
             public boolean isFinished() {
-                return m_difference >= 190;    
+                return m_difference >= 175;    
             }
-
+  
             @Override
             public void end(boolean interrupted) {
                 m_aimer.m_motor.set(0);
@@ -191,7 +192,10 @@ public class Shooter extends SubsystemBase implements RobotMap {
 
     private CommandBase m_aimDown() {
         return new CommandBase() {
-           
+           @Override
+           public void initialize() {
+               addRequirements(m_aimer);
+           }
             @Override
             public void execute() {
                 m_aimer.m_motor.set(-0.3);
@@ -363,7 +367,12 @@ public class Shooter extends SubsystemBase implements RobotMap {
     public CommandBase getAccelerateToThrow() {
         return new CommandBase() {
             @Override
-            public void execute() {
+            public void initialize() {
+                addRequirements(m_thrower);
+            }
+            @Override
+            public void execute() 
+            {
                 m_thrower.m_motor.set(0.8);
             }
 

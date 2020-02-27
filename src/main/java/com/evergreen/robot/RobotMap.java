@@ -28,7 +28,7 @@ public interface RobotMap {
         climbPull = 13, //Victor
         chassisLeftFront = 14, //Victor
         chassisLeftMiddle = 15; //Talon
-        //TODO: check correct ports
+        
     }
     
     //Detail Piston Components

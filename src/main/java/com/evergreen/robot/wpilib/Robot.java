@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.evergreen.robot.wpilib.commands.ResetGyro;
+import com.evergreen.robot.wpilib.commands.Stop;
 import com.evergreen.robot.wpilib.commands.TurnPowePortInfront;
 import com.evergreen.robot.wpilib.subsystem.Shooter;
 
@@ -93,13 +94,16 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         // new PrintCommand("CHECK").schedule();
-        // Preferences.getInstance().putDouble("AAAaAAAAa", Utilites.getPowerPortToRobotAngle());
+        // Preferences.getInstance().putDouble("AAAaAAAAa",
+        // Utilites.getPowerPortToRobotAngle());
         Preferences.getInstance().putDouble("PP/distance2", Utilites.getDirectDistanceFromPowerPort());
         CommandScheduler.getInstance().run();
-        
+
         Preferences.getInstance().putBoolean("PP/inRange",
-        Preferences.getInstance().getDouble("PP/distance2", 0)>Preferences.getInstance().getDouble("PP/minDistance", -1000)&&
-        Preferences.getInstance().getDouble("PP/distance2", 0)>Preferences.getInstance().getDouble("PP/maxDistance", 1000))
+                Preferences.getInstance().getDouble("PP/distance2", 0) > Preferences.getInstance()
+                        .getDouble("PP/minDistance", -1000)
+                        && Preferences.getInstance().getDouble("PP/distance2", 0) > Preferences.getInstance()
+                                .getDouble("PP/maxDistance", 1000))
 
         ;
         // System.out.println("TEST");
@@ -142,8 +146,8 @@ public class Robot extends TimedRobot {
         // Preferences.getInstance().putDouble("PP/Kp", 0);
         // Preferences.getInstance().putDouble("PP/Ki", 0);
         // Preferences.getInstance().putDouble("PP/Kd", 0);
-        Preferences.getInstance().putDouble("PP/minDistance",2.5);
-        Preferences.getInstance().putDouble("PP/maxDistance",3);
+        Preferences.getInstance().putDouble("PP/minDistance", 2.5);
+        Preferences.getInstance().putDouble("PP/maxDistance", 3);
 
         Autonomous.getInstance();
 
@@ -153,18 +157,64 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-
-        // Autonomous.getInstance().schedule();
-
+        // CommandScheduler.getInstance().run();
+        
+        
+        // try {
+        //     Thread.sleep(6500);
+        // } catch (InterruptedException e) {
+        //     e.printStackTrace();
+        // }
+        // Shooter.getInstance().m_thrower.m_motor.set(0.3);
+        // try {
+        //     Thread.sleep(500);
+        // } catch (InterruptedException e) {
+        //     e.printStackTrace();
+        // }
+        // Storage.getInstance().m_passMotor.set(0.3);
+        
+        // try {
+        //     Thread.sleep(5000);
+        // } catch (InterruptedException e) {
+        //     e.printStackTrace();
+        // }
         Chassis.getInstance().move(-0.6);
-        try {
-            Thread.sleep(1000);
+        try{
+        Thread.sleep(600);
         } catch (InterruptedException e) {
             e.printStackTrace();
             throw new RuntimeException();
         }
         Chassis.getInstance().move(0);
-        // Shooter.getInstance().getAimUp();
+
+        
+        // try{
+        //     Shooter.getInstan22222222222222222222222222221ce().getAimDown().schedule();;
+        //     CommandScheduler.getInstance().run();
+        //     Thread.sleep(1000);
+        //     Shooter.getInstance().getAimUp().schedule();;
+        //     CommandScheduler.getInstance().run();
+        //     Thread.sleep(200);
+        //     //  Chassis.getInstance().turnToPPCmd().schedule();
+        //     // new Stop().schedule();
+        //     Shooter.getInstance().getAccelerateToThrow().schedule();;
+        //     CommandScheduler.getInstance().run();
+        //     Thread.sleep(3500);
+        //     Storage.getInstance().getPass().schedule();;
+        //     CommandScheduler.getInstance().run();
+        //     Thread.sleep(8000);
+        //     Chassis.getInstance().move(0.6);
+
+        //     Thread.sleep(1000);
+        // } catch (InterruptedException e) {
+        //     e.printStackTrace();
+        //     throw new RuntimeException();
+        // }
+        // Chassis.getInstance().move(0);
+        
+        
+        
+
         // Chassis.getInstance().move(0.6);
         // try {
         //     Thread.sleep(1000);
@@ -173,15 +223,7 @@ public class Robot extends TimedRobot {
         //     throw new RuntimeException();
         // }
         // Chassis.getInstance().move(0);
-        // Chassis.getInstance().turnToPPCmd().schedule();
-        // Shooter.getInstance().getAccelerateToThrow();
-        // try {
-        //     Thread.sleep(2000);
-        // } catch (InterruptedException e) {
-        //     e.printStackTrace();
-        //     throw new RuntimeException();
-        // }
-        // Storage.getInstance().getPass();
+
 
         
         
@@ -228,9 +270,20 @@ public class Robot extends TimedRobot {
             }
             @Override
             public void end(boolean interrupted) {
-                Chassis.getInstance().SpeedModifier = 0.85;
+                Chassis.getInstance().SpeedModifier = 0.5;
             }
         });
+        // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSRS).whileHeld(new CommandBase() {
+        //     @Override
+        //     public void initialize() {
+        //         Shooter.getInstance().m_thrower.m_motor.set(0.1);
+        //     }
+        //     @Override
+        //     public void end(boolean interrupted) {
+        //         Shooter.getInstance().m_thrower.m_motor.set(0);
+        //     }
+
+        // });
 
         Rolletta.getInstance().getLiftTrigger().whileActiveOnce(Rolletta.getInstance().toggle());
 

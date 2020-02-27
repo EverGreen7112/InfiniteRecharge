@@ -50,16 +50,16 @@ public class Chassis extends SubsystemBase {
 private static Chassis m_instance;
   
   //declaring the front speed controllers (talon)
-  private WPI_TalonSRX m_rightFront = new WPI_TalonSRX(MotorPorts.chassisRightFront);
-  private WPI_TalonSRX m_leftFront = new WPI_TalonSRX(MotorPorts.chassisLeftFront);
+  private WPI_VictorSPX m_rightFront = new WPI_VictorSPX(MotorPorts.chassisRightFront);
+  private WPI_VictorSPX m_leftFront = new WPI_VictorSPX(MotorPorts.chassisLeftFront);
  
   //declaring the gyro 
   private Gyro m_gyro = new ADXRS450_Gyro();
   
 
   //declaring the other speed controllers
-  private SpeedControllerGroup m_rightBack = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisRightBack), new WPI_VictorSPX(MotorPorts.chassisRightMiddle));
-  private SpeedControllerGroup m_leftBack = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisLeftBack), new WPI_VictorSPX(MotorPorts.chassisLeftMiddle));
+  private SpeedControllerGroup m_rightBack = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisRightBack), new WPI_TalonSRX(MotorPorts.chassisRightMiddle));
+  private SpeedControllerGroup m_leftBack = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisLeftBack), new WPI_TalonSRX(MotorPorts.chassisLeftMiddle));
   
   private Command m_defaultDrive = new RunCommand(
     () -> drive(-Robot.getRightJoystick() * getSpeedModifier(), -Robot.getLeftJoystick() * getSpeedModifier()), 
@@ -159,7 +159,7 @@ private static Chassis m_instance;
     Preferences.getInstance().putDouble("Chassis/distance/TOLERANCE", VELOCITY_TOLERANCE);
     Preferences.getInstance().putDouble("Chassis/Speed", 0.8);
   }
-  public double SpeedModifier = 0.85;
+  public double SpeedModifier = 0.5;
 
 
   // creating a chassis object
@@ -312,11 +312,11 @@ public Gyro getGyro(){
   return m_gyro;
 }
 //returning the right talon mototr
-public TalonSRX getRightTalonSRX(){
+public WPI_VictorSPX getRightTalonSRX(){
   return m_rightFront;
 }
 //returning the left talon motor
-public TalonSRX getLefTalonSRX(){
+public WPI_VictorSPX getLefTalonSRX(){
   return m_leftFront;
 }
 //returning the right victor momtors

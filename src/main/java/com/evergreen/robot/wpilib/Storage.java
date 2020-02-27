@@ -32,7 +32,7 @@ public class Storage extends SubsystemBase {
   //TODO: find the correct value of minimum distance
 
   //New speed controller and ultrasonic sensor for passing the power cells.
-  private SpeedController m_passMotor = new WPI_VictorSPX(MotorPorts.passer);
+  public SpeedController m_passMotor = new WPI_VictorSPX(MotorPorts.passer);
    private AnalogInput ultrasonic = 
      new AnalogInput(AnalogPorts.storageUltrasonic);
   // TODO Y 2 ports needed
@@ -116,6 +116,7 @@ public class Storage extends SubsystemBase {
       @Override
       public void initialize() {
         m_passMotor.set(getSpeed());
+        addRequirements(Storage.getInstance());
       }
       @Override
         public void end(boolean interrupted) {

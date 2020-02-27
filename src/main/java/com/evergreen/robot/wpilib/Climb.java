@@ -26,7 +26,7 @@ public class Climb extends SubsystemBase {
   private double CLIMB_UP_SPEED = 0.5;
   private double CLIMB_PULL_SPEED = 1; 
   private double CLIMB_PUSH_SPEED = -0.7; 
-  private double ELEVATOR_DESCEND_SPEED = -0.55;
+  private double ELEVATOR_DESCEND_SPEED = -0.4;
   private long DESCEND_TIME = 2000;
 
   //creates the speed controllers

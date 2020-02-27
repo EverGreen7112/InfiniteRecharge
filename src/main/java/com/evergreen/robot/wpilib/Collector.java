@@ -25,7 +25,7 @@ public class Collector extends SubsystemBase {
   private double COLLECTOR_SPEED = 0.8; 
 
   //creates the speed controllers for the system
-  private SpeedController m_collectorMotor = new WPI_VictorSPX(MotorPorts.collector);
+  public SpeedController m_collectorMotor = new WPI_VictorSPX(MotorPorts.collector);
 
   /**
    * Collects Power Cells (by setting a speed to the collecting mechanism)
@@ -37,6 +37,19 @@ public class Collector extends SubsystemBase {
       collect(0);
     }  
   };}
+  public CommandBase m_invertCollect(){
+    return new CommandBase() {
+      @Override
+      public void initialize() {
+        collect(-getSpeed());
+      }
+      @Override
+        public void end(boolean interrupted) {
+          collect(0);
+        }
+
+    };
+  }
 
   
   public CommandBase collectCmd(double speed){
