@@ -199,34 +199,70 @@ public class Robot extends TimedRobot {
 
         }
     };
+    public void collectFromTrunch(){
+        CommandBase m_move2 =  new MoveChassisTo(7);//in meters
+        m_move2.alongWith(Collector.getInstance().collectCmd() );
+        CommandScheduler.getInstance().run();
+    }
+    public void collectFromOurTrunch(){
+        CommandBase rotate = new RotateTo(90);
+        rotate.schedule();
+        CommandScheduler.getInstance().run();
+        while(!rotate.isFinished()){}
+        CommandBase m_move =  new MoveChassisTo(1.8);//in meters
+        m_move.schedule();
+        CommandScheduler.getInstance().run();
+        while(!m_move.isFinished()){}
+        rotate.schedule();
+        CommandScheduler.getInstance().run();
+        while(!rotate.isFinished()){}
+        collectFromTrunch();
+    }
+    public void backFromOurTrunchToShoot(){
+        CommandBase m_move2 =  new MoveChassisTo(-7);//in meters
+        m_move2.alongWith(Collector.getInstance().collectCmd() );
+        CommandScheduler.getInstance().run();
+        CommandBase rotate = new RotateTo(-90);
+        rotate.schedule();
+        CommandScheduler.getInstance().run();
+        while(!rotate.isFinished()){}
+        CommandBase m_move =  new MoveChassisTo(-1.8);//in meters
+        m_move.schedule();
+        CommandScheduler.getInstance().run();
+        while(!m_move.isFinished()){}
+        rotate.schedule();
+        CommandScheduler.getInstance().run();
+        while(!rotate.isFinished()){}
+        collectFromTrunch();
+    }
+    public void backFromOtherTrunchToShoot(){
+        CommandBase m_move2 =  new MoveChassisTo(-7);//in meters
+        m_move2.alongWith(Collector.getInstance().collectCmd() );
+        CommandScheduler.getInstance().run();
+        CommandBase rotate = new RotateTo(90);
+        rotate.schedule();
+        CommandScheduler.getInstance().run();
+        while(!rotate.isFinished()){}
+        CommandBase m_move =  new MoveChassisTo(-5.5);//in meters
+        m_move.schedule();
+        CommandScheduler.getInstance().run();
+        while(!m_move.isFinished()){}
+        rotate.schedule();
+        CommandScheduler.getInstance().run();
+        while(!rotate.isFinished()){}
+        collectFromTrunch();
+    }
+
+
     @Override
     public void autonomousInit() {
-        // CommandBase rotate = new RotateTo(90);
-        // rotate.schedule();
-        // CommandScheduler.getInstance().run();
-        // while(!rotate.isFinished()){}
-        // CommandBase m_move =  new MoveChassisTo(1.8);//in meters
-        // m_move.schedule();
-        // CommandScheduler.getInstance().run();
-        // while(!m_move.isFinished()){}
-        // rotate.schedule();
-        // CommandScheduler.getInstance().run();
-        // while(!rotate.isFinished()){}
-        // CommandBase m_move2 =  new MoveChassisTo(7);//in meters
-        // m_move2.alongWith(Collector.getInstance().collectCmd() );
-        // CommandScheduler.getInstance().run();
-       
-       
-       
-       
-       
-       
-       
-       
-        // CommandBase m_move2 =  new MoveChassisTo(7);//in meters
-        // m_move2.alongWith(Collector.getInstance().collectCmd() );
-        // CommandScheduler.getInstance().run();
+        //collect power cell from our trunch
 
+        
+       
+        
+       
+       
         
 
 
@@ -234,6 +270,7 @@ public class Robot extends TimedRobot {
 
 
 
+        //shoot and then move
 
         // CommandBase shoot2 = shoot;
         // shoot2.schedule();
@@ -251,16 +288,8 @@ public class Robot extends TimedRobot {
 
 
 
-
-
-        // Chassis.getInstance().move(-0.6);
-        // try{
-        // Thread.sleep(600);
-        // } catch (InterruptedException e) {
-        //     e.printStackTrace();
-        //     throw new RuntimeException();
-        // }
-        // Chassis.getInstance().move(0);
+            
+        
 
 
 
