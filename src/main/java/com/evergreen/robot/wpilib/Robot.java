@@ -1,5 +1,6 @@
 package com.evergreen.robot.wpilib;
 
+import java.io.IOException;
 import java.util.Set;
 
 import com.evergreen.everlib.structure.Tree;
@@ -17,7 +18,10 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import com.evergreen.robot.wpilib.Chassis.TrajectoryOption;
+import com.evergreen.robot.wpilib.commands.FollowTrajectory;
 import com.evergreen.robot.wpilib.commands.ResetGyro;
+import com.evergreen.robot.wpilib.commands.RotateTilSeePort;
 import com.evergreen.robot.wpilib.commands.Stop;
 import com.evergreen.robot.wpilib.commands.TurnPowePortInfront;
 import com.evergreen.robot.wpilib.subsystem.Shooter;
@@ -154,11 +158,81 @@ public class Robot extends TimedRobot {
         // Shooter.getInstance().m_thrower.m_motor.set(0.4);
 
     }
+    public CommandBase passInitainLine = new CommandBase() {
+        public void initialize(){
+            Chassis.getInstance().move(-0.6);
+        try {
+            Thread.sleep(600);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
+        Chassis.getInstance().move(0);
+        }
+    };
+    public CommandBase shoot = new CommandBase() {
+        public void initialize(){
+            new RotateTilSeePort(true, 0.3).schedule();
+            CommandBase turn =  Chassis.getInstance().turnToPPCmd();
+            turn.schedule();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                throw new RuntimeException();
+            }
+            //finish turn
+            CommandBase throwPC = Shooter.getInstance().getShootToUpper();
+            throwPC.schedule();
+            try {
+                Thread.sleep(4000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                throw new RuntimeException();
+            }
+            //finish throw
 
+            
+
+
+        }
+    };
     @Override
     public void autonomousInit() {
-        // CommandScheduler.getInstance().run();
         
+
+        try {
+            new FollowTrajectory(TrajectoryOption.MOCK, true).schedule();
+        } catch (IOException e1) {
+            passInitainLine.schedule();
+        }
+        CommandScheduler.getInstance().schedule();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         
         // try {
         //     Thread.sleep(6500);
