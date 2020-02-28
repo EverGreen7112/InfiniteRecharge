@@ -11,7 +11,9 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
@@ -137,8 +139,8 @@ public class Shooter extends SubsystemBase implements RobotMap {
 
     //////////////////////////// pid controllers/////////////////////////////////
     private PIDController m_aimController = new PIDController(aimerKp(), aimerKi(), aimerKd());
-
-    private PIDController m_throwController = new PIDController(throwerKp(), throwerKi(), throwerKd());
+    private ProfiledPIDController m_throwController = new ProfiledPIDController
+    (throwerKp(),throwerKi(),throwerKd(),new Constraints(0,0));//TODO: calculate constrains
     ////////////////////////////////////////////////////////////////////////////
 
     //////////////////////////// pid controllers
@@ -147,7 +149,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
         return m_aimController;
     }
 
-    public PIDController getThrowController() {
+    public ProfiledPIDController getThrowController() {
         return m_throwController;
     }
     ////////////////////////////////////////////////////////////////////////////
