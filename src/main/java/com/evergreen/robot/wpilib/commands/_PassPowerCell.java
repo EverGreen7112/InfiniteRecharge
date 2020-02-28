@@ -3,6 +3,7 @@ package com.evergreen.robot.wpilib.commands;
 import com.evergreen.robot.wpilib.Utilites;
 import com.evergreen.robot.wpilib.subsystem.Shooter;
 
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 
 /**
@@ -16,7 +17,9 @@ class _PassPowerCell extends PIDCommand {
     
     public _PassPowerCell(double distance) {
         super(
-            Shooter.getInstance().getThrowController(),
+            new PIDController( Shooter.getInstance().getThrowController().getP(),  Shooter.getInstance().getThrowController().getI(),
+            Shooter.getInstance().getThrowController().getD())
+           ,
             Shooter.getInstance()::getThrowerSpeed,
             () -> getMotorSpeed(distance) ,
             Shooter.getInstance().m_thrower.m_motor::set,

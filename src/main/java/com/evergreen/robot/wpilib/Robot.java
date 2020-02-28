@@ -20,8 +20,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.evergreen.robot.wpilib.Chassis.TrajectoryOption;
 import com.evergreen.robot.wpilib.commands.FollowTrajectory;
+import com.evergreen.robot.wpilib.commands.MoveChassisTo;
 import com.evergreen.robot.wpilib.commands.ResetGyro;
 import com.evergreen.robot.wpilib.commands.RotateTilSeePort;
+import com.evergreen.robot.wpilib.commands.RotateTo;
 import com.evergreen.robot.wpilib.commands.Stop;
 import com.evergreen.robot.wpilib.commands.TurnPowePortInfront;
 import com.evergreen.robot.wpilib.subsystem.Shooter;
@@ -192,21 +194,80 @@ public class Robot extends TimedRobot {
             }
             //finish throw
 
-            
+            //al oter auto command
 
 
         }
     };
     @Override
     public void autonomousInit() {
+        // CommandBase rotate = new RotateTo(90);
+        // rotate.schedule();
+        // CommandScheduler.getInstance().run();
+        // while(!rotate.isFinished()){}
+        // CommandBase m_move =  new MoveChassisTo(1.8);//in meters
+        // m_move.schedule();
+        // CommandScheduler.getInstance().run();
+        // while(!m_move.isFinished()){}
+        // rotate.schedule();
+        // CommandScheduler.getInstance().run();
+        // while(!rotate.isFinished()){}
+        // CommandBase m_move2 =  new MoveChassisTo(7);//in meters
+        // m_move2.alongWith(Collector.getInstance().collectCmd() );
+        // CommandScheduler.getInstance().run();
+       
+       
+       
+       
+       
+       
+       
+       
+        // CommandBase m_move2 =  new MoveChassisTo(7);//in meters
+        // m_move2.alongWith(Collector.getInstance().collectCmd() );
+        // CommandScheduler.getInstance().run();
+
         
 
-        try {
-            new FollowTrajectory(TrajectoryOption.MOCK, true).schedule();
-        } catch (IOException e1) {
-            passInitainLine.schedule();
-        }
-        CommandScheduler.getInstance().schedule();
+
+
+
+
+
+
+        // CommandBase shoot2 = shoot;
+        // shoot2.schedule();
+        // while(!shoot2.isFinished()){
+        //  }
+        //  Chassis.getInstance().move(-0.6);
+        // try{
+        // Thread.sleep(600);
+        // } catch (InterruptedException e) {
+        //     e.printStackTrace();
+        //     throw new RuntimeException();
+        // }
+        // Chassis.getInstance().move(0);
+
+
+
+
+
+
+        // Chassis.getInstance().move(-0.6);
+        // try{
+        // Thread.sleep(600);
+        // } catch (InterruptedException e) {
+        //     e.printStackTrace();
+        //     throw new RuntimeException();
+        // }
+        // Chassis.getInstance().move(0);
+
+
+
+
+
+
+
 
 
 
@@ -252,14 +313,6 @@ public class Robot extends TimedRobot {
         // } catch (InterruptedException e) {
         //     e.printStackTrace();
         // }
-        Chassis.getInstance().move(-0.6);
-        try{
-        Thread.sleep(600);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            throw new RuntimeException();
-        }
-        Chassis.getInstance().move(0);
 
         
         // try{
