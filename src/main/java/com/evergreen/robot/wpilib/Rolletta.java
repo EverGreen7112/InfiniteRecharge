@@ -610,7 +610,7 @@ public class Rolletta extends SubsystemBase {
   
   private Trigger liftTrigger = new Trigger() {
     public boolean get() {
-      return (Robot.m_operatorJoystick.getPOV() != -1);
+      return (Pistachio.m_operatorJoystick.getPOV() != -1);
     };
   };
  

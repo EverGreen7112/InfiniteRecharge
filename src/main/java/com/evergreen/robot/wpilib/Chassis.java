@@ -50,19 +50,19 @@ public class Chassis extends SubsystemBase {
 private static Chassis m_instance;
   
   //declaring the front speed controllers (talon)
-  private WPI_VictorSPX m_rightFront = new WPI_VictorSPX(MotorPorts.chassisRightFront);
-  private WPI_VictorSPX m_leftFront = new WPI_VictorSPX(MotorPorts.chassisLeftFront);
+  private WPI_TalonSRX m_rightFront = new WPI_TalonSRX(MotorPorts.chassisRightMiddle);
+  private WPI_TalonSRX m_leftFront = new WPI_TalonSRX(MotorPorts.chassisLeftMiddle);
  
   //declaring the gyro 
   private Gyro m_gyro = new ADXRS450_Gyro();
   
 
   //declaring the other speed controllers
-  private SpeedControllerGroup m_rightBack = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisRightBack), new WPI_TalonSRX(MotorPorts.chassisRightMiddle));
-  private SpeedControllerGroup m_leftBack = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisLeftBack), new WPI_TalonSRX(MotorPorts.chassisLeftMiddle));
+  private SpeedControllerGroup m_rightBack = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisRightBack), new WPI_VictorSPX(MotorPorts.chassisRightFront) );
+  private SpeedControllerGroup m_leftBack = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisLeftBack), new WPI_VictorSPX(MotorPorts.chassisLeftFront));
   
   private Command m_defaultDrive = new RunCommand(
-    () -> drive(-Robot.getRightJoystick() * getSpeedModifier(), -Robot.getLeftJoystick() * getSpeedModifier()), 
+    () -> drive(-Pistachio.getRightJoystick() * getSpeedModifier(), -Pistachio.getLeftJoystick() * getSpeedModifier()), 
     this);
 
   public Command getDefaultDrive() {
@@ -312,11 +312,11 @@ public Gyro getGyro(){
   return m_gyro;
 }
 //returning the right talon mototr
-public WPI_VictorSPX getRightTalonSRX(){
+public WPI_TalonSRX getRightTalonSRX(){
   return m_rightFront;
 }
 //returning the left talon motor
-public WPI_VictorSPX getLefTalonSRX(){
+public WPI_TalonSRX getLefTalonSRX(){
   return m_leftFront;
 }
 //returning the right victor momtors
@@ -423,7 +423,7 @@ public void rotate(double speed){
             Rolletta.getInstance().m_lifter.set(Rolletta.getInstance().GET_SPEED());
           }
           public boolean isFinished(){
-              return (Robot.m_righJoystick.getRawButtonPressed(6) || !Utilites.seePowerPort());
+              return (Pistachio.m_righJoystick.getRawButtonPressed(6) || !Utilites.seePowerPort());
           }
           
           public void end(boolean Interrupted) {

@@ -1,6 +1,7 @@
 package com.evergreen.robot.wpilib;
 
 import java.util.Set;
+import java.util.function.Supplier;
 
 import com.evergreen.everlib.structure.Tree;
 import com.evergreen.robot.RobotMap.ButtonPorts;
@@ -37,7 +38,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
  * Robot
  */
 
-public class Robot extends TimedRobot {
+public class Pistachio extends TimedRobot {
     boolean m_activate = true;
     boolean m_lifting = false;
     public static Joystick m_leftJoystick = new Joystick(JoystickPorts.leftChassisJS),
@@ -157,7 +158,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        // CommandScheduler.getInstance().run();
+        Autonomous.getInstance().schedule();
         
         
         // try {
@@ -178,18 +179,11 @@ public class Robot extends TimedRobot {
         // } catch (InterruptedException e) {
         //     e.printStackTrace();
         // }
-        Chassis.getInstance().move(-0.6);
-        try{
-        Thread.sleep(600);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            throw new RuntimeException();
-        }
-        Chassis.getInstance().move(0);
+
 
         
         // try{
-        //     Shooter.getInstan22222222222222222222222222221ce().getAimDown().schedule();;
+        //     Shooter.getInstance().getAimDown().schedule();;
         //     CommandScheduler.getInstance().run();
         //     Thread.sleep(1000);
         //     Shooter.getInstance().getAimUp().schedule();;
@@ -232,16 +226,17 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousPeriodic() {
         CommandScheduler.getInstance().run();
+        Autonomous.getInstance().update();
+
 
         
     }
-    //
 
     @Override
     public void teleopPeriodic() {
         CommandScheduler.getInstance().run();
-        
-
+        Preferences.getInstance().putDouble("talon1_encoder", Chassis.getInstance().getRightTalonSRX().getSelectedSensorPosition());
+        Preferences.getInstance().putDouble("talon15_encoder", Chassis.getInstance().getLefTalonSRX().getSelectedSensorPosition());
     }
 
     @Override
@@ -251,18 +246,15 @@ public class Robot extends TimedRobot {
 
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSY).whenPressed(Shooter.getInstance().getAimUp());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSA).whenPressed(Shooter.getInstance().getAimDown());
-        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSLT)
-                .whileHeld(Shooter.getInstance().getAccelerateToThrow());
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSLT).whileHeld(Shooter.getInstance().getAccelerateToThrow());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSRT).whileHeld(Storage.getInstance().getPass());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSLB).whileHeld(Climb.getInstance().m_up());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSRB).whileHeld(Climb.getInstance().getClimbDown());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSX).whileHeld(Collector.getInstance().collectCmd());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSB).whileHeld(Climb.getInstance().m_pull());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSStart).whenPressed(Rolletta.getInstance().getRotationControl());
-        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSBack)
-         .whenPressed(Rolletta.getInstance().getPositionControl());
-        new JoystickButton(m_righJoystick, 5)
-         .whenPressed(Chassis.getInstance().turnToPPCmd());
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSBack).whenPressed(Rolletta.getInstance().getPositionControl());
+        new JoystickButton(m_righJoystick, 5).whenPressed(Chassis.getInstance().turnToPPCmd());
         new JoystickButton(m_righJoystick, 1).whileHeld(new CommandBase() {
             @Override
             public void initialize() {
@@ -273,6 +265,7 @@ public class Robot extends TimedRobot {
                 Chassis.getInstance().SpeedModifier = 0.5;
             }
         });
+        
         // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSRS).whileHeld(new CommandBase() {
         //     @Override
         //     public void initialize() {
@@ -286,15 +279,6 @@ public class Robot extends TimedRobot {
         // });
 
         Rolletta.getInstance().getLiftTrigger().whileActiveOnce(Rolletta.getInstance().toggle());
-
-
-
-
-
-
-
-
-
 
         // new JoystickButton(m_operatorJoystick,
         // ButtonPorts.operatorJSY).whenPressed(Rolletta.getInstance().m_calibrateYellow());
@@ -326,5 +310,4 @@ public class Robot extends TimedRobot {
         // TODO: add climb down on RB
 
     };
-
 }
