@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
     public static CommandBase waitForShooting() {
        return new WaitCommand(TIME_TIL_SHOOTING);
     }
+    public static final int lowH = 0, lowS = 0, lowV =0, highH=0, highS=0, highV=0;
     //TODO: check
     public static final Pose2d POWER_PORT_POSE2D = new Pose2d(0, 2.38415,new Rotation2d(0));
     //TODO: fix ready for shoot, vison work angle getting
