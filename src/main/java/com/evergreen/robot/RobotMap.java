@@ -43,6 +43,8 @@ public interface RobotMap {
         public static final int 
         leftChassisEncoderA = 0,
         leftChassisEncoderB = 1,
+        rightEncoderA=7,
+        rightEncoderB = 8,
         throwerEncoderB = 2,
         throwerEncoderA = 3,
         rolletaMicroSwitchDown = 4,

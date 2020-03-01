@@ -18,7 +18,10 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import com.evergreen.robot.wpilib.commands.MoveChassisTo;
 import com.evergreen.robot.wpilib.commands.ResetGyro;
+import com.evergreen.robot.wpilib.commands.RotateTilSeePort;
+import com.evergreen.robot.wpilib.commands.RotateTo;
 import com.evergreen.robot.wpilib.commands.Stop;
 import com.evergreen.robot.wpilib.commands.TurnPowePortInfront;
 import com.evergreen.robot.wpilib.subsystem.Shooter;
@@ -30,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -149,16 +153,119 @@ public class Pistachio extends TimedRobot {
         // Preferences.getInstance().putDouble("PP/Kd", 0);
         Preferences.getInstance().putDouble("PP/minDistance", 2.5);
         Preferences.getInstance().putDouble("PP/maxDistance", 3);
+        Preferences.getInstance().putDouble("SmartDashBoard/lowh", Utilites.lowH);
+        Preferences.getInstance().putDouble("SmartDashBoard/lows", Utilites.lowS);
+        Preferences.getInstance().putDouble("SmartDashBoard/lowv", Utilites.lowV);
+        Preferences.getInstance().putDouble("SmartDashBoard/highh", Utilites.highH);
+        Preferences.getInstance().putDouble("SmartDashBoard/highs", Utilites.highS);
+        Preferences.getInstance().putDouble("SmartDashBoard/highv", Utilites.highV);
 
         Autonomous.getInstance();
 
         // Shooter.getInstance().m_thrower.m_motor.set(0.4);
 
     }
+     /**
+     * just pass the Initiaon line
+     */
+    public CommandBase passInitiaonLine(){
+        return new CommandBase() {
+        public void initialize(){
+            Chassis.getInstance().move(-0.6);
+        try {
+            Thread.sleep(600);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
+        Chassis.getInstance().move(0);
+        }
+    };}
+    /**
+     * shoot from every place
+     */
+    public CommandBase shoot(long shootTime){
+        return new CommandBase() {
+        public void initialize(){
+            new RotateTilSeePort(true, 0.3).schedule();
+            CommandBase turn =  Chassis.getInstance().turnToPPCmd();
+            turn.schedule();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                throw new RuntimeException();
+            }
+            //finish turn
+            CommandBase throwPC = Shooter.getInstance().getShootToUpper();
+            throwPC.schedule();
+            try {
+                Thread.sleep(shootTime);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                throw new RuntimeException();
+            }
+            //finish throw
+
+            //al oter auto command
+
+
+        }
+    };
+}   
+    /**
+     * collect from infront of our the trunch and bakc from it
+     * @param powerCell 2  or 3
+     */
+    
+    
+     // public void collectFromFrontTrunch(double powerCell,boolean aliienceTrunch){
+    //     if(a)
+    //     if(powerCell ==2){
+            
+    //         };
+    //     }
+    // }
+
+    
+    /**
+     * 
+     * start inftront the power cell collect two ball and return
+     */
+    public CommandBase collectTwoFromOurTrunch(){
+        return new SequentialCommandGroup(
+        
+        (new RotateTo(90)),
+        (new MoveChassisTo(1.5)),
+        new RotateTo(180)
+        );
+    }
+
+    
 
     @Override
     public void autonomousInit() {
-        Autonomous.getInstance().schedule();
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        // Autonomous.getInstance().schedule();
         
         
         // try {

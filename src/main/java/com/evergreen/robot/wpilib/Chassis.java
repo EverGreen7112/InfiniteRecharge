@@ -14,9 +14,12 @@ import java.util.List;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import com.evergreen.robot.RobotMap;
+import com.evergreen.robot.RobotMap.DigitalPorts;
 import com.evergreen.robot.RobotMap.MotorPorts;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
@@ -56,7 +59,8 @@ private static Chassis m_instance;
  
   //declaring the gyro 
   private Gyro m_gyro = new ADXRS450_Gyro();
-  
+  private Encoder m_rightEncoder = new Encoder(DigitalPorts.rightEncoderA, DigitalPorts.rightEncoderB);
+  private Encoder m_LeftEncoder = new Encoder(DigitalPorts.leftChassisEncoderA, DigitalPorts.leftChassisEncoderB);
 
   //declaring the other speed controllers
   private SpeedControllerGroup m_rightBack = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisRightBack), new WPI_VictorSPX(MotorPorts.chassisRightFront) );
@@ -144,6 +148,9 @@ private static Chassis m_instance;
     m_rightBack.setInverted(true);
     m_rightFront.setInverted(true);
     m_gyro.calibrate();
+    m_rightEncoder.setDistancePerPulse(0.002307012);
+    m_LeftEncoder.setDistancePerPulse(0.002307012);
+    m_rightEncoder.setReverseDirection(true);
 
     //entering the PID componets into the prefernces
     Preferences.getInstance().putDouble("Chassis/angle/KP", ANGLE_KP);
@@ -259,25 +266,25 @@ private static Chassis m_instance;
   }
 //returning the distance from left sensor
   public double getLeftDistance() {
-    return m_leftFront.getSelectedSensorPosition();
+    return m_LeftEncoder.getDistance();
   } 
 //returning the distance from right sensor
   public double getRightDistance() {
-    return m_rightFront.getSelectedSensorPosition();
+    return m_rightEncoder.getDistance();
   }
 //returning the speed of the right motors
  public double getRightVelocity(){
-   return m_rightFront.getSelectedSensorVelocity();
+   return m_rightEncoder.getRate();
  }
  //returning the speed of the left motor
  public double getLeftVelocity(){
-   return m_leftFront.getSelectedSensorVelocity();
+   return m_LeftEncoder.getRate();
  }
  // returning the average speed
  public DifferentialDriveWheelSpeeds getVelocity() {
    return new DifferentialDriveWheelSpeeds(
-     m_leftFront.getSelectedSensorVelocity(), 
-     m_rightFront.getSelectedSensorVelocity());
+     m_LeftEncoder.getRate(), 
+     m_rightEncoder.getRate());
  }
 
  //returning the average distance from both sensors
