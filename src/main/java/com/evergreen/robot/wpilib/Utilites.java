@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
      */
     //TODO: tune
     //may cause recursive
-    public static final double TIME_TIL_SHOOTING = 0.3;
+    public static final double TIME_TIL_SHOOTING = 0.8;
     public static CommandBase waitForShooting() {
        return new WaitCommand(TIME_TIL_SHOOTING);
     }
