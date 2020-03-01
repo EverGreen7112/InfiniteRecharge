@@ -1,7 +1,7 @@
 package com.evergreen.robot.wpilib;
 
-import java.io.IOException;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import com.evergreen.everlib.structure.Tree;
 import com.evergreen.robot.RobotMap.ButtonPorts;
@@ -18,12 +18,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import com.evergreen.robot.wpilib.Chassis.TrajectoryOption;
-import com.evergreen.robot.wpilib.commands.FollowTrajectory;
-import com.evergreen.robot.wpilib.commands.MoveChassisTo;
 import com.evergreen.robot.wpilib.commands.ResetGyro;
-import com.evergreen.robot.wpilib.commands.RotateTilSeePort;
-import com.evergreen.robot.wpilib.commands.RotateTo;
 import com.evergreen.robot.wpilib.commands.Stop;
 import com.evergreen.robot.wpilib.commands.TurnPowePortInfront;
 import com.evergreen.robot.wpilib.subsystem.Shooter;
@@ -43,7 +38,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
  * Robot
  */
 
-public class Robot extends TimedRobot {
+public class Pistachio extends TimedRobot {
     boolean m_activate = true;
     boolean m_lifting = false;
     public static Joystick m_leftJoystick = new Joystick(JoystickPorts.leftChassisJS),
@@ -154,157 +149,17 @@ public class Robot extends TimedRobot {
         // Preferences.getInstance().putDouble("PP/Kd", 0);
         Preferences.getInstance().putDouble("PP/minDistance", 2.5);
         Preferences.getInstance().putDouble("PP/maxDistance", 3);
-        Preferences.getInstance().putDouble("SmartDashBoard/lowh", Utilites.lowH);
-        Preferences.getInstance().putDouble("SmartDashBoard/lows", Utilites.lowS);
-        Preferences.getInstance().putDouble("SmartDashBoard/lowv", Utilites.lowV);
-        Preferences.getInstance().putDouble("SmartDashBoard/highh", Utilites.highH);
-        Preferences.getInstance().putDouble("SmartDashBoard/highs", Utilites.highS);
-        Preferences.getInstance().putDouble("SmartDashBoard/highv", Utilites.highV);
-        
-        
+
         Autonomous.getInstance();
 
         // Shooter.getInstance().m_thrower.m_motor.set(0.4);
 
     }
-    /**
-     * just pass the Initiaon line
-     */
-    public CommandBase passInitiaonLine(){
-        return new CommandBase() {
-        public void initialize(){
-            Chassis.getInstance().move(-0.6);
-        try {
-            Thread.sleep(600);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            throw new RuntimeException();
-        }
-        Chassis.getInstance().move(0);
-        }
-    };}
-    /**
-     * shoot from every place
-     */
-    public CommandBase shoot(long shootTime){
-        return new CommandBase() {
-        public void initialize(){
-            new RotateTilSeePort(true, 0.3).schedule();
-            CommandBase turn =  Chassis.getInstance().turnToPPCmd();
-            turn.schedule();
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                throw new RuntimeException();
-            }
-            //finish turn
-            CommandBase throwPC = Shooter.getInstance().getShootToUpper();
-            throwPC.schedule();
-            try {
-                Thread.sleep(shootTime);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                throw new RuntimeException();
-            }
-            //finish throw
-
-            //al oter auto command
-
-
-        }
-    };
-}
-    public CommandBase collectTwoFromOurTrunch(){
-        return new CommandBase() {
-            @Override
-            public void initialize() {
-                RotateTo m_rotate =  new RotateTo(90);
-                MoveChassisTo m_move = new MoveChassisTo(1.6);
-                m_rotate.schedule();
-                CommandScheduler.getInstance().run();
-                while(!m_rotate.isFinished()){}
-                m_move.schedule();
-                CommandScheduler.getInstance().run();
-                while(!m_move.isFinished()){}
-                m_rotate.setSetPoint(180);
-                m_rotate.schedule();
-                CommandScheduler.getInstance().run();
-                m_move.setDistance(4.2);
-                m_move.deadlineWith(Collector.getInstance().collectCmd()).schedule();
-            }
-        };
-    }
 
     @Override
     public void autonomousInit() {
-        //collect power cell from our trunch
-
+        Autonomous.getInstance().schedule();
         
-       
-        
-       
-       
-        
-
-
-
-
-
-
-        //shoot and then move
-
-        // CommandBase shoot2 = shoot;
-        // shoot2.schedule();
-        // while(!shoot2.isFinished()){
-        //  }
-        //  Chassis.getInstance().move(-0.6);
-        // try{
-        // Thread.sleep(600);
-        // } catch (InterruptedException e) {
-        //     e.printStackTrace();
-        //     throw new RuntimeException();
-        // }
-        // Chassis.getInstance().move(0);
-
-
-
-
-            
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         
         // try {
         //     Thread.sleep(6500);
@@ -325,9 +180,10 @@ public class Robot extends TimedRobot {
         //     e.printStackTrace();
         // }
 
+
         
         // try{
-        //     Shooter.getInstan22222222222222222222222222221ce().getAimDown().schedule();;
+        //     Shooter.getInstance().getAimDown().schedule();;
         //     CommandScheduler.getInstance().run();
         //     Thread.sleep(1000);
         //     Shooter.getInstance().getAimUp().schedule();;
@@ -370,16 +226,17 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousPeriodic() {
         CommandScheduler.getInstance().run();
+        Autonomous.getInstance().update();
+
 
         
     }
-    //
 
     @Override
     public void teleopPeriodic() {
         CommandScheduler.getInstance().run();
-        
-
+        Preferences.getInstance().putDouble("talon1_encoder", Chassis.getInstance().getRightTalonSRX().getSelectedSensorPosition());
+        Preferences.getInstance().putDouble("talon15_encoder", Chassis.getInstance().getLefTalonSRX().getSelectedSensorPosition());
     }
 
     @Override
@@ -389,18 +246,15 @@ public class Robot extends TimedRobot {
 
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSY).whenPressed(Shooter.getInstance().getAimUp());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSA).whenPressed(Shooter.getInstance().getAimDown());
-        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSLT)
-                .whileHeld(Shooter.getInstance().getAccelerateToThrow());
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSLT).whileHeld(Shooter.getInstance().getAccelerateToThrow());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSRT).whileHeld(Storage.getInstance().getPass());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSLB).whileHeld(Climb.getInstance().m_up());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSRB).whileHeld(Climb.getInstance().getClimbDown());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSX).whileHeld(Collector.getInstance().collectCmd());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSB).whileHeld(Climb.getInstance().m_pull());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSStart).whenPressed(Rolletta.getInstance().getRotationControl());
-        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSBack)
-         .whenPressed(Rolletta.getInstance().getPositionControl());
-        new JoystickButton(m_righJoystick, 5)
-         .whenPressed(Chassis.getInstance().turnToPPCmd());
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSBack).whenPressed(Rolletta.getInstance().getPositionControl());
+        new JoystickButton(m_righJoystick, 5).whenPressed(Chassis.getInstance().turnToPPCmd());
         new JoystickButton(m_righJoystick, 1).whileHeld(new CommandBase() {
             @Override
             public void initialize() {
@@ -411,6 +265,7 @@ public class Robot extends TimedRobot {
                 Chassis.getInstance().SpeedModifier = 0.5;
             }
         });
+        
         // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSRS).whileHeld(new CommandBase() {
         //     @Override
         //     public void initialize() {
@@ -424,15 +279,6 @@ public class Robot extends TimedRobot {
         // });
 
         Rolletta.getInstance().getLiftTrigger().whileActiveOnce(Rolletta.getInstance().toggle());
-
-
-
-
-
-
-
-
-
 
         // new JoystickButton(m_operatorJoystick,
         // ButtonPorts.operatorJSY).whenPressed(Rolletta.getInstance().m_calibrateYellow());
@@ -464,5 +310,4 @@ public class Robot extends TimedRobot {
         // TODO: add climb down on RB
 
     };
-
 }

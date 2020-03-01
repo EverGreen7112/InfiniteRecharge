@@ -34,7 +34,6 @@ public class Autonomous extends SequentialCommandGroup {
      * the number of options that we wish to have.
      */
     public static final int OPTIONS_NUMBER = 10;
-    private SequentialCommandGroup m_wrapped = new SequentialCommandGroup();
     private SendableChooser<CommandBase>[] m_options = new SendableChooser[OPTIONS_NUMBER];
     private Supplier<Double>[] m_arguments = new Supplier[OPTIONS_NUMBER];
     private CommandBase[] m_commands;
@@ -90,10 +89,10 @@ public class Autonomous extends SequentialCommandGroup {
     }
     
     
+    
     @Override
     public void schedule(boolean interruptible) {        
-        m_wrapped = new SequentialCommandGroup(m_commands);
-        m_wrapped.schedule(interruptible);
+       new SequentialCommandGroup(m_commands).schedule(interruptible);
     }
     
     public void update() {
@@ -104,6 +103,21 @@ public class Autonomous extends SequentialCommandGroup {
             }
         }
     }
+
+    public void driveByTime() {
+        double kP = 0.0002;
+        double start = System.currentTimeMillis();
+        Supplier<Double> runTime =
+            () -> System.currentTimeMillis() - start;
+        
+        while (runTime.get() < 2000) {
+            Chassis.getInstance().move(kP * runTime.get());
+        }
+
+        Chassis.getInstance().move(0);
+    }
+
+
    
     public CommandBase[] getCurrentCommands(){
         return m_commands;

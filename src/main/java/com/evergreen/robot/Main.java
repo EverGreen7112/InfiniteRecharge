@@ -7,7 +7,7 @@
 
 package com.evergreen.robot;
 
-import com.evergreen.robot.wpilib.Robot;
+import com.evergreen.robot.wpilib.Pistachio;
 
 import edu.wpi.first.wpilibj.RobotBase;
 
@@ -27,6 +27,6 @@ public final class Main {
    */
   //TODO: make sure that robot import is correct
   public static void main(String... args) {
-    RobotBase.startRobot(Robot::new);
+    RobotBase.startRobot(Pistachio::new);
   }
 }

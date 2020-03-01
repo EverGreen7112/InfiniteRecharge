@@ -21,7 +21,7 @@ public interface RobotMap {
         collector = 4, //Victor
         passer = 5, //Victor. The motor which passes a power cell from the storage to the shooter.
         aimer = 6, //Talon. Aims the shooter.
-        lifter = 7, //Victor
+        lifter = 7, //Victor, Roletta Lifter
         thrower = 8, //Victor
         spinner = 9, //Talon
         climbUp = 12, //Talon
