@@ -175,21 +175,7 @@ private static Chassis m_instance;
     if (m_instance==null) m_instance = new Chassis();
     return m_instance;
   }
- 
-//rotating chassis to a choosen set point with pid
-  public void rotateTo(double setpoint){//TODO: check
-    
-    m_anglePID.setSetpoint(setpoint);
-    m_anglePID.setTolerance(ANGLE_TOLERANCE);
-
-    while (Math.abs(m_anglePID.getPositionError()) > getPIDAngleTolerance()) {
-      double speed = m_anglePID.calculate(m_gyro.getAngle());
-      m_rightFront.set(speed);
-      m_rightBack.set(speed);
-      m_leftFront.set(-speed);
-      m_leftBack.set(-speed);
-    }
-  }
+   
   //sets same speed to all left motors
   public void setLeftSpeed(double speed){
     m_leftBack.set(speed);
@@ -315,9 +301,11 @@ public PIDController getDistancePID(){
 private PIDController getVelocityPID(){
   return m_velocityPID;
 }
-//returing the gyro object
-public Gyro getGyro(){
-  return m_gyro;
+public void resetGyro(){
+  m_gyro.reset();
+}
+public void calibrateGyro(){
+  m_gyro.calibrate();
 }
 //returning the right talon mototr
 public WPI_TalonSRX getRightTalonSRX(){
@@ -373,6 +361,21 @@ public void rotate(double speed){
  
   public void setVoltage(double left, double right) {
     drive(left / 12, right / 12);
+  }
+  /**
+   * 
+   * @return the gyro angle modulo 360
+   */
+  public double getAbsuluteAngle(){
+    return m_gyro.getAngle()%360;
+  }
+  /**
+   * 
+   * @return the gyro angle(continue
+   * from 360 to 361 degrees)
+   */
+  public double getOriginalAngle(){
+    return m_gyro.getAngle();
   }
 
   public RamseteCommand follow(TrajectoryOption trajectory) throws IOException {//have Not check yet

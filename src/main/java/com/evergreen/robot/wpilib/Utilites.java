@@ -58,7 +58,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
      */
     public static double getPowerPortToAllinceStationAngle(){
         if(isVisonAngleWork()){
-            return 90 -Chassis.getInstance().getGyro().getAngle()+getPowerPortToRobotAngle();
+            return 90 -Chassis.getInstance().getAbsuluteAngle()+getPowerPortToRobotAngle();
         }
         return Math.asin(getXDistanceFromPowerPort()/getDirectDistanceFromPowerPort());
     }
@@ -71,7 +71,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
         Preferences.getInstance().putDouble("another angle",SmartDashboard.getNumber("Angle", 0.3) );
         return SmartDashboard.getNumber("Angle", 360);
         }
-        return Chassis.getInstance().getGyro().getAngle()- Math.atan(getYDistanceFromPowerPort()/getXDistanceFromPowerPort());
+        return Chassis.getInstance().getAbsuluteAngle()- Math.atan(getYDistanceFromPowerPort()/getXDistanceFromPowerPort());
        
     }
     

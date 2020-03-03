@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class ResetGyro extends CommandBase {
 @Override
 public void initialize() {
-    Chassis.getInstance().getGyro().reset();
+    Chassis.getInstance().resetGyro();
 }
 @Override
 public boolean isFinished() {

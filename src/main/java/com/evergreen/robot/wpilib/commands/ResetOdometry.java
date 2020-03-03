@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class ResetOdometry extends CommandBase{
 @Override
 public void initialize() {
-    Chassis.getInstance().getGyro().reset();
+    Chassis.getInstance().resetGyro();
     Chassis.getInstance().getOdometry().resetPosition(Utilites.POWER_PORT_POSE2D, Chassis.getInstance().getHeading());
 }
     

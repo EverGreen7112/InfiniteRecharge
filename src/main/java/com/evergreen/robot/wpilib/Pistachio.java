@@ -15,6 +15,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -37,6 +38,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import sun.util.resources.cldr.ext.CurrencyNames_yo;
 
 /**
  * Robot
@@ -66,6 +68,7 @@ public class Pistachio extends TimedRobot {
 
     @Override
     public void testInit() {
+        
         // Rolletta.getInstance().toggle().schedule();
         // new
         // JoystickButton(m_joystick,1).whileHeld(Collector.getInstance().collectCmd());
@@ -90,8 +93,7 @@ public class Pistachio extends TimedRobot {
 
     @Override
     public void testPeriodic() {
-        Rolletta.getInstance().m_lifter.set(0.3);
-        // new PrintCommand("message").schedule();
+      
         CommandScheduler.getInstance().run();
 
     }
@@ -196,7 +198,7 @@ public class Pistachio extends TimedRobot {
                 e.printStackTrace();
                 throw new RuntimeException();
             }
-            //finish turn
+            turn.cancel();
             CommandBase throwPC = Shooter.getInstance().getShootToUpper();
             throwPC.schedule();
             try {
@@ -205,47 +207,162 @@ public class Pistachio extends TimedRobot {
                 e.printStackTrace();
                 throw new RuntimeException();
             }
-            //finish throw
+            throwPC.cancel();
 
-            //al oter auto command
 
 
         }
     };
 }   
     /**
-     * collect from infront of our the trunch and bakc from it
-     * @param powerCell 2  or 3
+     * collect from infront the trunch and bakc from it
+     * @param powerCell 1 or 2  or 3
+     * @param allienceTrunch collect from allience trunch if not true: power cell param not meter and the robot will collect 2 powercel
+     * assuiming that the robot is infront of the lower power cell
      */
-    
-    
-     // public void collectFromFrontTrunch(double powerCell,boolean aliienceTrunch){
-    //     if(a)
-    //     if(powerCell ==2){
+     public void collectFromFrontTrunch(int powerCell,boolean allienceTrunch){
+        MoveChassisTo m_move;
+        CommandBase m_collect;
+        //collect from our trunch
+        if(allienceTrunch){
+            switch (powerCell) {
+               //one power cell
+                case 1:
+                   
+                    m_move = new MoveChassisTo(3.6);
+                    m_collect = Collector.getInstance().collectCmd();
+                    //move to the power cellls and collect them
+                    m_move.schedule();
+                    m_collect.schedule();
+                    CommandScheduler.getInstance().run();
+                    while(!m_move.isFinished()){
+                 
+                    }
+                    m_collect.cancel();
+                    //return from the trunch
+                    new MoveChassisTo(-3.6).schedule();
+                    CommandScheduler.getInstance().run();
+                break;
+            //two power cells
+            case 2:
+                m_move = new MoveChassisTo(4.4);
+                m_collect = Collector.getInstance().collectCmd();
+                //move to the power cellls and collect them
+                m_move.schedule();
+                m_collect.schedule();
+                CommandScheduler.getInstance().run();
+                while(!m_move.isFinished()){
             
-    //         };
-    //     }
-    // }
+                }
+                m_collect.cancel();
+                //return from the trunch
+                new MoveChassisTo(-4.4).schedule();
+                    CommandScheduler.getInstance().run();
+           break;
+           //three power cells
+           case 3:
+                m_move = new MoveChassisTo(5.5);
+                m_collect = Collector.getInstance().collectCmd();
+                //move to the power cellls and collect them
+                m_move.schedule();
+                m_collect.schedule();
+                CommandScheduler.getInstance().run();
+                while(!m_move.isFinished()){
+        
+                }
+                m_collect.cancel();
+                //return from the trunch
+                new MoveChassisTo(-5.5).schedule();
+                CommandScheduler.getInstance().run();
+       break;
 
+        }
+       //collect from opponent trunch 
+        }else{
+            //collect one power cell
+            m_move = new MoveChassisTo(3.3);
+            m_collect = Collector.getInstance().collectCmd();
+            m_move.schedule();
+            m_collect.schedule();
+            CommandScheduler.getInstance().run();
+            while(!m_move.isFinished()){
+                 
+            }
+            m_collect.cancel();
+            //collect another power cell
+            CommandBase m_rotate = new RotateTo(-90);
+            m_rotate.schedule();
+            CommandScheduler.getInstance().run();
+            while(!m_rotate.isFinished()){}
+            CommandBase m_move2 = new MoveChassisTo(0.8);
+            m_move2.schedule();
+            m_collect.schedule();
+            CommandScheduler.getInstance().run();
+            while(!m_move2.isFinished()){
+
+            }
+            m_collect.cancel();
+            //return 0.8 meter upper from starting point
+            m_rotate.schedule();
+            CommandScheduler.getInstance().run();
+            while(!m_rotate.isFinished())
+            new MoveChassisTo(-3.3).schedule();
+            CommandScheduler.getInstance().run();
+
+
+
+        }
+    }
+    
+    
+    public CommandBase returnFromOurTrunch(){
+        return new SequentialCommandGroup(
+        new RotateTo(90),
+        new MoveChassisTo(2),
+        new RotateTo(90));
+    }
+    public CommandBase returnFromOpponentTrunch(){
+        return new SequentialCommandGroup(
+            new RotateTo(-90),
+            new MoveChassisTo(4.4),
+            new RotateTo(-90)
+        );
+    }
     
     /**
      * 
      * start inftront the power cell collect two ball and return
      */
-    public CommandBase collectTwoFromOurTrunch(){
+    public CommandBase collectFromOurTrunch(int powerCells){
         return new SequentialCommandGroup(
         
         (new RotateTo(90)),
-        (new MoveChassisTo(1.5)),
-        new RotateTo(180)
+        (new MoveChassisTo(2)),
+        new RotateTo(90),
+        new InstantCommand(() -> collectFromFrontTrunch(powerCells, true)),
+        new RotateTo(90),
+        new MoveChassisTo(2),
+        new RotateTo(90)
         );
     }
+    public CommandBase collectFromOpponentTrunch(){
+        return new SequentialCommandGroup(
+            (new RotateTo(-90)),
+            (new MoveChassisTo(5.2)),
+            new RotateTo(-90),
+            new InstantCommand(() -> collectFromFrontTrunch(0, false)),
+            new RotateTo(-90),
+            new MoveChassisTo(4.4),
+            new RotateTo(-90)
+            );
+        
+    }
 
-    
 
+    //TODO: check and tune drive to and rotate to,check all method above
     @Override
     public void autonomousInit() {
-        
+        //TODO: check and tune drive to and rotate to,check all method above
         
         
         
