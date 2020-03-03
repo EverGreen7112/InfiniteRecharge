@@ -49,7 +49,9 @@ public class Shooter extends SubsystemBase implements RobotMap {
         // TODO:put correct SpeedController Type
         
         public WPI_TalonSRX m_motor = new WPI_TalonSRX(MotorPorts.aimer);
-        public DigitalInput m_downSwitch = new DigitalInput(DigitalPorts.aimerSwitch);
+        public DigitalInput m_downSwitch = new DigitalInput(DigitalPorts.aimerDownSwitch);
+        public DigitalInput m_upSwitch = new DigitalInput(DigitalPorts.aimerUpSwitch);
+
         
     }
 
@@ -158,38 +160,61 @@ public class Shooter extends SubsystemBase implements RobotMap {
 
     private CommandBase m_aimUp() {
         return new CommandBase() {
-            double m_start;
-            double m_difference;
-
+            @Override
             public void initialize() {
                 addRequirements(m_aimer);
-                m_start = System.currentTimeMillis();
             }
+             @Override
+             public void execute() {
+                 m_aimer.m_motor.set(0.5);
+             }
+ 
+             @Override
+             public boolean isFinished() {
+                 return m_aimer.m_upSwitch.get();
+             }
+ 
+             @Override
+             public void end(boolean interrupted) {
+             // Created weird bang bang
+              
+                 m_aimer.m_motor.set(0);
+             }
+         };}
+        
+    //     return new CommandBase() {
+    //         double m_start;
+    //         double m_difference;
 
-            @Override
-            public void execute() {
-                m_aimer.m_motor.set(0.7);
-                SmartDashboard.putNumber("START", m_start);
+    //         public void initialize() {
+    //             addRequirements(m_aimer);
+    //             m_start = System.currentTimeMillis();
+    //         }
 
-                SmartDashboard.putNumber(
-                    "CURRENT", System.currentTimeMillis());
+    //         @Override
+    //         public void execute() {
+    //             m_aimer.m_motor.set(0.7);
+    //             SmartDashboard.putNumber("START", m_start);
+
+    //             SmartDashboard.putNumber(
+    //                 "CURRENT", System.currentTimeMillis());
                 
-                m_difference = System.currentTimeMillis() - m_start;
+    //             m_difference = System.currentTimeMillis() - m_start;
                 
-                SmartDashboard.putNumber("DIFFERENCE", m_difference);
-            }
+    //             SmartDashboard.putNumber("DIFFERENCE", m_difference);
+    //         }
 
-            @Override
-            public boolean isFinished() {
-                return m_difference >= 175;    
-            }
+    //         @Override
+    //         public boolean isFinished() {
+    //             return m_difference >= 175;    
+    //         }
   
-            @Override
-            public void end(boolean interrupted) {
-                m_aimer.m_motor.set(0);
-            }
-        };
-    }
+    //         @Override
+    //         public void end(boolean interrupted) {
+    //             m_aimer.m_motor.set(0);
+    //         }
+    //     };
+    // }
     
 
     private CommandBase m_aimDown() {
@@ -214,8 +239,8 @@ public class Shooter extends SubsystemBase implements RobotMap {
              
                 m_aimer.m_motor.set(0);
             }
-        };
-        }
+        };}
+        
     private CommandBase m_aimToggle() {
         return new PIDCommand(m_aimController, this::getAimerAngle, () -> {
             if (m_atUpperPosition) {
