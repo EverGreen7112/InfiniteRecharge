@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import com.evergreen.robot.wpilib.commands.CheckSpeedControllers;
 import com.evergreen.robot.wpilib.commands.MoveChassisTo;
 import com.evergreen.robot.wpilib.commands.ResetGyro;
 import com.evergreen.robot.wpilib.commands.RotateTilSeePort;
@@ -38,7 +39,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import sun.util.resources.cldr.ext.CurrencyNames_yo;
+
 
 /**
  * Robot
@@ -68,6 +69,8 @@ public class Pistachio extends TimedRobot {
 
     @Override
     public void testInit() {
+        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSA).whileHeld(new CheckSpeedControllers());
+        
         
         // Rolletta.getInstance().toggle().schedule();
         // new
