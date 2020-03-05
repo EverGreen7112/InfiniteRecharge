@@ -7,8 +7,6 @@
 
 package com.evergreen.robot;
 
-import com.evergreen.robot.wpilib.Pistachio;
-
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
