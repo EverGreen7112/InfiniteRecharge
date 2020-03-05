@@ -16,4 +16,8 @@ public class Stop extends CommandBase {
         Chassis.getInstance().getRightControllerGroup().set(0);
         Chassis.getInstance().getLeftControllerGroup().set(0);
     }
+    @Override
+    public boolean isFinished() {
+        return true;
+    }
 }

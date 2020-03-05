@@ -42,7 +42,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
     public void schedule() {
        addCommands(
            new RotateTo(m_TurnningAngle.get())
-            ,new MoveChassisTo(Utilites.Pitaguras(m_xDistance.get(), Utilites.getYDistanceFromPowerPort())),
+            ,new MoveChassisTo(Utilites.Pythagoras(m_xDistance.get(), Utilites.getYDistanceFromPowerPort())),
             new RotateTo(-1*(90 - Utilites.getPowerPortToAllinceStationAngle() + m_TurnningAngle.get()))
             );
 
@@ -52,7 +52,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
     public void schedule(boolean interruptible) {
         addCommands(
             new RotateTo(m_TurnningAngle.get())
-             ,new MoveChassisTo(Utilites.Pitaguras(m_xDistance.get(), Utilites.getYDistanceFromPowerPort())),
+             ,new MoveChassisTo(Utilites.Pythagoras(m_xDistance.get(), Utilites.getYDistanceFromPowerPort())),
              new RotateTo(-1*(90 - Utilites.getPowerPortToAllinceStationAngle() + m_TurnningAngle.get()))
              );
  

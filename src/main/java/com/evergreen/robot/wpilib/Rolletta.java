@@ -7,8 +7,12 @@
 
 package com.evergreen.robot.wpilib;
 
+import java.util.Set;
+import java.util.function.Supplier;
+
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import com.evergreen.everlib.shuffleboard.loggables.DashboardStreams;
 import com.evergreen.robot.RobotMap.DigitalPorts;
 import com.evergreen.robot.RobotMap.MotorPorts;
 import com.revrobotics.ColorMatch;
@@ -22,105 +26,176 @@ import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Rolletta extends SubsystemBase {
   //Creates the single Rolletta instance
   private static Rolletta m_instance;
   
   //General Constants
-   private double LIFT_SPEED;  
+   private double LIFT_SPEED = 0.35;  
    //45 degrees offset to make sure it's not too little
    private double ROTATION_CONTROL_SETPOINT = 360 * 3 + 45; 
    private double ROBOT_SENSOR_OFFSET = 90;
-   private boolean isLifting = true;
+   private boolean m_isLifting ;
 
-  //Color RGB constants
+  //Color RGB constants][
   private double 
-    BLUE_R,
-    BLUE_G,
-    BLUE_B,    
-    GREEN_R,
-    GREEN_G,
-    GREEN_B, //Add 60 degrees offset to make sure.
-    RED_R,
-    RED_G,
-    RED_B,
-    YELLOW_R,
-    YELLOW_G,
-    YELLOW_B;
+    BLUE_R = 0.210693,
+    BLUE_G = 0.487793,
+    BLUE_B = 0.301514,    
+    GREEN_R = 0.232422,
+    GREEN_G =0.531738,
+    GREEN_B = 0.236084, //Add 60 degrees offset to make sure.
+    RED_R=0.338135,
+    RED_G = 0.461426,
+    RED_B = 0.200439,
+    YELLOW_R =0.279541,
+    YELLOW_G = 0.536377,
+    YELLOW_B = 0.184082;
+    private final int COLORSTEP =1;
     //Control Panel calibrated colors - this is what we expect to read on field
     private Color BLUE = ColorMatch.makeColor(BLUE_R, BLUE_G, BLUE_B);
     private Color GREEN = ColorMatch.makeColor(GREEN_R, GREEN_G, GREEN_B);
     private Color RED = ColorMatch.makeColor(RED_R, RED_G, RED_B);
     private Color YELLOW = ColorMatch.makeColor(YELLOW_R, YELLOW_G, YELLOW_B);
-    
   //The speed controllers
-  private SpeedController m_spinner = new WPI_TalonSRX(MotorPorts.spiner);
-  private SpeedController m_lifter = new WPI_VictorSPX(MotorPorts.lifter);
+  private WPI_TalonSRX m_spinner = new WPI_TalonSRX(MotorPorts.spinner);
+  public SpeedController m_lifter = new WPI_VictorSPX(MotorPorts.lifter);
 
   //The encoder for the spinning motor
-  private Encoder m_spinnerEncoder = new Encoder(DigitalPorts.rollettaA,DigitalPorts.rollettaB);
+  //private Encoder m_spinnerEncoder = new Encoder(DigitalPorts.rollettaA,DigitalPorts.rollettaB);
 
   //The Color Sensor
-  ColorSensorV3 m_colorSensor = new ColorSensorV3(Port.kMXP);
+  private final ColorSensorV3 m_colorSensor = new ColorSensorV3(Port.kOnboard);
   //The color matcher - detects known colors
   private final ColorMatch m_colorMatcher = new ColorMatch();
 
 
   //The switches to control the ifter motor
-  private DigitalInput m_upperSwitch = new DigitalInput(DigitalPorts.rollettaUpperSwitch);
-  private DigitalInput m_lowerSwitch = new DigitalInput(DigitalPorts.rollettaLowerSwitch);
+  //TODO fix ports
+  private DigitalInput m_upperSwitch = new DigitalInput(DigitalPorts.rolletaMicroSwitchUp);
+  private DigitalInput m_lowerSwitch = new DigitalInput(DigitalPorts.rolletaMicroSwitchDown);
+
 
   private double m_rightOffset = 0;
   private double m_leftOffset = 0;
 
   
+  public boolean isDown() {
+    return m_lowerSwitch.get();
+  }
+
+  public boolean isUp() {
+    return m_upperSwitch.get();
+  }
+
   //Commands:
   /**
    * Lifting and Lowering the mechanism
    */
-  public CommandBase lift = 
-    new RunCommand( () -> move(isLifting, isLifting ? m_upperSwitch : m_lowerSwitch), Rolletta.getInstance()){
-    @Override
-    public void end(boolean interrupted){
-      m_lifter.set(0);
-    }
+  public CommandBase toggle() { 
+    return  new CommandBase() {
+
+      @Override
+      public void initialize() {
+          addRequirements(Rolletta.getInstance());
+      }
+
+      @Override
+      public boolean isFinished() {
+        boolean done = move(m_isLifting);
+        SmartDashboard.putBoolean("Hit Switch", m_isLifting);
+        return done;
+      }
+
+      @Override
+      public void end(boolean interrupted) {
+        if (!interrupted){
+          m_isLifting = !m_isLifting;
+        }
+        m_lifter.set(0);        
+      }
+
+
+    };
+    
   };
+  /**
+   * 
+   * @return
+   */
+  public String getnextRightColor(String color){
+    switch(color){
+      case "R":
+      return "Y";
+      case "G":
+      return "R";
+      
+      case "Y":
+      return "B";
+      
+      case "B":
+      return "G";
+      
+      default:
+      return "U";
+    }
+  }
 
    /**
    * Calibrates the BLUE RBG components, ought to run on disabled
    */
-  public CommandBase calibrateBlue = 
-    new RunCommand(() -> calibrateBlue(), Rolletta.getInstance()).withTimeout(3.5);
+  public CommandBase m_calibrateBlue() {
+    return new RunCommand(() -> calibrateBlue(), this).withTimeout(3.5);
+  }
 
    /**
    * Calibrates the GREEN RBG components, ought to run on disabled
    */
-  public CommandBase calibrateGreen = 
-    new RunCommand(() -> calibrateGreen(), Rolletta.getInstance()).withTimeout(3.5);
-  
+  public CommandBase m_calibrateGreen() {
+    return new RunCommand(() -> calibrateGreen(), this).withTimeout(3.5);
+}
    /**
    * Calibrates the RED RBG components, ought to run on disabled
    */
-  public CommandBase calibrateRed = 
-    new RunCommand(() -> calibrateRed(), Rolletta.getInstance()).withTimeout(3.5);
-  
+  public CommandBase m_calibrateRed() {
+    return new RunCommand(() -> calibrateRed(), this).withTimeout(3.5);
+  }
    /**
    * Calibrates the YELLOW RBG components, ought to run on disabled
    */
-  public CommandBase calibrateYellow = 
-    new RunCommand(() -> calibrateYellow(), Rolletta.getInstance()).withTimeout(3.5);
+  public CommandBase m_calibrateYellow() {
+    return new RunCommand(() -> calibrateYellow(), this).withTimeout(3.5);
+  }
+
+  public boolean isLifting() {
+    return m_isLifting;
+  }
+  public String getColorGoal(){
+    // return "G";
+    if(DriverStation.getInstance().getGameSpecificMessage().length()!=0){
+    return Character.toString(DriverStation.getInstance().getGameSpecificMessage().charAt(0));  
+    }
+    return "U";
+  }
 
   /**
    * Creates a new Rolletta.
    */
   public Rolletta() {
     //Adds to the shuffleboard constatns, detected color, etc.
+    m_lifter.setInverted(true);
+    m_isLifting= !isUp();
+
     Preferences.getInstance().putDouble("Rolletta/Lift Speed", LIFT_SPEED);
     Preferences.getInstance().putString("Rolletta/Detected color", getCurrentColor());
     Preferences.getInstance().putDouble("Rolletta/Blue/R", BLUE_R);
@@ -144,7 +219,7 @@ public class Rolletta extends SubsystemBase {
   /**
    * Returns the single instance
    */
-  public static Rolletta getInstance() {
+  public static synchronized Rolletta getInstance() {
     if (m_instance == null) m_instance = new Rolletta();
     return m_instance;
   }
@@ -155,21 +230,27 @@ public class Rolletta extends SubsystemBase {
    * @param lifting
    * @param untilHit
    */
-  public void move(boolean lifting, DigitalInput untilHit) {
-    double liftSpeed = lifting ? GET_SPEED() : -GET_SPEED();    
-    if (untilHit.get()) {
-      m_lifter.set(0);
-      isLifting = !isLifting;
+  public boolean move(boolean lifting) {
+    double liftSpeed = lifting ? GET_SPEED() : -GET_SPEED();
+    Supplier<Boolean> untilHit = lifting ? this::isUp : this::isDown;
+    SmartDashboard.putBoolean("Hit", untilHit.get());
+    
+    while (!untilHit.get()) {
+      m_lifter.set(liftSpeed);
     }
-    else  m_lifter.set(liftSpeed);
+    
+    return true;
+
+
+    
   }
 
   /**
    * <b>Rotation Control method:</b>
    * <p> 
    * Spins the control panel between 3-5 times.
-   */
-  public void rotationControl() {
+  */
+  private void rotationControl() {
     spinDegrees(ROTATION_CONTROL_SETPOINT); 
   }
 
@@ -178,8 +259,6 @@ public class Rolletta extends SubsystemBase {
    * <p>Spins the control panel to the color given from the FMS.
    */
   public void positionControl() {
-
-
     if (toLeft(getTargetAngle()) - getLeftAngle() > getTargetAngle() - getRightAngle())
       spinTo(getTargetAngle());
     else
@@ -243,6 +322,7 @@ public class Rolletta extends SubsystemBase {
     BLUE_R = blueDetected.red;
     BLUE_G = blueDetected.green;
     BLUE_B = blueDetected.blue;
+    BLUE = ColorMatch.makeColor(BLUE_R, BLUE_G, BLUE_B);
   }
   
   /**
@@ -253,6 +333,7 @@ public class Rolletta extends SubsystemBase {
     GREEN_R = greenDetected.red;
     GREEN_G = greenDetected.green;
     GREEN_B = greenDetected.blue;
+    GREEN = ColorMatch.makeColor(GREEN_R, GREEN_G, BLUE_B);
   }
 
   /**
@@ -263,6 +344,7 @@ public class Rolletta extends SubsystemBase {
     RED_R = redDetected.red;
     RED_G = redDetected.green;
     RED_B = redDetected.blue;
+    RED = ColorMatch.makeColor(RED_R, RED_G, RED_B);
   }
 
   /**
@@ -273,6 +355,7 @@ public class Rolletta extends SubsystemBase {
     YELLOW_R = yellowDetected.red;
     YELLOW_G = yellowDetected.green;
     YELLOW_B = yellowDetected.blue;
+    YELLOW = ColorMatch.makeColor(YELLOW_R, YELLOW_G, YELLOW_B);
   }
 
   /**
@@ -293,6 +376,12 @@ public class Rolletta extends SubsystemBase {
       return "Unknown";
     }
   }
+  
+  
+
+  public ColorSensorV3 getColorSensor() {
+    return m_colorSensor;
+  }
 
 
   // Sensor Methods
@@ -301,12 +390,13 @@ public class Rolletta extends SubsystemBase {
    * @return the angle we need to target, modulu 180 with RED=0.
    */
   public double getTargetAngle() {
+    
     return getColorAngle(DriverStation.getInstance().getGameSpecificMessage());
   }
 
   /**Resets the spinner encoder and the current offset according to current sensor input.*/
   public void resetSensor() {
-    m_spinnerEncoder.reset();
+    m_spinner.setSelectedSensorPosition(0);
     m_rightOffset = getColorAngle(getCurrentColor()) + ROBOT_SENSOR_OFFSET;
     m_leftOffset = toLeft(getColorAngle(getCurrentColor())) - ROBOT_SENSOR_OFFSET;
   }
@@ -334,7 +424,7 @@ public class Rolletta extends SubsystemBase {
    * {@link #resetSensor()}
    */
   public double getRawAngle() {
-    return m_spinnerEncoder.getDistance();
+    return m_spinner.getSelectedSensorPosition();
   }
 
   
@@ -392,6 +482,7 @@ public class Rolletta extends SubsystemBase {
     }
 
     m_spinner.set(0);
+
   }
 
   /**
@@ -415,56 +506,140 @@ public class Rolletta extends SubsystemBase {
   /**
    * @return A {@link CommandBase} representatoion of {@link #rotationControl()}
    */
-  public PIDCommand getRotationControl() {
-    return new PIDCommand(
-      getController(), 
-      this::getRawAngle,
-      () -> ROTATION_CONTROL_SETPOINT, 
-      (output) -> m_spinner.set(output),
-      this);
+  public CommandBase getRotationControl() {
+    // return new PIDCommand(
+    //   getController(), 
+    //   this::getRawAngle,
+    //   () -> ROTATION_CONTROL_SETPOINT, 
+    //   (output) -> m_spinner.set(output),
+    //   this);
+    return new CommandBase() {
+      @Override
+      public void initialize() {
+        m_spinner.set(0.4);
+      }
+      @Override
+        public boolean isFinished() {
+          try {
+            Thread.sleep(6800);
+           } catch (InterruptedException e) {
+             e.printStackTrace();
+             throw new RuntimeException();
+          }
+          m_spinner.set(-0.6);
+          try {
+            Thread.sleep(500);
+           } catch (InterruptedException e) {
+             e.printStackTrace();
+             throw new RuntimeException();
+          }
+          
+          return true;
+        }
+      @Override
+        public void end(boolean interrupted) {
+          
+          m_spinner.set(0);
+         
+        }
+       
+    };
   }
 
   /**
    * @return A {@link CommandBase} representatoion of {@link #positionControl()}
    */
-  public PIDCommand getPositionControl() {
+  public CommandBase getPositionControl() {
 
-    resetSensor();
+    // resetSensor();
 
-    double currentLeft = getLeftAngle();
-    double currentRight = getRightAngle();
-    double target = getTargetAngle();
-    double rightError = target - currentRight;
-    double leftError = toLeft(target) - currentLeft;
+    // double currentLeft = getLeftAngle();
+    // double currentRight = getRightAngle();
+    // double target = getTargetAngle();
+    // double rightError = target - currentRight;
+    // double leftError = toLeft(target) - currentLeft;
 
-    if (rightError < leftError) {
+    // if (rightError < leftError) {
 
-      return new PIDCommand(
-        getController(),
-        this::getRightAngle, 
-        this::getTargetAngle,
-        (output) -> m_spinner.set(output), 
-        this);
-    }
+    //   return new PIDCommand(
+    //     getController(),
+    //     this::getRightAngle, 
+    //     this::getTargetAngle,
+    //     (output) -> m_spinner.set(output), 
+    //     this);
+    // }
 
-    else {
+    // else {
 
-      return new PIDCommand(
-        getController(),
-        this::getLeftAngle,
-        () -> toLeft(getTargetAngle()),
-        (output) -> m_spinner.set(output), 
-        this);
+    //   return new PIDCommand(
+    //     getController(),
+    //     this::getLeftAngle,
+    //     () -> toLeft(getTargetAngle()),
+    //     (output) -> m_spinner.set(output), 
+    //     this);
 
-    }
+    // }
+    return new CommandBase() {
+      boolean atPosition =  getCurrentColor().equals(getnextRightColor(getnextRightColor(getColorGoal())));
+      @Override
+      public void initialize() {
+        m_spinner.set(0.2);
+      }
+      @Override
+        public boolean isFinished() {
+          return getCurrentColor().equals(getnextRightColor(getnextRightColor(getColorGoal())));
+        }
+        @Override
+          public void end(boolean interrupted) {
+            if(!atPosition){
+            try {
+              Thread.sleep(200);
+            } catch (InterruptedException e) {
+              e.printStackTrace();
+              throw new RuntimeException();
+            }
+          }
+            m_spinner.set(0);
+          }
+    };
   }
 
   private double toLeft(double rightAngle) {
     return rightAngle % -180;
   }
+  
+  private Trigger liftTrigger = new Trigger() {
+    public boolean get() {
+      return (Pistachio.m_operatorJoystick.getPOV() != -1);
+    };
+  };
+ 
+  public Trigger getLiftTrigger() {
+    return liftTrigger;
+  }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
-  }
-}
+    SmartDashboard.putBoolean("Rolleta/isLifting", m_isLifting);
+    SmartDashboard.putNumber("Rolleta/Lifter Speed", m_lifter.get());
+    SmartDashboard.putNumber("Rolleta/Spinner Speed", m_spinner.get());
+    Preferences.getInstance().putString("Rolletta/Detected color", getCurrentColor());
+    Preferences.getInstance().putDouble("rrrrrrrr", m_colorSensor.getRed());
+    Preferences.getInstance().putDouble("gggggggg", m_colorSensor.getGreen());
+    Preferences.getInstance().putDouble("bbbbbbbb", m_colorSensor.getBlue());
+    Preferences.getInstance().putDouble("rr", RED_R);
+    Preferences.getInstance().putDouble("rg", RED_G);
+    Preferences.getInstance().putDouble("rb", RED_B);
+    
+    Preferences.getInstance().putDouble("gr",GREEN_R);
+    Preferences.getInstance().putDouble("gg", GREEN_G);
+    Preferences.getInstance().putDouble("gb", GREEN_B);
+    
+    Preferences.getInstance().putDouble("br",BLUE_R);
+    Preferences.getInstance().putDouble("bg", BLUE_G);
+    Preferences.getInstance().putDouble("bb", BLUE_B);
+    
+    Preferences.getInstance().putDouble("yr",YELLOW_R);
+    Preferences.getInstance().putDouble("yg", YELLOW_G);
+    Preferences.getInstance().putDouble("yb", YELLOW_B);
+}}

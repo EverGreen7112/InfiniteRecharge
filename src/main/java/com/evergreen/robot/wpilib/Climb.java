@@ -18,51 +18,78 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climb extends SubsystemBase {
-  
+  ///dkasfj
   // creates an instance of Climb
   private static Climb m_instance;
 
   //creates speed constants
   private double CLIMB_UP_SPEED = 0.5;
-  private double CLIMB_PULL_SPEED = 0.5; 
-  private double ELEVATOR_DESCEND_SPEED = -0.5;
+  private double CLIMB_PULL_SPEED = 1; 
+  private double CLIMB_PUSH_SPEED = -0.7; 
+  private double ELEVATOR_DESCEND_SPEED = -0.4;
   private long DESCEND_TIME = 2000;
 
   //creates the speed controllers
   private SpeedController m_climbPull = new WPI_VictorSPX(MotorPorts.climbPull);
+  public SpeedController getClimbPull(){
+    return m_climbPull;
+  }
   private SpeedController m_climbUp = new WPI_TalonSRX(MotorPorts.climbUp);
+  public SpeedController getClimbUp(){
+    return m_climbUp;
+  }
 
   /**
    * Lifts the hook elevator
    */
-  public CommandBase m_up = new RunCommand(() -> climbUp(getUpSpeed()), Climb.getInstance()) {
-    @Override
-    public void end(boolean interrupted) {
-      m_climbUp.set(getDescendSpeed());
-      try {
-        Thread.sleep(getDescendTime());
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-        throw new RuntimeException();
+  public CommandBase m_up(){
+
+    return new RunCommand(() -> climbUp(getUpSpeed()), this) {
+      @Override
+      public void end(boolean interrupted) {
+        m_climbUp.set(0);
+        
       }
-      m_climbUp.set(0.0);
-    }
-  };
+    };
+  }
+
+
+  public CommandBase getPush() {
+    return 
+      new RunCommand(() -> climbPull(CLIMB_PUSH_SPEED), this) {
+        @Override
+        public void end(boolean interrupted) {
+          m_climbPull.set(0);
+        }
+      };
+  }
+  
 
   /**
    * Pulls up the robot
    */
-  public CommandBase m_pull = new RunCommand(() -> climbPull(getPullSpeed()), Climb.getInstance()) {
+  public CommandBase m_pull(){
+   return new RunCommand(() -> climbPull(getPullSpeed()), this) {
     @Override
     public void end(boolean interrupted) {
       m_climbPull.set(0.0);
     }
-  };
+  };}
+  public CommandBase getClimbDown(){
+    return new RunCommand(() -> climbUp(getDescendSpeed()), this) {
+      @Override
+      public void end(boolean interrupted) {
+        m_climbUp.set(0.0);
+      }
+    };
+  }
 
   /** Climb Constructor:
    * Creates a new Climb.
    */
   private Climb() {
+    m_climbPull.setInverted(true);//positve values if pull.
+    m_climbUp.setInverted(true);
     //uploads the speed constants to the shuffelboard
     Preferences.getInstance().putDouble("Climb/Elevator Speed", CLIMB_UP_SPEED);
     Preferences.getInstance().putDouble("Climb/Pull-Up Speed", CLIMB_PULL_SPEED);
@@ -71,7 +98,7 @@ public class Climb extends SubsystemBase {
   }
 
   //creates get instance method
-  public static Climb getInstance() {
+  public static synchronized Climb getInstance() {
     if (m_instance == null) m_instance = new Climb();
     return m_instance;
   }

@@ -7,17 +7,24 @@
 
 package com.evergreen.robot.wpilib;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import com.evergreen.robot.RobotMap;
+import com.evergreen.robot.RobotMap.DigitalPorts;
 import com.evergreen.robot.RobotMap.MotorPorts;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -26,10 +33,17 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
@@ -40,16 +54,25 @@ public class Chassis extends SubsystemBase {
 private static Chassis m_instance;
   
   //declaring the front speed controllers (talon)
-  private WPI_TalonSRX m_rightFront = new WPI_TalonSRX(MotorPorts.chassisRightFront);
-  private WPI_TalonSRX m_leftFront = new WPI_TalonSRX(MotorPorts.chassisLeftFront);
+  private WPI_TalonSRX m_rightFront = new WPI_TalonSRX(MotorPorts.chassisRightMiddle);
+  private WPI_TalonSRX m_leftFront = new WPI_TalonSRX(MotorPorts.chassisLeftMiddle);
  
-  //declaring the gyro
+  //declaring the gyro 
   private Gyro m_gyro = new ADXRS450_Gyro();
-  
+  private Encoder m_rightEncoder = new Encoder(DigitalPorts.rightEncoderA, DigitalPorts.rightEncoderB);
+  private Encoder m_LeftEncoder = new Encoder(DigitalPorts.leftChassisEncoderA, DigitalPorts.leftChassisEncoderB);
 
   //declaring the other speed controllers
-  private SpeedControllerGroup m_rightBack = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisRightBack), new WPI_VictorSPX(MotorPorts.chassisRightMiddle));
-  private SpeedControllerGroup m_leftBack = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisLeftBack), new WPI_VictorSPX(MotorPorts.chassisLeftMiddle));
+  private SpeedControllerGroup m_rightBack = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisRightBack), new WPI_VictorSPX(MotorPorts.chassisRightFront) );
+  private SpeedControllerGroup m_leftBack = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisLeftBack), new WPI_VictorSPX(MotorPorts.chassisLeftFront));
+  
+  private Command m_defaultDrive = new RunCommand(
+    () -> drive(-Pistachio.getRightJoystick() * getSpeedModifier(), -Pistachio.getLeftJoystick() * getSpeedModifier()), 
+    this);
+
+  public Command getDefaultDrive() {
+    return m_defaultDrive;
+  }
   
   //creating pid componets for angle velocity and distance
   private double 
@@ -67,6 +90,10 @@ private static Chassis m_instance;
     DISTANCE_KI = 0,
     DISTANCE_KD = 0,
     DISTANCE_TOLERANCE = 1;
+
+  private double 
+    MIN_THROW_DISTANCE = 2.2,
+    MAX_THROW_DISTANCE = 2.7;
   
   //creating pid controllers for angle velocity and distance
   private PIDController 
@@ -83,7 +110,7 @@ private static Chassis m_instance;
     MAX_VELOCITY = 0,
     MAX_ACCELERATION = 0;  //m 
   //TODO check
-  
+
   private DifferentialDriveKinematics m_kinematics = new DifferentialDriveKinematics(CHASSIS_WIDTH);
 
   private DifferentialDriveOdometry m_odometry;
@@ -93,11 +120,38 @@ private static Chassis m_instance;
   private TrajectoryConfig m_trajectoryConfig = new TrajectoryConfig(MAX_VELOCITY, MAX_ACCELERATION);
 
   private RamseteController m_ramseteController = new RamseteController();
- 
+
+  public DifferentialDriveKinematics getKinematics() {
+    return m_kinematics;
+  }
+
+  public DifferentialDriveOdometry getOdometry(){
+    return m_odometry;
+  }
+
+  public SimpleMotorFeedforward getFeedForword(){
+    return m_feedorward;
+  }
+
+  public TrajectoryConfig getTrajectoryConfig(){
+    return m_trajectoryConfig;
+  }
+
+  public RamseteController getRamseteController(){
+    return m_ramseteController;
+  }
   
   
 
   private Chassis() {
+    
+    m_rightBack.setInverted(true);
+    m_rightFront.setInverted(true);
+    m_gyro.calibrate();
+    m_rightEncoder.setDistancePerPulse(0.002307012);
+    m_LeftEncoder.setDistancePerPulse(0.002307012);
+    m_rightEncoder.setReverseDirection(true);
+
     //entering the PID componets into the prefernces
     Preferences.getInstance().putDouble("Chassis/angle/KP", ANGLE_KP);
     Preferences.getInstance().putDouble("Chassis/angle/KI", ANGLE_KI);
@@ -111,31 +165,17 @@ private static Chassis m_instance;
     Preferences.getInstance().putDouble("Chassis/distance/KI", DISTANCE_KI);
     Preferences.getInstance().putDouble("Chassis/distance/KD", DISTANCE_KD);
     Preferences.getInstance().putDouble("Chassis/distance/TOLERANCE", VELOCITY_TOLERANCE);
+    Preferences.getInstance().putDouble("Chassis/Speed", 0.8);
   }
+  public double SpeedModifier = 0.5;
 
 
   // creating a chassis object
-  public static Chassis getInstance(){
-    if (m_instance==null){
-      m_instance = new Chassis();
-    }
+  public static synchronized Chassis getInstance(){
+    if (m_instance==null) m_instance = new Chassis();
     return m_instance;
   }
- 
-//rotating chassis to a choosen set point with pid
-  public void rotateTo(double setpoint){
-    
-    m_anglePID.setSetpoint(setpoint);
-    m_anglePID.setTolerance(ANGLE_TOLERANCE);
-
-    while (Math.abs(m_anglePID.getPositionError()) > getPIDAngleTolerance()) {
-      double speed = m_anglePID.calculate(m_gyro.getAngle());
-      m_rightFront.set(speed);
-      m_rightBack.set(speed);
-      m_leftFront.set(-speed);
-      m_leftBack.set(-speed);
-    }
-  }
+   
   //sets same speed to all left motors
   public void setLeftSpeed(double speed){
     m_leftBack.set(speed);
@@ -145,6 +185,33 @@ private static Chassis m_instance;
   public void setRightSpeed(double speed){
     m_rightBack.set(speed);
     m_rightFront.set(speed);
+  }
+
+  public CommandBase getMoveByTime() {
+    return new CommandBase() {
+      double m_start;
+
+      @Override
+      public void initialize() {
+        m_start = System.currentTimeMillis();  
+      }
+
+      @Override
+      public void execute() {
+        move(0.7);
+      }
+
+      @Override
+      public boolean isFinished() {
+        return System.currentTimeMillis() - m_start > 2000;
+      }
+
+      @Override
+      public void end(boolean interrupted) {
+        move(0);
+      }
+
+    };
   }
   
 //returning the angle kp
@@ -185,25 +252,25 @@ private static Chassis m_instance;
   }
 //returning the distance from left sensor
   public double getLeftDistance() {
-    return m_leftFront.getSelectedSensorPosition();
+    return m_LeftEncoder.getDistance();
   } 
 //returning the distance from right sensor
   public double getRightDistance() {
-    return m_rightFront.getSelectedSensorPosition();
+    return m_rightEncoder.getDistance();
   }
 //returning the speed of the right motors
  public double getRightVelocity(){
-   return m_rightFront.getSelectedSensorVelocity();
+   return m_rightEncoder.getRate();
  }
  //returning the speed of the left motor
  public double getLeftVelocity(){
-   return m_leftFront.getSelectedSensorVelocity();
+   return m_LeftEncoder.getRate();
  }
  // returning the average speed
- private DifferentialDriveWheelSpeeds getVelocity() {
+ public DifferentialDriveWheelSpeeds getVelocity() {
    return new DifferentialDriveWheelSpeeds(
-     m_leftFront.getSelectedSensorVelocity(), 
-     m_rightFront.getSelectedSensorVelocity());
+     m_LeftEncoder.getRate(), 
+     m_rightEncoder.getRate());
  }
 
  //returning the average distance from both sensors
@@ -234,16 +301,18 @@ public PIDController getDistancePID(){
 private PIDController getVelocityPID(){
   return m_velocityPID;
 }
-//returing the gyro object
-public Gyro getGyro(){
-  return m_gyro;
+public void resetGyro(){
+  m_gyro.reset();
+}
+public void calibrateGyro(){
+  m_gyro.calibrate();
 }
 //returning the right talon mototr
-public TalonSRX getRightTalonSRX(){
+public WPI_TalonSRX getRightTalonSRX(){
   return m_rightFront;
 }
 //returning the left talon motor
-public TalonSRX getLefTalonSRX(){
+public WPI_TalonSRX getLefTalonSRX(){
   return m_leftFront;
 }
 //returning the right victor momtors
@@ -293,11 +362,26 @@ public void rotate(double speed){
   public void setVoltage(double left, double right) {
     drive(left / 12, right / 12);
   }
+  /**
+   * 
+   * @return the gyro angle modulo 360
+   */
+  public double getAbsuluteAngle(){
+    return m_gyro.getAngle()%360;
+  }
+  /**
+   * 
+   * @return the gyro angle(continue
+   * from 360 to 361 degrees)
+   */
+  public double getOriginalAngle(){
+    return m_gyro.getAngle();
+  }
 
-  public RamseteCommand follow(Pose2d... points) {
+  public RamseteCommand follow(TrajectoryOption trajectory) throws IOException {//have Not check yet
     return
       new RamseteCommand(
-        TrajectoryGenerator.generateTrajectory(List.of(points), m_trajectoryConfig), 
+        trajectory.getTrajectory(), 
         m_odometry::getPoseMeters, 
         m_ramseteController, 
         m_feedorward, 
@@ -310,10 +394,60 @@ public void rotate(double speed){
 
     
   }
+
+
+  public static enum TrajectoryOption {
+    MOCK("Mock");
+
+    String m_name;
+
+    private TrajectoryOption(String name) {
+      m_name = name;
+    }
+
+    public String getName() {
+      return m_name;
+    }
+
+    public Trajectory getTrajectory() throws IOException {
+      Path trajectoryJson = Filesystem.getDeployDirectory().toPath().resolve("paths/" + m_name + ".wpilib.json");
+      return TrajectoryUtil.fromPathweaverJson(trajectoryJson);
+      
+    }
+  }
+
+  public double getSpeedModifier() {
+    return SpeedModifier;
+  }
   
+  public CommandBase turnToPPCmd() {
+    return new PIDCommand(
+      new PIDController(0.073,0.008,0.03),
+      Utilites::getPowerPortToRobotAngle,
+      0.0,
+      Chassis.getInstance()::rotate,
+      Chassis.getInstance()
+    ) {    
+          @Override
+          public void execute() {
+            super.execute();
+            Rolletta.getInstance().m_lifter.set(Rolletta.getInstance().GET_SPEED());
+          }
+          public boolean isFinished(){
+              return (Pistachio.m_righJoystick.getRawButtonPressed(6) || !Utilites.seePowerPort());
+          }
+          
+          public void end(boolean Interrupted) {
+              Chassis.getInstance().drive(0, 0);
+          }
+      };
+  }
   
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    SmartDashboard.putBoolean(
+      "CanThrow", 
+      Utilites.getDirectDistanceFromPowerPort() < MAX_THROW_DISTANCE
+        && Utilites.getDirectDistanceFromPowerPort() > MIN_THROW_DISTANCE);
   }
 }

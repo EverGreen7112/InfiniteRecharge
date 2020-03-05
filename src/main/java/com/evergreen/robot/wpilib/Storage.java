@@ -8,9 +8,11 @@
 package com.evergreen.robot.wpilib;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import com.evergreen.robot.RobotMap.AnalogPorts;
 import com.evergreen.robot.RobotMap.DigitalPorts;
 import com.evergreen.robot.RobotMap.MotorPorts;
 
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Ultrasonic;
@@ -24,37 +26,56 @@ public class Storage extends SubsystemBase {
   private static Storage m_instance;
 
   // The passing speed, time and minimum empty distance constants
-  private double PASS_SPEED = 0.5;
+  private double PASS_SPEED = 0.8;
   private long PASS_TIME = 2000; //Notice the time is in milliseconds
   private double MIN_EMPTY_DIST; //Minimum Distance in which Storage is Empty, in mm
   //TODO: find the correct value of minimum distance
 
   //New speed controller and ultrasonic sensor for passing the power cells.
-  private SpeedController m_passMotor = new WPI_VictorSPX(MotorPorts.passer);
-  private Ultrasonic ultrasonic = 
-    new Ultrasonic(DigitalPorts.storageUltrasonicA, DigitalPorts.storageUltrasonicB);
-
+  public SpeedController m_passMotor = new WPI_VictorSPX(MotorPorts.passer);
+   private AnalogInput ultrasonic = 
+     new AnalogInput(AnalogPorts.storageUltrasonic);
+  // TODO Y 2 ports needed
   /**
    * Passes a Power Cell to the Shooter, stops after a fixed amount of time.
    */
-  public CommandBase passByTime = 
-    new RunCommand(() -> m_passByTime(getSpeed(), getTime()), Storage.getInstance()) {
-    @Override
-    public void end(boolean interrupted) {
-      m_passMotor.set(0);
-    }
+  public CommandBase passByTime() {
+    return new CommandBase() {
+      @Override
+        public void initialize() {
+          m_passMotor.set(getSpeed());
+        }
+      @Override
+        public boolean isFinished() {
+          try {
+            Thread.sleep(getTime());
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+          }
+          return true;
+        }
+          @Override
+        public void end(boolean interrupted) {
+          m_passMotor.set(0);
+        }
+        };
+      
   };
+  
 
   /**
    * Passes a Power Cell to the Shooter, stops by the Ultrasonic sensor signals.
    */
-  public CommandBase passBySensor = 
-    new RunCommand(() -> m_passBySensor(getSpeed(), getUltrasonicDistance()), Storage.getInstance()) {
-    @Override 
+  public CommandBase passBySensorCmd(){
+    return new RunCommand(() -> passBySensor(getSpeed(), getUltrasonicDistance()), this) {
+    
+      @Override 
     public void end(boolean interrupted) {
       m_passMotor.set(0);
     }
   };
+}
   
   /**
    * Creates a new Storage.
@@ -69,7 +90,7 @@ public class Storage extends SubsystemBase {
   /**
    * Gets the Storage single instance.
    */
-  public static Storage getInstance() {
+  public static synchronized Storage getInstance() {
     if (m_instance == null)
       m_instance = new Storage();
     return m_instance;
@@ -80,18 +101,31 @@ public class Storage extends SubsystemBase {
    * 
    * @throws InterruptedException
    */
-  public void m_passByTime(double m_speed, long m_time) {
-    m_passMotor.set(m_speed);
+  public void passByTime(double speed, long time) {
+    m_passMotor.set(speed);
     try {
-      Thread.sleep(m_time);
+      Thread.sleep(time);
     } catch (InterruptedException e) {
       e.printStackTrace();
       throw new RuntimeException();
     }
     m_passMotor.set(0);
   }
+  public CommandBase getPass(){
+    return new CommandBase() {
+      @Override
+      public void initialize() {
+        m_passMotor.set(getSpeed());
+        addRequirements(Storage.getInstance());
+      }
+      @Override
+        public void end(boolean interrupted) {
+          m_passMotor.set(0);
+        }
+    };
+  }
   //TODO: check if work
-  public void m_passBySensor(double m_speed, double dist) {
+  public void passBySensor(double m_speed, double dist) {
     if ((dist <= MIN_EMPTY_DIST) && (dist != 0)) {
       m_passMotor.set(m_speed);
     }
@@ -117,8 +151,8 @@ public class Storage extends SubsystemBase {
   /**
    * Gets the Ultrasonic value (in mm).
    */
-  public double getUltrasonicDistance() {
-    return ultrasonic.getRangeMM();
+   public double getUltrasonicDistance() {
+    return ultrasonic.getVoltage();
   }
 
   /**
