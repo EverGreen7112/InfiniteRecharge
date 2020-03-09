@@ -1,5 +1,12 @@
 package com.evergreen.robot;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import com.evergreen.robot.RobotMap.ButtonPorts;
+import com.evergreen.robot.RobotMap.JoystickPorts;
+import com.evergreen.robot.RobotMap.MotorPorts;
+import com.evergreen.robot.commands.RotateTo;
 import com.evergreen.robot.commands.chassisutils.MoveChassisTo;
 import com.evergreen.robot.commands.pid.RotateTo;
 import com.evergreen.robot.commands.sensor.RotateTilSeePort;
@@ -19,6 +26,7 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -34,8 +42,10 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class Pistachio extends TimedRobot {
     boolean m_activate = true;
     boolean m_lifting = false;
-    public static Joystick m_leftJoystick = new Joystick(JoystickPorts.leftChassisJS),
-            m_righJoystick = new Joystick(JoystickPorts.rightChasisJS), m_operatorJoystick = new Joystick(2);
+    public static Joystick 
+        m_righJoystick = new Joystick(JoystickPorts.rightChasisJS), 
+        m_leftJoystick = new Joystick(JoystickPorts.leftChassisJS),
+        m_operatorJoystick = new Joystick(2);
 
     // Creates JS objects
 
@@ -49,7 +59,8 @@ public class Pistachio extends TimedRobot {
 
     @Override
     public void testInit() {
-        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSA).whileHeld(new CheckSpeedControllers());
+        new MoveChassisTo(1).schedule();
+        // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSA).whileHeld(new CheckSpeedControllers());
         
         
         // Rolletta.getInstance().toggle().schedule();
@@ -63,23 +74,24 @@ public class Pistachio extends TimedRobot {
 
         // System.out.println("PRINTING WHY");
         // Command cmd
-        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSY)
-                .whenPressed(Rolletta.getInstance().m_calibrateYellow());
-        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSB)
-                .whenPressed(Rolletta.getInstance().m_calibrateRed());
-        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSX)
-                .whenPressed(Rolletta.getInstance().m_calibrateBlue());
-        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSA)
-                .whenPressed(Rolletta.getInstance().m_calibrateGreen());
-
+        // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSY)
+        //         .whenPressed(Rolletta.getInstance().m_calibrateYellow());
+        // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSB)
+        //         .whenPressed(Rolletta.getInstance().m_calibrateRed());
+        // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSX)
+        //         .whenPressed(Rolletta.getInstance().m_calibrateBlue());
+        // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSA)
+        CommandScheduler.getInstance().run();
+        //         .whenPressed(Rolletta.getInstance().m_calibrateGreen());
+        Shooter.getInstance();
     }
 
     @Override
     public void testPeriodic() {
-      
         CommandScheduler.getInstance().run();
-
     }
+
+    
 
     @Override
     public void robotPeriodic() {
@@ -100,6 +112,31 @@ public class Pistachio extends TimedRobot {
 
         // System.out.println("REFLECTIVE CENTER " +
         // SmartDashboard.getNumber("Distance", -2));
+
+        
+        
+        if (Chassis.getInstance().getOdometry() != null) {
+            SmartDashboard.putNumber("Robot X", Chassis.getInstance().getOdometry().getPoseMeters().getTranslation().getX());
+            SmartDashboard.putNumber("Robot Y", Chassis.getInstance().getOdometry().getPoseMeters().getTranslation().getY());
+            SmartDashboard.putNumber("Robot Alpha", Chassis.getInstance().getOdometry().getPoseMeters().getRotation().getDegrees());
+            Chassis.getInstance().getOdometry().update(
+                Rotation2d.fromDegrees(Chassis.getInstance().getAngle()),
+                Chassis.getInstance().getLeftDistance(),
+                Chassis.getInstance().getRightDistance()
+            );
+        }
+
+        else Chassis.getInstance().initOdometry(0, 0);
+
+        SmartDashboard.putNumber("CHASSIS LEFT RAW", Chassis.getInstance().getLeftEncoder().getRaw());
+        SmartDashboard.putNumber("CHASSIS LEFT TICKS", Chassis.getInstance().getLeftEncoder().get());
+        SmartDashboard.putNumber("CHASSIS LEFT DISTANCE", Chassis.getInstance().getLeftEncoder().getDistance
+        ());
+
+        SmartDashboard.putNumber(
+            "CHASSIS LEFT TALON", Chassis.getInstance().getLeftTalon().getSelectedSensorPosition());
+        SmartDashboard.putNumber("CHASSIS RIGHT", Chassis.getInstance().getRightDistance());
+        
     }
 
     @Override
@@ -133,9 +170,9 @@ public class Pistachio extends TimedRobot {
         CameraServer.getInstance().startAutomaticCapture();
         CommandScheduler.getInstance().registerSubsystem(Shooter.getInstance(), Chassis.getInstance(),
                 Climb.getInstance(), Collector.getInstance(), Rolletta.getInstance(), Storage.getInstance());
-        // Preferences.getInstance().putDouble("PP/Kp", 0);
-        // Preferences.getInstance().putDouble("PP/Ki", 0);
-        // Preferences.getInstance().putDouble("PP/Kd", 0);
+        Preferences.getInstance().putDouble("PP/Kp", 0);
+        Preferences.getInstance().putDouble("PP/Ki", 0);
+        Preferences.getInstance().putDouble("PP/Kd", 0);
         Preferences.getInstance().putDouble("PP/minDistance", 2.5);
         Preferences.getInstance().putDouble("PP/maxDistance", 3);
         SmartDashboard.putNumber("lowh", Utilites.lowH);
@@ -346,6 +383,8 @@ public class Pistachio extends TimedRobot {
     @Override
     public void autonomousInit() {
         //TODO: check and tune drive to and rotate to,check all method above
+        new MoveChassisTo(-2).schedule();
+        CommandScheduler.getInstance().run();
         
         
         
@@ -433,10 +472,10 @@ public class Pistachio extends TimedRobot {
     @Override
     public void autonomousPeriodic() {
         CommandScheduler.getInstance().run();
-        Autonomous.getInstance().update();
+        // Autonomous.getInstance().update();
 
-
-        
+        // if (m_operatorJoystick.getRawButton(1))
+        //     Chassis.getInstance().
     }
 
     @Override
@@ -444,13 +483,14 @@ public class Pistachio extends TimedRobot {
         CommandScheduler.getInstance().run();
         Preferences.getInstance().putDouble("talon1_encoder", Chassis.getInstance().getRightTalonSRX().getSelectedSensorPosition());
         Preferences.getInstance().putDouble("talon15_encoder", Chassis.getInstance().getLefTalonSRX().getSelectedSensorPosition());
+        // new WPI_TalonSRX(6).set(-0.5);
     }
 
     @Override
     public void teleopInit() {
         Rolletta.getInstance().addAllColors();
         Chassis.getInstance().setDefaultCommand(Chassis.getInstance().defaultDriveCMD()); // checed
-
+        Preferences.getInstance().putDouble("PP/somthing", 0);
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSY).whenPressed(Shooter.getInstance().getAimUp());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSA).whenPressed(Shooter.getInstance().getAimDown());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSLT).whileHeld(Shooter.getInstance().getAccelerateToThrow());
@@ -463,10 +503,12 @@ public class Pistachio extends TimedRobot {
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSBack).whenPressed(Rolletta.getInstance().getPositionControl());
         new JoystickButton(m_righJoystick, 5).whenPressed(Chassis.getInstance().turnToPowerPortCMD());
         new JoystickButton(m_righJoystick, 1).whileHeld(new CommandBase() {
+            
             @Override
             public void initialize() {
                 Chassis.getInstance().SpeedModifier = 1;
             }
+
             @Override
             public void end(boolean interrupted) {
                 Chassis.getInstance().SpeedModifier = 0.5;
@@ -500,8 +542,6 @@ public class Pistachio extends TimedRobot {
         // Rolletta.getInstance().addAllColors(),
         // Rolletta.getInstance()).withTimeout(3.5));
 
-
-
         // new JoystickButton(m_operatorJoystick,
         // ButtonPorts.operatorJSLT).whileHeld(Shooter.getInstance().getShooterSpeedControl());
         // new JoystickButton(m_righJoystick, 8).whileHeld(new InstantCommand(() ->
@@ -512,9 +552,11 @@ public class Pistachio extends TimedRobot {
        
         // new JoystickButton(m_operatorJoystick,
         // ButtonPorts.operatorJSStart).whenPressed(Rolletta.getInstance().getRotationControl());
-        // new JoystickButton(m_operatorJoystick,
+        // new JoystickButton(m_operfatorJoystick,
         // ButtonPorts.operatorJSBack).whenPressed(Rolletta.getInstance().getPositionControl());
         // TODO: add climb down on RB
+
+        Chassis.getInstance().initOdometry(0, 0);
 
     };
 }

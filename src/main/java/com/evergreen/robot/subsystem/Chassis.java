@@ -9,6 +9,7 @@ package com.evergreen.robot.subsystem;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.function.Supplier;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
@@ -80,7 +81,10 @@ public class Chassis extends SubsystemBase {
   //====================================SENSORS=====================================
   private Gyro m_gyro = new ADXRS450_Gyro();
   private Encoder m_rightEncoder = new Encoder(DigitalPorts.rightEncoderA, DigitalPorts.rightEncoderB);
-  private Encoder m_LeftEncoder = new Encoder(DigitalPorts.leftChassisEncoderA, DigitalPorts.leftChassisEncoderB);
+  private Encoder m_leftEncoder = new Encoder(DigitalPorts.leftChassisEncoderA, DigitalPorts.leftChassisEncoderB);
+  public Encoder getRightEncoder(){
+    return m_rightEncoder;
+  }
   //================================================================================
   
   
@@ -88,22 +92,22 @@ public class Chassis extends SubsystemBase {
   //===============================CONTROL CONSTANTS================================
   //=======================PID Constants========================
   private double 
-  ANGLE_KP = 0,
-  ANGLE_KI = 0,
-  ANGLE_KD = 0,
-  ANGLE_TOLERANCE = 1,
+  ANGLE_KP = 0.016,
+  ANGLE_KI = 0.01,
+  ANGLE_KD = 0.093,
+  ANGLE_TOLERANCE = 1.7,
   
   VELOCITY_KP = 0,
   VELOCITY_KI = 0,
   VELOCITY_KD = 0,
   VELOCITY_TOLERANCE = 1,
   
-  DISTANCE_KP = 0,
-  DISTANCE_KI = 0,
-  DISTANCE_KD = 0,
-  DISTANCE_TOLERANCE = 1;
-  //============================================================
-  
+  DISTANCE_KP = 0.15,
+  DISTANCE_KI = 0.015,
+  DISTANCE_KD = 0.12,
+  DISTANCE_TOLERANCE = 0.04;
+  //================================================
+
   //==================Command Constants=============
   /**The minimum distance from the power port in which we are able to hit the outer target. */
   private double MIN_THROW_DISTANCE = 2.2;
@@ -157,7 +161,7 @@ public class Chassis extends SubsystemBase {
    * needed speed vector into its seperate sides.*/
   private DifferentialDriveKinematics m_kinematics = new DifferentialDriveKinematics(CHASSIS_WIDTH);
   
-  /**The position calculator, using the {@link #m_LeftEncoder left} and {@link #m_rightEncoder right} encoders
+  /**The position calculator, using the {@link #m_leftEncoder left} and {@link #m_rightEncoder right} encoders
    * and the {@link #m_gyro gyro} to determine the x-y position of the robot and its angle at each moment.
    */
   private DifferentialDriveOdometry m_odometry;
@@ -178,6 +182,25 @@ public class Chassis extends SubsystemBase {
 
 
   
+  /**
+   * @return the kinematics calculator for seperating the chassis needed speed vector into its seperate sides, as a 
+   * {@link DifferentialDriveKinematics} object.
+   * */
+  public DifferentialDriveKinematics getKinematics() {
+    return m_kinematics;
+  }
+
+  public Encoder getLeftEncoder() {
+    return m_leftEncoder;
+  }
+
+  /**@return the chassis' {@link DifferentialDriveOdometry} object -
+   *  The position calculator, using the {@link #m_leftEncoder left} and {@link #m_rightEncoder right} encoders
+   * and the {@link #m_gyro gyro} to determine the x-y position of the robot and its angle at each moment.
+   */
+  public DifferentialDriveOdometry getOdometry(){
+    return m_odometry;
+  }
   
   
   //==================================CONSTRUCTORS==================================
@@ -193,12 +216,10 @@ public class Chassis extends SubsystemBase {
     m_rightTalon.setInverted(true);
     
     m_gyro.calibrate();
-    
-    m_rightEncoder.setDistancePerPulse(0.002307012);
-    m_LeftEncoder.setDistancePerPulse(0.002307012);
-    
+    m_rightEncoder.setDistancePerPulse(0.002699259);
+    m_leftEncoder.setDistancePerPulse(0.002699259);
     m_rightEncoder.setReverseDirection(true);
-    //----------------------------------------
+    m_distancePIDController.setTolerance(DISTANCE_TOLERANCE);
     
     //-------Preferences Initialization-------
     Preferences.getInstance().putDouble("Chassis/angle/KP", ANGLE_KP);
@@ -217,7 +238,7 @@ public class Chassis extends SubsystemBase {
     //----------------------------------------
     
   }
-  //=======================================================================================================================================================
+  public double SpeedModifier = 1;
   
     //====================================GETTERS=====================================
     //==========================Instance==========================
@@ -435,7 +456,7 @@ public class Chassis extends SubsystemBase {
   
   //returning the distance from left sensor
   public double getLeftDistance() {
-    return m_LeftEncoder.getDistance();
+    return m_leftEncoder.getDistance();
   } 
   //returning the distance from right sensor
   public double getRightDistance() {
@@ -447,18 +468,18 @@ public double getRightVelocity(){
 }
 //returning the speed of the left motor
  public double getLeftVelocity(){
-   return m_LeftEncoder.getRate();
+   return m_leftEncoder.getRate();
  }
  // returning the average speed
  public DifferentialDriveWheelSpeeds getVelocity() {
    return new DifferentialDriveWheelSpeeds(
-     m_LeftEncoder.getRate(), 
+     m_leftEncoder.getRate(), 
      m_rightEncoder.getRate());
     }
     
     //returning the average distance from both sensors
     public double getDistance(){
-      return (getLeftDistance()+getRightDistance())/2;
+      return getRightDistance();
     }
     
     //returning the angle tolerance
@@ -512,6 +533,42 @@ public double getRightVelocity(){
 public SpeedControllerGroup getLeftControllerGroup(){
   return m_leftVictors;
 }
+
+  public void testMotorsPeriodic() {
+    
+    if (Pistachio.m_operatorJoystick.getRawButton(1))
+    new WPI_VictorSPX(MotorPorts.chassisLeftBack).set(0.25);
+  else
+      new WPI_VictorSPX(MotorPorts.chassisLeftBack).set(0);
+
+    
+  if (Pistachio.m_operatorJoystick.getRawButton(2))
+    new WPI_VictorSPX(MotorPorts.chassisLeftFront).set(0.25);
+  else
+      new WPI_VictorSPX(MotorPorts.chassisLeftFront).set(0);
+
+  if (Pistachio.m_operatorJoystick.getRawButton(3))
+       new WPI_VictorSPX(MotorPorts.chassisRightBack).set(0.25);
+  else
+      new WPI_VictorSPX(MotorPorts.chassisRightBack).set(0);
+
+  if (Pistachio.m_operatorJoystick.getRawButton(4))
+    new WPI_VictorSPX(MotorPorts.chassisRightFront).set(0.25);
+  else
+      new WPI_VictorSPX(MotorPorts.chassisRightFront).set(0);
+
+  
+  if (Pistachio.m_operatorJoystick.getRawButton(5))
+    new WPI_TalonSRX(MotorPorts.chassisLeftMiddle).set(0.25);
+  else
+      new WPI_TalonSRX(MotorPorts.chassisLeftMiddle).set(0);
+    
+  if (Pistachio.m_operatorJoystick.getRawButton(6))
+    new WPI_TalonSRX(MotorPorts.chassisRightMiddle).set(0.25);
+  else
+      new WPI_TalonSRX(MotorPorts.chassisRightMiddle).set(0);
+  } 
+
 //rotating the chassis in a certin speed
 public void rotate(double speed){
   
@@ -610,24 +667,31 @@ public void rotate(double speed){
   }
   
   public CommandBase turnToPowerPortCMD() {
+    
+   Supplier<Double> something = () ->Preferences.getInstance().getDouble("PP/somthing", 0);
     return new PIDCommand(
-      new PIDController(0.073,0.008,0.03),
+      new PIDController(
+        ANGLE_KP,
+        ANGLE_KI,
+        ANGLE_KD),
       Utilites::getPowerPortToRobotAngle,
       0.0,
-      Chassis.getInstance()::rotate,
-      Chassis.getInstance()
-    ) {    
-          @Override
+      this::rotate,
+      this
+    ) { 
           public void execute() {
             super.execute();
-            Rolletta.getInstance().m_lifter.set(Rolletta.getInstance().GET_SPEED());
+            SmartDashboard.putNumber(
+              "PID OUTPUT",
+              getController().calculate(Utilites.getPowerPortToRobotAngle()));
           }
+
           public boolean isFinished(){
               return (Pistachio.m_righJoystick.getRawButtonPressed(6) || !Utilites.seePowerPort());
           }
           
           public void end(boolean Interrupted) {
-              Chassis.getInstance().drive(0, 0);
+              drive(0, 0);
           }
       };
   }
@@ -638,11 +702,19 @@ public void rotate(double speed){
       this);
   }
   
+  public double getAngle() {
+    return m_gyro.getAngle();
+  }
+
+  public WPI_TalonSRX getLeftTalon() {
+    return m_leftTalon;
+  }
   @Override
   public void periodic() {
     SmartDashboard.putBoolean(
       "CanThrow", 
       Utilites.getDirectDistanceFromPowerPort() < MAX_THROW_DISTANCE
         && Utilites.getDirectDistanceFromPowerPort() > MIN_THROW_DISTANCE);
+
   }
 }

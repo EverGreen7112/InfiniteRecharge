@@ -58,7 +58,7 @@ public class Rolletta extends SubsystemBase {
     YELLOW_B = 0.184082;
 
   @SuppressWarnings("unused")
-  private final int COLORSTEP =1;
+  private final int COLORSTEP = 1;
     //Control Panel calibrated colors - this is what we expect to read on field
     private Color BLUE = ColorMatch.makeColor(BLUE_R, BLUE_G, BLUE_B);
     private Color GREEN = ColorMatch.makeColor(GREEN_R, GREEN_G, GREEN_B);
