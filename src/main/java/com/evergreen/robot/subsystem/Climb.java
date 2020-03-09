@@ -9,7 +9,7 @@ package com.evergreen.robot.subsystem;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
-import com.evergreen.robot.RobotMap.MotorPorts;
+import com.evergreen.robot.utils.RobotMap.MotorPorts;
 
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.SpeedController;

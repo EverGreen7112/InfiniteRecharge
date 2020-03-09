@@ -30,8 +30,8 @@ public class FollowTrajectory extends ParallelDeadlineGroup implements DoubleArg
             Chassis.getInstance().getFeedForword(), 
             Chassis.getInstance().getKinematics(), 
             ()->Chassis.getInstance().getVelocity(),
-            new PIDController(Chassis.getInstance().getDistanceKp(), Chassis.getInstance().getDistanceKi(), Chassis.getInstance().getDistanceKd()), 
-            new PIDController(Chassis.getInstance().getDistanceKp(), Chassis.getInstance().getDistanceKi(), Chassis.getInstance().getDistanceKd()), 
+            new PIDController(Chassis.getInstance().getDistanceKP(), Chassis.getInstance().getDistanceKI(), Chassis.getInstance().getDistanceKD()), 
+            new PIDController(Chassis.getInstance().getDistanceKP(), Chassis.getInstance().getDistanceKI(), Chassis.getInstance().getDistanceKD()), 
             Chassis.getInstance()::setVoltage, 
             Shooter.getInstance())
         , new CommandBase[0]);
@@ -50,8 +50,8 @@ public class FollowTrajectory extends ParallelDeadlineGroup implements DoubleArg
             Chassis.getInstance().getFeedForword(), 
             Chassis.getInstance().getKinematics(), 
             ()->Chassis.getInstance().getVelocity(),
-            new PIDController(Chassis.getInstance().getDistanceKp(), Chassis.getInstance().getDistanceKi(), Chassis.getInstance().getDistanceKd()), 
-            new PIDController(Chassis.getInstance().getDistanceKp(), Chassis.getInstance().getDistanceKi(), Chassis.getInstance().getDistanceKd()), 
+            new PIDController(Chassis.getInstance().getDistanceKP(), Chassis.getInstance().getDistanceKI(), Chassis.getInstance().getDistanceKD()), 
+            new PIDController(Chassis.getInstance().getDistanceKP(), Chassis.getInstance().getDistanceKI(), Chassis.getInstance().getDistanceKD()), 
             Chassis.getInstance()::setVoltage, 
             Shooter.getInstance())
         , new CommandBase[0]);

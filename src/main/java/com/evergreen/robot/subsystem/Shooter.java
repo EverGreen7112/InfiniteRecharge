@@ -2,8 +2,8 @@ package com.evergreen.robot.subsystem;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
-import com.evergreen.robot.RobotMap;
 import com.evergreen.robot.commands.pid.PassPowerCell;
+import com.evergreen.robot.utils.RobotMap;
 import com.evergreen.robot.utils.Utilites;
 
 import edu.wpi.first.wpilibj.DigitalInput;

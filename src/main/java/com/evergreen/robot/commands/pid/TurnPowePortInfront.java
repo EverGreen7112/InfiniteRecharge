@@ -1,4 +1,4 @@
-package com.evergreen.robot.commands;
+package com.evergreen.robot.commands.pid;
 
 import com.evergreen.robot.subsystem.Chassis;
 import com.evergreen.robot.subsystem.Shooter;
@@ -14,7 +14,7 @@ public class TurnPowePortInfront extends PIDCommand {
     
     
     public TurnPowePortInfront() {
-        super(new PIDController(Chassis.getInstance().getAngleKp(),Chassis.getInstance().getAngleKi(), Chassis.getInstance().getAngleKd()),
+        super(new PIDController(Chassis.getInstance().getAngleKP(),Chassis.getInstance().getAngleKI(), Chassis.getInstance().getAngleKD()),
          Utilites::getPowerPortToRobotAngle, 0.0, Chassis.getInstance()::rotate, Shooter.getInstance());
         // TODO Auto-generated constructor stub
     }

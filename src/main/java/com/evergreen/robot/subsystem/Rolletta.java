@@ -11,9 +11,9 @@ import java.util.function.Supplier;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
-import com.evergreen.robot.RobotMap.DigitalPorts;
-import com.evergreen.robot.RobotMap.MotorPorts;
 import com.evergreen.robot.Pistachio;
+import com.evergreen.robot.utils.RobotMap.DigitalPorts;
+import com.evergreen.robot.utils.RobotMap.MotorPorts;
 import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorSensorV3;

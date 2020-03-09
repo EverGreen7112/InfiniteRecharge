@@ -2,8 +2,7 @@ package com.evergreen.robot.commands.util;
 
 import java.util.function.Supplier;
 
-import com.evergreen.robot.commands.Stop;
-import com.evergreen.robot.commands.WaitCommandEG;
+import com.evergreen.robot.commands.chassisutils.Stop;
 import com.evergreen.robot.commands.sensor.RotateTilSeePort;
 import com.evergreen.robot.subsystem.Chassis;
 import com.evergreen.robot.subsystem.Shooter;
@@ -36,7 +35,7 @@ public class Autonomous extends SequentialCommandGroup {
     private CommandBase[] m_commands;
     private static Autonomous m_instance;
 
-    public static synchronized Autonomous getInstance() {
+    public static Autonomous getInstance() {
         if (m_instance == null) m_instance = new Autonomous();
         return m_instance;
     }
@@ -54,7 +53,7 @@ public class Autonomous extends SequentialCommandGroup {
             // m_options[i].addOption("driveStraight #" + i, new MoveChassisTo(m_arguments[i].get()));
             // m_options[i].addOption("driveXdistanceWithoutStopping #", new DriveToNoStop(m_arguments[i].get()));
             // m_options[i].addOption("driveXdistanceWhileCollecting #", new CollectWhileMoving(m_arguments[i].get()));
-            m_options[i].addOption("DriveForTime", Chassis.getInstance().getMoveByTime());
+            m_options[i].addOption("DriveForTime", Chassis.getInstance().moveByTimeCMD());
             // m_options[i].addOption("driveXDistanceFromPowerPort #" + i, 
             //     new DriveToPowerPort(m_arguments[i].get()));
             m_options[i].addOption("TurnToPowerPort", Chassis.getInstance().turnToPowerPortCMD());

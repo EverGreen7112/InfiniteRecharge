@@ -12,10 +12,10 @@ import java.nio.file.Path;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
-import com.evergreen.robot.RobotMap.DigitalPorts;
-import com.evergreen.robot.RobotMap.MotorPorts;
 import com.evergreen.robot.Pistachio;
 import com.evergreen.robot.utils.Utilites;
+import com.evergreen.robot.utils.RobotMap.DigitalPorts;
+import com.evergreen.robot.utils.RobotMap.MotorPorts;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
@@ -75,8 +75,9 @@ public class Chassis extends SubsystemBase {
   /**The Victor end */
   private SpeedControllerGroup m_rightVictors = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisRightBack), new WPI_VictorSPX(MotorPorts.chassisRightFront) );
   private SpeedControllerGroup m_leftVictors = new SpeedControllerGroup(new WPI_VictorSPX(MotorPorts.chassisLeftBack), new WPI_VictorSPX(MotorPorts.chassisLeftFront));
+  //================================================================================
   
-  //=====================================SENSORS====================================
+  //====================================SENSORS=====================================
   private Gyro m_gyro = new ADXRS450_Gyro();
   private Encoder m_rightEncoder = new Encoder(DigitalPorts.rightEncoderA, DigitalPorts.rightEncoderB);
   private Encoder m_LeftEncoder = new Encoder(DigitalPorts.leftChassisEncoderA, DigitalPorts.leftChassisEncoderB);
@@ -84,8 +85,8 @@ public class Chassis extends SubsystemBase {
   
   
   
-  //================================CONTROL CONSTANTS===============================
-  //==================PID Constants==================
+  //===============================CONTROL CONSTANTS================================
+  //=======================PID Constants========================
   private double 
   ANGLE_KP = 0,
   ANGLE_KI = 0,
@@ -101,17 +102,35 @@ public class Chassis extends SubsystemBase {
   DISTANCE_KI = 0,
   DISTANCE_KD = 0,
   DISTANCE_TOLERANCE = 1;
-  //================================================
-
-  //==================Command Constants=============
+  //============================================================
   
+  //==================Command Constants=============
   /**The minimum distance from the power port in which we are able to hit the outer target. */
   private double MIN_THROW_DISTANCE = 2.2;
   
   /**The maximum distance from the power port in which we are able to hit the outer target. */
   private double MAX_THROW_DISTANCE = 2.7;
-  //================================================
+  
+  /**The multiplier of the joystick's value, in default drive.*/
+  private double SPEED_MODIFIER = 0.5;
 
+  /**
+   * The amount of time, in milliseconds, the chassis will be moved during the
+   * {@link #moveByTimeCMD()}. 
+   * <p>
+   * <b> Note that this is not at all precise; 
+   * At the end of the command, <i>acceleration</i> will be 0, but not
+   * necessarily speed.</b>
+   */
+  private double MOVE_BY_TIME_PERIOD = 2000;
+
+  /**
+   * The percentage speed that the chassis will move at during the 
+   * {@link #moveByTimeCMD()}.
+   * */
+  private double MOVE_BY_TIME_VELOCITY = 0.7;
+  //================================================
+  
   //==================Profiling Constants=============
   private final double 
   CHASSIS_WIDTH = 0.54,
@@ -119,9 +138,9 @@ public class Chassis extends SubsystemBase {
   kV = 0,
   kA = 0,
   MAX_VELOCITY = 0,
-  MAX_ACCELERATION = 0;  //m 
+  MAX_ACCELERATION = 0;
   //==================================================
-
+  
   //================================================================================
   
   
@@ -134,7 +153,8 @@ public class Chassis extends SubsystemBase {
   //==============================================
   
   //==================Profiling Components=============
-  /**The kinematics calculator for seperating the chassis needed speed vector into its seperate sides.*/
+  /**The kinematics calculator for seperating the chassis 
+   * needed speed vector into its seperate sides.*/
   private DifferentialDriveKinematics m_kinematics = new DifferentialDriveKinematics(CHASSIS_WIDTH);
   
   /**The position calculator, using the {@link #m_LeftEncoder left} and {@link #m_rightEncoder right} encoders
@@ -157,58 +177,30 @@ public class Chassis extends SubsystemBase {
   //==========================================================================================
 
 
-  //===================================GETTERS================================================
   
+  
+  
+  //==================================CONSTRUCTORS==================================
   /**
-   * @return the kinematics calculator for seperating the chassis needed speed vector into its seperate sides, as a 
-   * {@link DifferentialDriveKinematics} object.
-   * */
-  public DifferentialDriveKinematics getKinematics() {
-    return m_kinematics;
-  }
-
-  /**@return the chassis' {@link DifferentialDriveOdometry} object -
-   *  The position calculator, using the {@link #m_LeftEncoder left} and {@link #m_rightEncoder right} encoders
-   * and the {@link #m_gyro gyro} to determine the x-y position of the robot and its angle at each moment.
+   * The private, single constructor of the chassis (see {@link #getInstance()}). 
+   * The constructor configures the motors and sensors, and puts constants on the
+   * shuffleboard. 
    */
-  public DifferentialDriveOdometry getOdometry(){
-    return m_odometry;
-  }
-  
-  /**
-   * 
-   * @return
-   */
-  public SimpleMotorFeedforward getFeedForword(){
-    return m_feedorward;
-  }
-  
-  public TrajectoryConfig getTrajectoryConfig(){
-    return m_trajectoryConfig;
-  }
-  
-  public RamseteController getRamseteController(){
-    return m_ramseteController;
-  }
-  
-  
-  // creating a chassis object
-  public static synchronized Chassis getInstance(){
-    if (m_instance==null) m_instance = new Chassis();
-    return m_instance;
-  }
-  
-  
   private Chassis() {
     
+    //--------Component Configuration---------  
     m_rightVictors.setInverted(true);
     m_rightTalon.setInverted(true);
+    
     m_gyro.calibrate();
+    
     m_rightEncoder.setDistancePerPulse(0.002307012);
     m_LeftEncoder.setDistancePerPulse(0.002307012);
-    m_rightEncoder.setReverseDirection(true);
     
-    //entering the PID componets into the prefernces
+    m_rightEncoder.setReverseDirection(true);
+    //----------------------------------------
+    
+    //-------Preferences Initialization-------
     Preferences.getInstance().putDouble("Chassis/angle/KP", ANGLE_KP);
     Preferences.getInstance().putDouble("Chassis/angle/KI", ANGLE_KI);
     Preferences.getInstance().putDouble("Chassis/angle/KD", ANGLE_KD);
@@ -222,22 +214,198 @@ public class Chassis extends SubsystemBase {
     Preferences.getInstance().putDouble("Chassis/distance/KD", DISTANCE_KD);
     Preferences.getInstance().putDouble("Chassis/distance/TOLERANCE", VELOCITY_TOLERANCE);
     Preferences.getInstance().putDouble("Chassis/Speed", 0.8);
+    //----------------------------------------
+    
   }
-  public double SpeedModifier = 0.5;
+  //=======================================================================================================================================================
   
+    //====================================GETTERS=====================================
+    //==========================Instance==========================
+    /**
+     * There is only one physical chassis - so we'd really only ever want to 
+     * create one chassis. Fittingly, if we tried, errors would be thrown as 
+     * we would try to create more objects from the same ports, and distaters 
+     * would wait to happen as we could try to tell the chassis to move forward 
+     * and backward, turn and turn right, all at the same time.
+     * <p>
+     * To avoid this, we made the {@link #Chassis() constructor} private, 
+     * and created a single, static instance, within the class itself. 
+     * This method is its getter - and the only way to access an object 
+     * of the chassis.
+     * @return The single instance of the chassis. 
+     */
+    public static Chassis getInstance() {
+      if (m_instance == null) m_instance = new Chassis();
+      return m_instance;
+    }
+    //============================================================
   
-  //sets same speed to all left motors
+    //=========================Profiling==========================
+    /**
+     * @return the kinematics calculator for seperating the chassis needed speed vector into its seperate sides, as a 
+     * {@link DifferentialDriveKinematics} object.
+     * */
+    public DifferentialDriveKinematics getKinematics() {
+      return m_kinematics;
+    }
+  
+    /**@return the chassis' {@link DifferentialDriveOdometry} object, needed for trajectory tracking -
+     * The position calculator, using the {@link #m_LeftEncoder left} and {@link #m_rightEncoder right} encoders
+     * and the {@link #m_gyro gyro} to determine the x-y position of the robot and its angle at each moment.
+     */
+    public DifferentialDriveOdometry getOdometry() {
+      return m_odometry;
+    }
+    
+    /**
+     * @return The {@link SimpleMotorFeedforward feedforward} component of the motion profiling, using 
+     * found constants (kS, kV, kA) to predict the required voltage for a desored speed setpoint.
+     */
+    public SimpleMotorFeedforward getFeedForword() {
+      return m_feedorward;
+    }
+    
+    /**
+     * @return The speed and acceleration configuration for our motion profiling.
+     * <i>Deprecated - redundant with PathWeaver.</i> 
+     */
+    @Deprecated
+    public TrajectoryConfig getTrajectoryConfig() {
+      return m_trajectoryConfig;
+    }
+    
+    /**
+     * @return The {@link RamseteController} calculator for the motion profiling,
+     * using a complex feedback loop to compute required motor input and achieve
+     * desired speed.  
+     */
+    public RamseteController getRamseteController() {
+      return m_ramseteController;
+    }
+    //============================================================
+    
+    //=========================Constants==========================
+    //==================PID===================
+    //=======Angle========
+    /**
+     * @return The kP constant of the chassis' angle PID feedback loop,
+     * accounting for its proportional component.
+     */
+    public double getAngleKP(){
+      return Preferences.getInstance().getDouble("Chassis/distance/KD", ANGLE_KP);
+    }
+  
+    /**
+     * @return The kI Constant of the chassis' angle PID feedback loop,
+     * accounting for its integral component.
+     */
+    public double getAngleKI(){
+      return ANGLE_KI;
+    }
+    
+    /**
+     * @return The kD Constant of the chassis' angle PID feedback loop,
+     * accounting for its derivative component.
+     */
+    public double getAngleKD() {
+      return ANGLE_KD;
+    }
+    //====================
+
+    //======Velocity======
+    /**
+     * @return The kP Constant of the chassis' velocity PID feedback loop,
+     * accounting for its proportional component.
+     */
+    public double getVelocityKP() {
+      return VELOCITY_KP;
+    }
+    
+    /**
+     * @return The kI Constant of the chassis' velocity PID feedback loop,
+     * accounting for its integral component.
+     */
+    public double getVelocityKI() {
+      return VELOCITY_KI;
+    }
+    
+    /**
+     * @return The kD Constant of the chassis' velocity PID feedback loop,
+     * accounting for its derivative component.
+     */
+    public double getVelocityKD() {
+      return VELOCITY_KD;
+    }
+    //====================
+  
+    //======Distance======
+    /**
+     * @return The kP Constant of the chassis' distance PID feedback loop,
+     * accounting for its proportional component.
+     */
+    public double getDistanceKP() {
+      return DISTANCE_KP;
+    }
+    
+    /**
+     * @return The kI Constant of the chassis' angle PID feedback loop,
+     * accounting for its derivative component.
+     */
+    public double getDistanceKI() {
+      return DISTANCE_KI;
+    }
+    
+    /**
+     * @return The kD constnat of the chassis' distance PID feedback loop, 
+     * accounting fot its derivative component.
+     */
+    public double getDistanceKD() {
+    return DISTANCE_KD;
+    }
+    //====================
+    //========================================
+    //============================================================
+    //================================================================================
+    
+  
+  //====================================SETTERS=====================================
+  //===========================Motors===========================
+  /**
+   * Sets the left side of the chassis moving at an input percentage speed.
+   * @param speed - the speed to move the chassis' left side 
+   * <p>
+   * The speed should be A percentage between -1 to 1, with the sign inidicating direction
+   * and the number what percentage of thew maximum voltage output
+   * the motors.)
+   */
   public void setLeftSpeed(double speed){
     m_leftVictors.set(speed);
     m_leftTalon.set(speed);
   }
-  // sets same speed to all right motors
+  
+  /**
+   * Sets the right side of the chassis moving at an input percentage speed.
+   * @param speed - the speed to move the chassis' left side 
+   * <p>
+   * The speed should be A percentage between -1 to 1, with the sign inidicating direction
+   * and the number what percentage of thew maximum voltage output
+   * the motors.)
+   */
   public void setRightSpeed(double speed){
     m_rightVictors.set(speed);
     m_rightTalon.set(speed);
   }
-  
-  public CommandBase getMoveByTime() {
+  //============================================================
+
+  //==========================Commands==========================
+  /**
+   * @return A command which moves the chassis for a certain amount
+   * of milliseconds. <p>
+   * The speed and duration of this command can be determined 
+   * at the chassis constants {@link #MOVE_BY_TIME_VELOCITY} and
+   *  {@link #MOVE_BY_TIME_PERIOD}, respectively.
+   */
+  public CommandBase moveByTimeCMD() {
     return new CommandBase() {
       double m_start;
       
@@ -248,12 +416,12 @@ public class Chassis extends SubsystemBase {
       
       @Override
       public void execute() {
-        move(0.7);
+        move(MOVE_BY_TIME_VELOCITY);
       }
       
       @Override
       public boolean isFinished() {
-        return System.currentTimeMillis() - m_start > 2000;
+        return System.currentTimeMillis() - m_start > MOVE_BY_TIME_PERIOD;
       }
       
       @Override
@@ -263,42 +431,8 @@ public class Chassis extends SubsystemBase {
       
     };
   }
+  //============================================================
   
-  public double getAngleKp(){
-    return Preferences.getInstance().getDouble("Chassis/distance/KD", ANGLE_KP);
-  }
-  //returning the angle ki
-  public double getAngleKi(){
-    return ANGLE_KI;
-  }
-  //returning the angle kd
-  public double getAngleKd() {
-    return ANGLE_KD;
-  }
-  //returning the velocity kp
-  public double getVelocityKp() {
-    return VELOCITY_KP;
-  }
-  //returning the velocity ki
-  public double getVelocityKi() {
-    return VELOCITY_KI;
-  }
-  //returning the velocity kd
-  public double getVelocityKd() {
-    return VELOCITY_KD;
-  }
-  //returning the distance kp
-  public double getDistanceKp() {
-    return DISTANCE_KP;
-  }
-  //returning the distance ki
-  public double getDistanceKi() {
-    return DISTANCE_KI;
-  }
-//returning the distance kd
-public double getDistanceKd() {
-  return DISTANCE_KD;
-  }
   //returning the distance from left sensor
   public double getLeftDistance() {
     return m_LeftEncoder.getDistance();
@@ -442,8 +576,8 @@ public void rotate(double speed){
         m_feedorward, 
         m_kinematics, 
         this::getVelocity,
-        new PIDController(getDistanceKp(), getDistanceKi(), getDistanceKd()), 
-        new PIDController(getDistanceKp(), getDistanceKi(), getDistanceKd()), 
+        new PIDController(getDistanceKP(), getDistanceKI(), getDistanceKD()), 
+        new PIDController(getDistanceKP(), getDistanceKI(), getDistanceKD()), 
         this::setVoltage, 
         this);
 
@@ -472,7 +606,7 @@ public void rotate(double speed){
   }
 
   public double getSpeedModifier() {
-    return SpeedModifier;
+    return SPEED_MODIFIER;
   }
   
   public CommandBase turnToPowerPortCMD() {

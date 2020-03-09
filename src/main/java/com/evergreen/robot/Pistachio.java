@@ -1,9 +1,7 @@
 package com.evergreen.robot;
 
-import com.evergreen.robot.RobotMap.ButtonPorts;
-import com.evergreen.robot.RobotMap.JoystickPorts;
-import com.evergreen.robot.commands.RotateTo;
 import com.evergreen.robot.commands.chassisutils.MoveChassisTo;
+import com.evergreen.robot.commands.pid.RotateTo;
 import com.evergreen.robot.commands.sensor.RotateTilSeePort;
 import com.evergreen.robot.commands.util.Autonomous;
 import com.evergreen.robot.commands.util.CheckSpeedControllers;
@@ -14,6 +12,8 @@ import com.evergreen.robot.subsystem.Rolletta;
 import com.evergreen.robot.subsystem.Shooter;
 import com.evergreen.robot.subsystem.Storage;
 import com.evergreen.robot.utils.Utilites;
+import com.evergreen.robot.utils.RobotMap.ButtonPorts;
+import com.evergreen.robot.utils.RobotMap.JoystickPorts;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.Joystick;
@@ -138,12 +138,12 @@ public class Pistachio extends TimedRobot {
         // Preferences.getInstance().putDouble("PP/Kd", 0);
         Preferences.getInstance().putDouble("PP/minDistance", 2.5);
         Preferences.getInstance().putDouble("PP/maxDistance", 3);
-        Preferences.getInstance().putDouble("SmartDashBoard/lowh", Utilites.lowH);
-        Preferences.getInstance().putDouble("SmartDashBoard/lows", Utilites.lowS);
-        Preferences.getInstance().putDouble("SmartDashBoard/lowv", Utilites.lowV);
-        Preferences.getInstance().putDouble("SmartDashBoard/highh", Utilites.highH);
-        Preferences.getInstance().putDouble("SmartDashBoard/highs", Utilites.highS);
-        Preferences.getInstance().putDouble("SmartDashBoard/highv", Utilites.highV);
+        SmartDashboard.putNumber("lowh", Utilites.lowH);
+        SmartDashboard.putNumber("lows", Utilites.lowS);
+        SmartDashboard.putNumber("lowv", Utilites.lowV);
+        SmartDashboard.putNumber("highh", Utilites.highH);
+        SmartDashboard.putNumber("highs", Utilites.highS);
+        SmartDashboard.putNumber("highv", Utilites.highV);
 
         Autonomous.getInstance();
 

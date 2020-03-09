@@ -1,4 +1,4 @@
-package com.evergreen.robot.commands;
+package com.evergreen.robot.commands.util;
 
 import com.evergreen.robot.utils.DoubleArgCommand;
 

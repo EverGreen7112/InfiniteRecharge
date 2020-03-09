@@ -8,8 +8,8 @@
 package com.evergreen.robot.subsystem;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
-import com.evergreen.robot.RobotMap.AnalogPorts;
-import com.evergreen.robot.RobotMap.MotorPorts;
+import com.evergreen.robot.utils.RobotMap.AnalogPorts;
+import com.evergreen.robot.utils.RobotMap.MotorPorts;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Preferences;
