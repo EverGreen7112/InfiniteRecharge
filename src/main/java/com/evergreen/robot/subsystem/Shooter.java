@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -42,21 +43,23 @@ public class Shooter extends SubsystemBase implements RobotMap {
     /**
      * the part that aim the thrower
      */
-    public class Aimer extends SubsystemBase{
+    public class Aimer extends SubsystemBase {
         public WPI_TalonSRX m_motor = new WPI_TalonSRX(MotorPorts.aimer);
         public DigitalInput m_downSwitch = new DigitalInput(DigitalPorts.aimerDownSwitch);
         public DigitalInput m_upSwitch = new DigitalInput(DigitalPorts.aimerUpSwitch);
-
-        
     }
 
     /**
      * the two wheels which shoot the power cell
      */
-    public class Thrower extends SubsystemBase{
+    public class Thrower extends SubsystemBase {
         // TODO:put correct SpeedController Type
         public SpeedController m_motor = new WPI_VictorSPX(MotorPorts.thrower);
         public Encoder m_encoder = new Encoder(DigitalPorts.throwerEncoderA, DigitalPorts.throwerEncoderB);
+
+        private Thrower() {
+            m_encoder.reset();
+        }
     }
 
     public static SpeedController m_throwerMotor = new WPI_TalonSRX(MotorPorts.thrower);
@@ -67,6 +70,18 @@ public class Shooter extends SubsystemBase implements RobotMap {
      * shooter highet in cm
      */
     public static final double SHOOTER_HEIGHT = 29;
+    public static final double kS = 2.27;
+    public static final double kV = 0.03;
+    public static final double kA = 0.00759;
+
+    private SimpleMotorFeedforward feedforward = 
+        new SimpleMotorFeedforward(kS, kV, kA);
+
+    public void setSpeed(double meterspersec) {
+        m_thrower.m_motor.set(
+            feedforward.calculate(meterspersec));
+    }
+    
     /**
      * if the aimer is at the upper position return true if it at the lower position
      * return false if between return last position
@@ -116,8 +131,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
         return 0.5 * Math.PI;
     }
 
-    /**
-     * 
+    /**%
      * @return the speed that used to drop the ball
      */
     public double droppingSpeed() {
@@ -155,62 +169,62 @@ public class Shooter extends SubsystemBase implements RobotMap {
     /////////////////////////// commands////////////////////////////////////////////////
 
     private CommandBase m_aimUp() {
+        // return new CommandBase() {
+        //     @Override
+        //     public void initialize() {
+        //         addRequirements(m_aimer);
+        //     }
+
+        //     @Override
+        //     public void execute() {
+        //         m_aimer.m_motor.set(0.5);
+        //     }
+ 
+        //      @Override
+        //      public boolean isFinished() {
+        //          return m_aimer.m_upSwitch.get();
+        //      }
+ 
+        //      @Override
+        //      public void end(boolean interrupted) {
+        //      // Created weird bang bang
+        //          m_aimer.m_motor.set(0);
+        //      }
+        //  };}
+        
         return new CommandBase() {
-            @Override
+            double m_start;
+            double m_difference;
+
             public void initialize() {
                 addRequirements(m_aimer);
+                m_start = System.currentTimeMillis();
             }
-             @Override
-             public void execute() {
-                 m_aimer.m_motor.set(0.5);
-             }
- 
-             @Override
-             public boolean isFinished() {
-                 return m_aimer.m_upSwitch.get();
-             }
- 
-             @Override
-             public void end(boolean interrupted) {
-             // Created weird bang bang
-              
-                 m_aimer.m_motor.set(0);
-             }
-         };}
-        
-    //     return new CommandBase() {
-    //         double m_start;
-    //         double m_difference;
 
-    //         public void initialize() {
-    //             addRequirements(m_aimer);
-    //             m_start = System.currentTimeMillis();
-    //         }
+            @Override
+            public void execute() {
+                m_aimer.m_motor.set(0.7);
+                SmartDashboard.putNumber("START", m_start);
 
-    //         @Override
-    //         public void execute() {
-    //             m_aimer.m_motor.set(0.7);
-    //             SmartDashboard.putNumber("START", m_start);
-
-    //             SmartDashboard.putNumber(
-    //                 "CURRENT", System.currentTimeMillis());
+                SmartDashboard.putNumber(
+                    "CURRENT", System.currentTimeMillis());
                 
-    //             m_difference = System.currentTimeMillis() - m_start;
+                m_difference = System.currentTimeMillis() - m_start;
                 
-    //             SmartDashboard.putNumber("DIFFERENCE", m_difference);
-    //         }
+                SmartDashboard.putNumber("DIFFERENCE", m_difference);
+            }
 
-    //         @Override
-    //         public boolean isFinished() {
-    //             return m_difference >= 175;    
-    //         }
+            @Override
+            public boolean isFinished() {
+                return m_difference >= 175;    
+            }
   
-    //         @Override
-    //         public void end(boolean interrupted) {
-    //             m_aimer.m_motor.set(0);
-    //         }
-    //     };
-    // }
+            @Override
+            public void end(boolean interrupted) {
+                m_aimer.m_motor.set(0);
+            }
+        };
+    }
     
 
     private CommandBase m_aimDown() {
@@ -289,9 +303,8 @@ public class Shooter extends SubsystemBase implements RobotMap {
     private CommandBase m_accelerteTothrow() {
         return new PIDCommand(m_aimController, this::getThrowerSpeed,()->{ 
         if (m_atUpperPosition) {
-            if(Utilites.isShootingToInnerWork()){
-
-            return  PowerPorts.INNER.motorSpeed;
+            if(Utilites.isShootingToInnerWork()) {
+                return  PowerPorts.INNER.motorSpeed;
             }
                 return PowerPorts.OUTER.motorSpeed;
             }
