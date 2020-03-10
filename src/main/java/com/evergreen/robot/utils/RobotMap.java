@@ -49,7 +49,6 @@ public interface RobotMap {
         rolletaMicroSwitchUp = 5,
         aimerDownSwitch = 6,
         rightEncoderA = 7,
-        aimerUpSwitch = 7, //TODO: check AimerUp switch DIO port
         rightEncoderB = 8;
         
 

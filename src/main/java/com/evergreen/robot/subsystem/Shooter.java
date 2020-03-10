@@ -46,7 +46,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
     public class Aimer extends SubsystemBase {
         public WPI_TalonSRX m_motor = new WPI_TalonSRX(MotorPorts.aimer);
         public DigitalInput m_downSwitch = new DigitalInput(DigitalPorts.aimerDownSwitch);
-        public DigitalInput m_upSwitch = new DigitalInput(DigitalPorts.aimerUpSwitch);
+        // public DigitalInput m_upSwitch = new DigitalInput(DigitalPorts.aimerUpSwitch);
     }
 
     /**
@@ -410,7 +410,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
             @Override
             public void execute() 
             {
-                m_thrower.m_motor.set(0.8);
+                m_thrower.m_motor.set(0.92);
             }
 
             @Override
@@ -484,7 +484,6 @@ public class Shooter extends SubsystemBase implements RobotMap {
         Preferences.getInstance().putDouble("thrower/droppingSpeed", 0.06);
         // m_aimer.m_motor.config(aimerAnglePerPulse());
         m_thrower.m_encoder.setDistancePerPulse(throwerDistancePerPulse());
-
     }
 
     public static synchronized Shooter getInstance() {

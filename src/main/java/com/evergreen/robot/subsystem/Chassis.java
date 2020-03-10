@@ -186,9 +186,7 @@ public class Chassis extends SubsystemBase {
    * @return the kinematics calculator for seperating the chassis needed speed vector into its seperate sides, as a 
    * {@link DifferentialDriveKinematics} object.
    * */
-  public DifferentialDriveKinematics getKinematics() {
-    return m_kinematics;
-  }
+  
 
   public Encoder getLeftEncoder() {
     return m_leftEncoder;
@@ -274,9 +272,7 @@ public class Chassis extends SubsystemBase {
      * The position calculator, using the {@link #m_LeftEncoder left} and {@link #m_rightEncoder right} encoders
      * and the {@link #m_gyro gyro} to determine the x-y position of the robot and its angle at each moment.
      */
-    public DifferentialDriveOdometry getOdometry() {
-      return m_odometry;
-    }
+   
     
     /**
      * @return The {@link SimpleMotorFeedforward feedforward} component of the motion profiling, using 
