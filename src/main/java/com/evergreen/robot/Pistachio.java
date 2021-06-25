@@ -480,7 +480,6 @@ public class Pistachio extends TimedRobot {
         CommandScheduler.getInstance().run();
         Preferences.getInstance().putDouble("talon1_encoder", Chassis.getInstance().getRightTalonSRX().getSelectedSensorPosition());
         Preferences.getInstance().putDouble("talon15_encoder", Chassis.getInstance().getLefTalonSRX().getSelectedSensorPosition());
-        // new WPI_TalonSRX(6).set(-0.5);
     }
 
     @Override
@@ -496,10 +495,12 @@ public class Pistachio extends TimedRobot {
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSRB).whileHeld(Climb.getInstance().getClimbDown());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSX).whileHeld(Collector.getInstance().collectCmd());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSB).whileHeld(Climb.getInstance().m_pull());
-        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSStart).whenPressed(Rolletta.getInstance().getRotationControl());
-        new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSBack).whenPressed(Rolletta.getInstance().getPositionControl());
         new JoystickButton(m_righJoystick, 5).whenPressed(Chassis.getInstance().turnToPowerPortCMD());
-        new JoystickButton(m_righJoystick, 1).whileHeld(new CommandBase() {
+		new JoystickButton(m_righJoystick, 8).whileHeld(new InstantCommand(() ->
+        CommandScheduler.getInstance().cancelAll()));
+        new JoystickButton(m_leftJoystick, 8).whileHeld(new InstantCommand(() ->
+        CommandScheduler.getInstance().cancelAll()));
+        new JoystickButton(m_righJoystick, 1).whileHeld(new CommandBase() {//turbo mode
             
             @Override
             public void initialize() {
@@ -511,20 +512,19 @@ public class Pistachio extends TimedRobot {
                 Chassis.getInstance().SpeedModifier = 0.5;
             }
         });
-        
-        // new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSRS).whileHeld(new CommandBase() {
-        //     @Override
-        //     public void initialize() {
-        //         Shooter.getInstance().m_thrower.m_motor.set(0.1);
-        //     }
-        //     @Override
-        //     public void end(boolean interrupted) {
-        //         Shooter.getInstance().m_thrower.m_motor.set(0);
-        //     }
 
-        // });
+		new JoystickButton(m_leftJoystick, 1).whileHeld(new CommandBase() {//slow mode
+            
+            @Override
+            public void initialize() {
+                Chassis.getInstance().SpeedModifier = 0.2;
+            }
 
-        Rolletta.getInstance().getLiftTrigger().whileActiveOnce(Rolletta.getInstance().toggle());
+            @Override
+            public void end(boolean interrupted) {
+                Chassis.getInstance().SpeedModifier = 0.5;
+            }
+        });
 
         // new JoystickButton(m_operatorJoystick,
         // ButtonPorts.operatorJSY).whenPressed(Rolletta.getInstance().m_calibrateYellow());
@@ -541,16 +541,7 @@ public class Pistachio extends TimedRobot {
 
         // new JoystickButton(m_operatorJoystick,
         // ButtonPorts.operatorJSLT).whileHeld(Shooter.getInstance().getShooterSpeedControl());
-        // new JoystickButton(m_righJoystick, 8).whileHeld(new InstantCommand(() ->
-        // CommandScheduler.getInstance().cancelAll()));
-        // new JoystickButton(m_leftJoystick, 8).whileHeld(new InstantCommand(() ->
-        // CommandScheduler.getInstance().cancelAll()));
-
-       
-        // new JoystickButton(m_operatorJoystick,
-        // ButtonPorts.operatorJSStart).whenPressed(Rolletta.getInstance().getRotationControl());
-        // new JoystickButton(m_operfatorJoystick,
-        // ButtonPorts.operatorJSBack).whenPressed(Rolletta.getInstance().getPositionControl());
+        
         // TODO: add climb down on RB
 
         Chassis.getInstance().initOdometry(0, 0);
