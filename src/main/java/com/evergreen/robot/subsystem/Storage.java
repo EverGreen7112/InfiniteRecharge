@@ -7,6 +7,7 @@
 
 package com.evergreen.robot.subsystem;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.evergreen.robot.utils.RobotMap.AnalogPorts;
 import com.evergreen.robot.utils.RobotMap.MotorPorts;
@@ -97,7 +98,6 @@ public class Storage extends SubsystemBase {
   /**
    * Sets the passing motor to input speed.
    * 
-   * @throws InterruptedException
    */
   public void passByTime(double speed, long time) {
     m_passMotor.set(speed);
@@ -113,12 +113,15 @@ public class Storage extends SubsystemBase {
     return new CommandBase() {
       @Override
       public void initialize() {
+        ((WPI_VictorSPX)m_passMotor).setNeutralMode(NeutralMode.Coast);
         m_passMotor.set(getSpeed());
         addRequirements(Storage.getInstance());
       }
+
       @Override
         public void end(boolean interrupted) {
           m_passMotor.set(0);
+        ((WPI_VictorSPX)m_passMotor).setNeutralMode(NeutralMode.Brake);
         }
     };
   }
