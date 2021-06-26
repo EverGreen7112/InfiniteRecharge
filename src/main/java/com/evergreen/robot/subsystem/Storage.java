@@ -99,7 +99,6 @@ public class Storage extends SubsystemBase {
   /**
    * Sets the passing motor to input speed.
    * 
-   * @throws InterruptedException
    */
   public void passByTime(double speed, long time) {
     m_passMotor.set(speed);
@@ -115,14 +114,16 @@ public class Storage extends SubsystemBase {
     return new CommandBase() {
       @Override
       public void initialize() {
+        ((WPI_VictorSPX)m_passMotor).setNeutralMode(NeutralMode.Coast);
         m_passMotor.set(getSpeed());
         addRequirements(Storage.getInstance());
       }
+
       @Override
         public void end(boolean interrupted) {
-          //m_passMotor.set(0);
-		   ((WPI_VictorSPX)(m_passMotor)).setNeutralMode(NeutralMode.Brake);
-		//    m_passMotor.stopMotor();
+          m_passMotor.set(0);
+        ((WPI_VictorSPX)m_passMotor).setNeutralMode(NeutralMode.Brake);
+	//    m_passMotor.stopMotor();
         }
     };
   }
