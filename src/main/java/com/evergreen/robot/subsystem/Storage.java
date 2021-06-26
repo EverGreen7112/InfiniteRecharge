@@ -118,7 +118,8 @@ public class Storage extends SubsystemBase {
       }
       @Override
         public void end(boolean interrupted) {
-          m_passMotor.set(0);
+          //m_passMotor.set(0);
+		  m_passMotor.setNeutralMode(NeutralMode.Brake);
         }
     };
   }
