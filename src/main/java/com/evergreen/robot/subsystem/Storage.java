@@ -7,7 +7,9 @@
 
 package com.evergreen.robot.subsystem;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.evergreen.robot.utils.RobotMap.AnalogPorts;
 import com.evergreen.robot.utils.RobotMap.MotorPorts;
 
@@ -119,7 +121,8 @@ public class Storage extends SubsystemBase {
       @Override
         public void end(boolean interrupted) {
           //m_passMotor.set(0);
-		  m_passMotor.setNeutralMode(NeutralMode.Brake);
+		   ((WPI_VictorSPX)(m_passMotor)).setNeutralMode(NeutralMode.Brake);
+		//    m_passMotor.stopMotor();
         }
     };
   }
