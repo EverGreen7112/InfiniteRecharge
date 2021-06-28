@@ -117,6 +117,13 @@ public class Chassis extends SubsystemBase {
   
   /**The multiplier of the joystick's value, in default drive.*/
   private double SPEED_MODIFIER = 0.5;
+  private final double DRIVE_SPEED=0.5;
+  public void setSPEED_MODIFIER(double sp){
+	  SPEED_MODIFIER = sp;
+  }
+  public void revertSPEED_MODIFIER(){
+	  SPEED_MODIFIER = DRIVE_SPEED;
+  }
 
   /**
    * The amount of time, in milliseconds, the chassis will be moved during the
@@ -236,7 +243,6 @@ public class Chassis extends SubsystemBase {
     //----------------------------------------
     
   }
-  public double SpeedModifier = 1;
   
     //====================================GETTERS=====================================
     //==========================Instance==========================

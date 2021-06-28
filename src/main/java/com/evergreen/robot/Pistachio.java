@@ -504,12 +504,12 @@ public class Pistachio extends TimedRobot {
             
             @Override
             public void initialize() {
-                Chassis.getInstance().SpeedModifier = 1;
+                Chassis.getInstance().setSPEED_MODIFIER(1);
             }
 
             @Override
             public void end(boolean interrupted) {
-                Chassis.getInstance().SpeedModifier = 0.5;
+                Chassis.getInstance().revertSPEED_MODIFIER();
             }
         });
 
@@ -517,12 +517,12 @@ public class Pistachio extends TimedRobot {
             
             @Override
             public void initialize() {
-                Chassis.getInstance().SpeedModifier = 0.2;
+                Chassis.getInstance().setSPEED_MODIFIER(0.2);
             }
 
             @Override
             public void end(boolean interrupted) {
-                Chassis.getInstance().SpeedModifier = 0.5;
+                Chassis.getInstance().revertSPEED_MODIFIER();
             }
         });
 

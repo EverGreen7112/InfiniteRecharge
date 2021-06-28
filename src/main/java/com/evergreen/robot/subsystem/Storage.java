@@ -114,7 +114,6 @@ public class Storage extends SubsystemBase {
     return new CommandBase() {
       @Override
       public void initialize() {
-        ((WPI_VictorSPX)m_passMotor).setNeutralMode(NeutralMode.Coast);
         m_passMotor.set(getSpeed());
         addRequirements(Storage.getInstance());
       }
@@ -123,7 +122,6 @@ public class Storage extends SubsystemBase {
         public void end(boolean interrupted) {
           m_passMotor.set(0);
         ((WPI_VictorSPX)m_passMotor).setNeutralMode(NeutralMode.Brake);
-	//    m_passMotor.stopMotor();
         }
     };
   }
