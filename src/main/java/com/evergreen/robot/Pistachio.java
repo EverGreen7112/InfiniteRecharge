@@ -485,7 +485,7 @@ public class Pistachio extends TimedRobot {
     @Override
     public void teleopInit() {
         Rolletta.getInstance().addAllColors();
-        Chassis.getInstance().setDefaultCommand(Chassis.getInstance().defaultDriveCMD()); // checed
+        Chassis.getInstance().setDefaultCommand(Chassis.getInstance().simpleDriveCMD()); // checed
         Preferences.getInstance().putDouble("PP/somthing", 0);
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSY).whenPressed(Shooter.getInstance().getAimUp());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSA).whenPressed(Shooter.getInstance().getAimDown());
@@ -504,12 +504,12 @@ public class Pistachio extends TimedRobot {
             
             @Override
             public void initialize() {
-                Chassis.getInstance().setSPEED_MODIFIER(1);
+                Chassis.getInstance().setSpeedModifier(1);
             }
 
             @Override
             public void end(boolean interrupted) {
-                Chassis.getInstance().revertSPEED_MODIFIER();
+                Chassis.getInstance().resetSpeed();
             }
         });
 
@@ -517,12 +517,12 @@ public class Pistachio extends TimedRobot {
             
             @Override
             public void initialize() {
-                Chassis.getInstance().setSPEED_MODIFIER(0.2);
+                Chassis.getInstance().setSpeedModifier(0.2);
             }
 
             @Override
             public void end(boolean interrupted) {
-                Chassis.getInstance().revertSPEED_MODIFIER();
+                Chassis.getInstance().resetSpeed();
             }
         });
 
