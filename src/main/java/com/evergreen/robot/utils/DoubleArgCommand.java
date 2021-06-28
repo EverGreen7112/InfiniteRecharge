@@ -1,10 +1,11 @@
 package com.evergreen.robot.utils;
 
 /**
- * DoubleArgCommand used for commands that use especially one argument like distance, time, speed etc. 
+ * DoubleArgCommand used for commands that use especially one argument like distance, time, speed etc.
  */
 public interface DoubleArgCommand {
-public void setValue(double value);
-public double getValue();
-    
+    void setValue(double value);
+
+    double getValue();
+
 }
