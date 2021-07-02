@@ -6,6 +6,7 @@ import com.evergreen.robot.commands.chassisutils.MoveChassisTo;
 import com.evergreen.robot.commands.sensor.RotateTilSeePort;
 import com.evergreen.robot.utils.DoubleArgCommand;
 import com.evergreen.robot.utils.Utilites;
+import com.evergreen.robot.utils.Vision;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
@@ -25,14 +26,15 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
     private Supplier <Double> m_TurnningAngle;
     /**
      * 
-     * @param DistanceFromPPGoal the desierd distance from power port after 
+     * @param distanceFromPPGoal the desierd distance from power port after
      * finshing the command
      */
     public DriveToPowerPort(double distanceFromPPGoal){
         m_distanceFromPP = distanceFromPPGoal;
-        m_xDistance = () ->Utilites.getXDistanceFromPowerPort() - m_distanceFromPP;
-        m_TurnningAngle = () -> (Utilites.getPowerPortToAllinceStationAngle()* Math.atan(m_xDistance.get()/Utilites.getYDistanceFromPowerPort()));
+        m_xDistance = () -> Vision.getXDistanceFromPowerPort() - m_distanceFromPP;
+        m_TurnningAngle = () -> (Vision.getPowerPortToAllinceStationAngle()* Math.atan(m_xDistance.get()/Vision.getYDistanceFromPowerPort()));
     }
+
     public void setDistanceFromPPGoal(double distanceFromPPGoal){
         m_distanceFromPP = distanceFromPPGoal;
     }
@@ -43,8 +45,8 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
     public void schedule() {
        addCommands(
            new RotateTo(m_TurnningAngle.get())
-            ,new MoveChassisTo(Utilites.Pythagoras(m_xDistance.get(), Utilites.getYDistanceFromPowerPort())),
-            new RotateTo(-1*(90 - Utilites.getPowerPortToAllinceStationAngle() + m_TurnningAngle.get()))
+            ,new MoveChassisTo(Utilites.pythagoras(m_xDistance.get(), Vision.getYDistanceFromPowerPort())),
+            new RotateTo(-1*(90 - Vision.getPowerPortToAllinceStationAngle() + m_TurnningAngle.get()))
             );
 
         super.schedule();
@@ -53,8 +55,8 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
     public void schedule(boolean interruptible) {
         addCommands(
             new RotateTo(m_TurnningAngle.get())
-             ,new MoveChassisTo(Utilites.Pythagoras(m_xDistance.get(), Utilites.getYDistanceFromPowerPort())),
-             new RotateTo(-1*(90 - Utilites.getPowerPortToAllinceStationAngle() + m_TurnningAngle.get()))
+             ,new MoveChassisTo(Utilites.pythagoras(m_xDistance.get(), Vision.getYDistanceFromPowerPort())),
+             new RotateTo(-1*(90 - Vision.getPowerPortToAllinceStationAngle() + m_TurnningAngle.get()))
              );
  
          super.schedule(interruptible);

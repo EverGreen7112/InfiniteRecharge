@@ -4,6 +4,7 @@ import com.evergreen.robot.subsystem.Chassis;
 import com.evergreen.robot.utils.DoubleArgCommand;
 import com.evergreen.robot.utils.Utilites;
 
+import com.evergreen.robot.utils.Vision;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /**
@@ -37,7 +38,7 @@ public class RotateTilSeePort extends CommandBase implements DoubleArgCommand {
     }
     @Override
     public boolean isFinished() {
-        return Utilites.seePowerPort();
+        return Vision.seePowerPort();
     }
     @Override
     public void end(boolean interrupted) {

@@ -13,6 +13,7 @@ import com.evergreen.robot.Pistachio;
 import com.evergreen.robot.utils.RobotMap.DigitalPorts;
 import com.evergreen.robot.utils.RobotMap.MotorPorts;
 import com.evergreen.robot.utils.Utilites;
+import com.evergreen.robot.utils.Vision;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.RamseteController;
@@ -719,7 +720,7 @@ public class Chassis extends SubsystemBase {
                         ANGLE_KP,
                         ANGLE_KI,
                         ANGLE_KD),
-                Utilites::getPowerPortToRobotAngle,
+                Vision::getPowerPortToRobotAngle,
                 0.0,
                 this::rotate,
                 this
@@ -728,11 +729,11 @@ public class Chassis extends SubsystemBase {
                 super.execute();
                 SmartDashboard.putNumber(
                         "PID OUTPUT",
-                        getController().calculate(Utilites.getPowerPortToRobotAngle()));
+                        getController().calculate(Vision.getPowerPortToRobotAngle()));
             }
 
             public boolean isFinished() {
-                return (Pistachio.m_righJoystick.getRawButtonPressed(6) || !Utilites.seePowerPort());
+                return (Pistachio.m_righJoystick.getRawButtonPressed(6) || !Vision.seePowerPort());
             }
 
             public void end(boolean Interrupted) {
@@ -763,8 +764,8 @@ public class Chassis extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putBoolean(
                 "CanThrow",
-                Utilites.getDirectDistanceFromPowerPort() < MAX_THROW_DISTANCE
-                        && Utilites.getDirectDistanceFromPowerPort() > MIN_THROW_DISTANCE);
+                Vision.getDirectDistanceFromPowerPort() < MAX_THROW_DISTANCE
+                        && Vision.getDirectDistanceFromPowerPort() > MIN_THROW_DISTANCE);
 
     }
 

@@ -19,6 +19,7 @@ import com.evergreen.robot.subsystem.Shooter;
 import com.evergreen.robot.subsystem.Storage;
 import com.evergreen.robot.utils.Utilites;
 
+import com.evergreen.robot.utils.Vision;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Preferences;
@@ -95,7 +96,7 @@ public class Pistachio extends TimedRobot {
         // new PrintCommand("CHECK").schedule();
         // Preferences.getInstance().putDouble("AAAaAAAAa",
         // Utilites.getPowerPortToRobotAngle());
-        Preferences.getInstance().putDouble("PP/distance2", Utilites.getDirectDistanceFromPowerPort());
+        Preferences.getInstance().putDouble("PP/distance2", Vision.getDirectDistanceFromPowerPort());
         CommandScheduler.getInstance().run();
 
         Preferences.getInstance().putBoolean("PP/inRange",
