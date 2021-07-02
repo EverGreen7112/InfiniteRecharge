@@ -19,6 +19,7 @@ import com.evergreen.robot.subsystem.Shooter;
 import com.evergreen.robot.subsystem.Storage;
 import com.evergreen.robot.utils.Utilites;
 
+import com.evergreen.robot.utils.Vision;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Preferences;
@@ -95,7 +96,7 @@ public class Pistachio extends TimedRobot {
         // new PrintCommand("CHECK").schedule();
         // Preferences.getInstance().putDouble("AAAaAAAAa",
         // Utilites.getPowerPortToRobotAngle());
-        Preferences.getInstance().putDouble("PP/distance2", Utilites.getDirectDistanceFromPowerPort());
+        Preferences.getInstance().putDouble("PP/distance2", Vision.getDirectDistanceFromPowerPort());
         CommandScheduler.getInstance().run();
 
         Preferences.getInstance().putBoolean("PP/inRange",
@@ -485,7 +486,7 @@ public class Pistachio extends TimedRobot {
     @Override
     public void teleopInit() {
         Rolletta.getInstance().addAllColors();
-        Chassis.getInstance().setDefaultCommand(Chassis.getInstance().defaultDriveCMD()); // checed
+        Chassis.getInstance().setDefaultCommand(Chassis.getInstance().simpleDriveCMD()); // checed
         Preferences.getInstance().putDouble("PP/somthing", 0);
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSY).whenPressed(Shooter.getInstance().getAimUp());
         new JoystickButton(m_operatorJoystick, ButtonPorts.operatorJSA).whenPressed(Shooter.getInstance().getAimDown());
@@ -504,12 +505,12 @@ public class Pistachio extends TimedRobot {
             
             @Override
             public void initialize() {
-                Chassis.getInstance().SpeedModifier = 1;
+                Chassis.getInstance().setSpeedModifier(1);
             }
 
             @Override
             public void end(boolean interrupted) {
-                Chassis.getInstance().SpeedModifier = 0.5;
+                Chassis.getInstance().resetSpeed();
             }
         });
 
@@ -517,12 +518,12 @@ public class Pistachio extends TimedRobot {
             
             @Override
             public void initialize() {
-                Chassis.getInstance().SpeedModifier = 0.2;
+                Chassis.getInstance().setSpeedModifier(0.2);
             }
 
             @Override
             public void end(boolean interrupted) {
-                Chassis.getInstance().SpeedModifier = 0.5;
+                Chassis.getInstance().resetSpeed();
             }
         });
 
