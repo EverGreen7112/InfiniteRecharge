@@ -217,3 +217,5 @@ local.properties
 .worksheet
 
 .idea/
+
+gradlew
