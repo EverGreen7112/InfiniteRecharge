@@ -35,7 +35,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
 
     private static final double LENGTH = 0.6;
     private static final double HEIGHT = 0.3;
-
+    private static final double THROWER_SPEED = 0.85;
     private static final boolean TRY_INNER = false;
 
     private static Shooter m_shooter;
@@ -412,7 +412,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
             @Override
             public void execute() 
             {
-                m_thrower.m_motor.set(0.92);
+                m_thrower.m_motor.set(THROWER_SPEED);
             }
 
             @Override
@@ -421,7 +421,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
             }
         };
     }
-
+    
     /**
      * 
      * @return {@link Shooter#shootToUpper} - fully(aim while accelerate and then

@@ -97,6 +97,7 @@ public class Pistachio extends TimedRobot {
         // Preferences.getInstance().putDouble("AAAaAAAAa",
         // Utilites.getPowerPortToRobotAngle());
         Preferences.getInstance().putDouble("PP/distance2", Vision.getDirectDistanceFromPowerPort());
+        Preferences.getInstance().putDouble("PP/ty", Vision.getPitchAngle());
         CommandScheduler.getInstance().run();
 
         Preferences.getInstance().putBoolean("PP/inRange",
@@ -106,6 +107,7 @@ public class Pistachio extends TimedRobot {
                                 .getDouble("PP/maxDistance", 1000))
 
         ;
+        Preferences.getInstance().putDouble("Shooter/throwing ratio", Shooter.getInstance().getThrowerSpeed()/Shooter.getInstance().throwerDistancePerPulse());
         // System.out.println("TEST");
 
         // System.out.println("REFLECTIVE CENTER " +

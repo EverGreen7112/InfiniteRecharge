@@ -10,8 +10,8 @@ import org.opencv.core.Mat;
 public class Vision {
 
     private static final NetworkTable limelight = NetworkTableInstance.getDefault().getTable("limelight");
-    private static final double CAMERA_ANGLE = 30;
-    private static final double CAMERA_HEIGHT = 0.7;
+    private static final double CAMERA_ANGLE = 14*(Math.PI/180);
+    private static final double CAMERA_HEIGHT = 0.605;
 
 
     public static double getXDistanceFromPowerPort() {
@@ -34,7 +34,7 @@ public class Vision {
         return 90 - Chassis.getInstance().getAbsuluteAngle() + getPowerPortToRobotAngle();
     }
 
-    private static double getPitchAngle() {
+    public static double getPitchAngle() {
         return limelight.getEntry("ty").getDouble(-1);
     }
 
