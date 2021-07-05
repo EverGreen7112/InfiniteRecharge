@@ -35,12 +35,12 @@ public class Shooter extends SubsystemBase implements RobotMap {
 
     private static final double LENGTH = 0.6;
     private static final double HEIGHT = 0.3;
-    private static final double THROWER_SPEED = 1;
+    private static final double THROWER_SPEED = 1 ;
     private static final boolean TRY_INNER = false;
 
     private static Shooter m_shooter;
     //====================Inner Subsystems=========================
-     /**
+     /**]
      * the part that aim the thrower
      */
     public Aimer m_aimer = new Aimer();
@@ -408,11 +408,12 @@ public class Shooter extends SubsystemBase implements RobotMap {
             @Override
             public void initialize() {
                 addRequirements(m_thrower);
+                m_thrower.m_motor.set(THROWER_SPEED);
             }
             @Override
             public void execute() 
             {
-                m_thrower.m_motor.set(THROWER_SPEED);
+                
             }
 
             @Override
@@ -440,6 +441,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
     public CommandBase getShootToBottom() {
         return shootToBottom();
     }
+
 
     /**
      * 

@@ -22,7 +22,9 @@ import com.evergreen.robot.utils.Utilites;
 import com.evergreen.robot.utils.Vision;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.Preferences;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -132,8 +134,7 @@ public class Pistachio extends TimedRobot {
         SmartDashboard.putNumber("CHASSIS LEFT TICKS", Chassis.getInstance().getLeftEncoder().get());
         SmartDashboard.putNumber("CHASSIS LEFT DISTANCE", Chassis.getInstance().getLeftEncoder().getDistance
         ());
-
-        SmartDashboard.putNumber(
+            SmartDashboard.putNumber(
             "CHASSIS LEFT TALON", Chassis.getInstance().getLeftTalon().getSelectedSensorPosition());
         SmartDashboard.putNumber("CHASSIS RIGHT", Chassis.getInstance().getRightDistance());
         
