@@ -43,10 +43,10 @@ public class Vision {
      * @return b angle, see whatsapp
      */
     public static double getPowerPortToRobotAngle() {
-        return limelight.getEntry("tx").getDouble(-1);
+        return limelight.getEntry("tx").getDouble(-1) *(-1);
     }
 
     public static boolean seePowerPort() {
-        return SmartDashboard.getBoolean("SeePowerPort", false);
+        return limelight.getEntry("tv").getDouble(0) == 1.0;
     }
 }

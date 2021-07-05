@@ -35,7 +35,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
 
     private static final double LENGTH = 0.6;
     private static final double HEIGHT = 0.3;
-    private static final double THROWER_SPEED = 0.85;
+    private static final double THROWER_SPEED = 1;
     private static final boolean TRY_INNER = false;
 
     private static Shooter m_shooter;

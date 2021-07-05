@@ -107,7 +107,7 @@ public class Pistachio extends TimedRobot {
                                 .getDouble("PP/maxDistance", 1000))
 
         ;
-        Preferences.getInstance().putDouble("Shooter/throwing ratio", Shooter.getInstance().getThrowerSpeed()/Shooter.getInstance().throwerDistancePerPulse());
+        Preferences.getInstance().putDouble("Shooter/throwing ratio", Shooter.getInstance().getThrowerSpeed()*60/(Shooter.getInstance().throwerDistancePerPulse()));
         // System.out.println("TEST");
 
         // System.out.println("REFLECTIVE CENTER " +
