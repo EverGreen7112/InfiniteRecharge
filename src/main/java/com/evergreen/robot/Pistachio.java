@@ -380,8 +380,8 @@ public class Pistachio extends TimedRobot {
     @Override
     public void autonomousInit() {
         //TODO: check and tune drive to and rotate to,check all method above
-        new MoveChassisTo(-2).schedule();
-        CommandScheduler.getInstance().run();
+        // new MoveChassisTo(-2).schedule();
+        // CommandScheduler.getInstan ce().run();
         
         
         

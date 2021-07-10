@@ -410,7 +410,7 @@ public class Shooter extends SubsystemBase implements RobotMap {
             @Override
             public void execute() 
             {
-                m_thrower.m_motor.set(0.92);
+                m_thrower.m_motor.set(1);
             }
 
             @Override
