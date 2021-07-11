@@ -18,11 +18,12 @@ public class MoveChassisByTime extends CommandBase implements DoubleArgCommand {
    * Creates a new MoveChassisByTime.
    */
   private double m_startTime;
-  private double TIME_CONST;
+  private long m_durationMillis;
   private double m_speed = Preferences.getInstance().getDouble("Chassis/Speed", 0.7);
 
-  public MoveChassisByTime() {
-    // Use addRequirements() here to declare subsystem dependencies.
+  public MoveChassisByTime(long durationMillis) {
+    m_durationMillis = durationMillis;
+    addRequirements(Chassis.getInstance());
   }
 
   // Called when the command is initially scheduled.
@@ -40,22 +41,24 @@ public class MoveChassisByTime extends CommandBase implements DoubleArgCommand {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return System.currentTimeMillis() - m_startTime > TIME_CONST;
+    return System.currentTimeMillis() - m_startTime > m_durationMillis;
   }
   
-    // Called once the command ends or is interrupted.
-    @Override
-    public void end(boolean interrupted) {
-      Chassis.getInstance().move(0);
-    }
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) {
+    Chassis.getInstance().move(0);
+  }
 
   @Override
   public void setValue(double value) {
-    TIME_CONST = value;
+    m_durationMillis = (long)value;
+
   }
 
   @Override
   public double getValue() {
-    return TIME_CONST;
+    return (double)m_durationMillis;
   }
+
 }

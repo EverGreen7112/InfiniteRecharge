@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.evergreen.robot.RobotMap.ButtonPorts;
 import com.evergreen.robot.RobotMap.JoystickPorts;
 import com.evergreen.robot.RobotMap.MotorPorts;
+import com.evergreen.robot.commands.chassisutils.MoveChassisByTime;
 import com.evergreen.robot.commands.chassisutils.MoveChassisTo;
 import com.evergreen.robot.commands.pid.RotateTo;
 import com.evergreen.robot.commands.sensor.RotateTilSeePort;
@@ -249,7 +250,6 @@ public class Pistachio extends TimedRobot {
             switch (powerCell) {
                //one power cell
                 case 1:
-                   
                     m_move = new MoveChassisTo(3.6);
                     m_collect = Collector.getInstance().collectCmd();
                     //move to the power cellls and collect them
@@ -380,103 +380,15 @@ public class Pistachio extends TimedRobot {
     }
 
 
-    //TODO: check and tune drive to and rotate to,check all method above
     @Override
     public void autonomousInit() {
-        //TODO: check and tune drive to and rotate to,check all method above
-        new MoveChassisTo(-2).schedule();
-        CommandScheduler.getInstance().run();
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        // Autonomous.getInstance().schedule();
-        
-        
-        // try {
-        //     Thread.sleep(6500);
-        // } catch (InterruptedException e) {
-        //     e.printStackTrace();
-        // }
-        // Shooter.getInstance().m_thrower.m_motor.set(0.3);
-        // try {
-        //     Thread.sleep(500);
-        // } catch (InterruptedException e) {
-        //     e.printStackTrace();
-        // }
-        // Storage.getInstance().m_passMotor.set(0.3);
-        
-        // try {
-        //     Thread.sleep(5000);
-        // } catch (InterruptedException e) {
-        //     e.printStackTrace();
-        // }
-
-
-        
-        // try{
-        //     Shooter.getInstance().getAimDown().schedule();;
-        //     CommandScheduler.getInstance().run();
-        //     Thread.sleep(1000);
-        //     Shooter.getInstance().getAimUp().schedule();;
-        //     CommandScheduler.getInstance().run();
-        //     Thread.sleep(200);
-        //     //  Chassis.getInstance().turnToPPCmd().schedule();
-        //     // new Stop().schedule();
-        //     Shooter.getInstance().getAccelerateToThrow().schedule();;
-        //     CommandScheduler.getInstance().run();
-        //     Thread.sleep(3500);
-        //     Storage.getInstance().getPass().schedule();;
-        //     CommandScheduler.getInstance().run();
-        //     Thread.sleep(8000);
-        //     Chassis.getInstance().move(0.6);
-
-        //     Thread.sleep(1000);
-        // } catch (InterruptedException e) {
-        //     e.printStackTrace();
-        //     throw new RuntimeException();
-        // }
-        // Chassis.getInstance().move(0);
-        
-        
-        
-
-        // Chassis.getInstance().move(0.6);
-        // try {
-        //     Thread.sleep(1000);
-        // } catch (InterruptedException e) {
-        //     e.printStackTrace();
-        //     throw new RuntimeException();
-        // }
-        // Chassis.getInstance().move(0);
-
-
-        
-        
+        new MoveChassisByTime(2000).schedule();
+        CommandScheduler.getInstance().run();        
     }
 
     @Override
     public void autonomousPeriodic() {
         CommandScheduler.getInstance().run();
-        // Autonomous.getInstance().update();
-
-        // if (m_operatorJoystick.getRawButton(1))
-        //     Chassis.getInstance().
     }
 
     @Override
