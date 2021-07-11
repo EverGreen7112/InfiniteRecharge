@@ -26,7 +26,7 @@ public class Storage extends SubsystemBase {
   private static Storage m_instance;
 
   // The passing speed, time and minimum empty distance constants
-  private double PASS_SPEED = 1;
+  private double PASS_SPEED = 0.5;
   private long PASS_TIME = 2000; //Notice the time is in milliseconds
   private double MIN_EMPTY_DIST; //Minimum Distance in which Storage is Empty, in mm
   //TODO: find the correct value of minimum distance

@@ -382,8 +382,84 @@ public class Pistachio extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        new MoveChassisByTime(2000).schedule();
         CommandScheduler.getInstance().run();        
+		//drive backwards
+		try{
+
+		
+		Chassis.getInstance().move(-0.4);
+
+            Thread.sleep(1000);
+		Thread.sleep(500);}
+			catch(Exception e){}
+            //turn to powerport
+            for(int i = 0;i<400;i++){
+				Chassis.getInstance().turnToPowerPortCMD().schedule();
+			CommandScheduler.getInstance().run(); 
+		try{Thread.sleep(5);}catch(Exception e){}
+			}
+			try{
+			CommandScheduler.getInstance().cancelAll();   
+        	Shooter.getInstance().getAccelerateToThrow().schedule();
+            CommandScheduler.getInstance().run();
+            Thread.sleep(2500);
+            Storage.getInstance().getPass().schedule();;
+            CommandScheduler.getInstance().run();
+            Thread.sleep(5500);
+            
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
+        Chassis.getInstance().move(0);
+       // CommandScheduler.getInstance().cancelAll();
+			
+			
+			
+			
+			 //TODO: check and tune drive to and rotate to,check all method above
+        // new MoveChassisTo(-2).schedule();
+        // CommandScheduler.getInstan ce().run();
+        
+        // Autonomous.getInstance().schedule();
+        
+        
+        // try {
+        //     Thread.sleep(6500);
+        // } catch (InterruptedException e) {
+        //     e.printStackTrace();
+        // }
+        // Shooter.getInstance().m_thrower.m_motor.set(0.3);
+        // try {
+        //     Thread.sleep(500);
+        // } catch (InterruptedException e) {
+        //     e.printStackTrace();
+        // }
+        // Storage.getInstance().m_passMotor.set(0.3);
+        
+        // try {
+        //     Thread.sleep(5000);
+        // } catch (InterruptedException e) {
+        //     e.printStackTrace();
+        // }
+		//cool
+        // try{
+		
+        
+        
+
+        // // Chassis.getInstance().move(0.6);
+        // // try {
+        // //     Thread.sleep(1000);
+        // // } catch (InterruptedException e) {
+        // //     e.printStackTrace();
+        // //     throw new RuntimeException();
+        // // }
+        // // Chassis.getInstance().move(0);
+
+
+        
+        
     }
 
     @Override
