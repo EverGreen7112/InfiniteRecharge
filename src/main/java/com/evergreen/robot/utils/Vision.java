@@ -10,7 +10,9 @@ import org.opencv.core.Mat;
 public class Vision {
 
     private static final NetworkTable limelight = NetworkTableInstance.getDefault().getTable("limelight");
-    private static final double CAMERA_ANGLE = 14*(Math.PI/180);
+    // private static final double CAMERA_ANGLE = 14*(Math.PI/180);
+    private static final double CAMERA_ANGLE = 14;
+
     private static final double CAMERA_HEIGHT = 0.605;
 
 
@@ -26,8 +28,11 @@ public class Vision {
     public static double getDirectDistanceFromPowerPort() {
         double cameraToPP = getPitchAngle();
         double contourHeight = Shooter.PowerPorts.OUTER.getHeight();
-
-        return (contourHeight - CAMERA_HEIGHT) / Math.tan(cameraToPP + CAMERA_ANGLE);
+        // double m = 3.37446;
+        // double b = -340.210638298;
+        double y = (contourHeight - CAMERA_HEIGHT) / Math.tan((cameraToPP + CAMERA_ANGLE) *Math.PI/180);
+        // return (y-b)/m;
+        return y;
     }
 
     public static double getPowerPortToAllinceStationAngle() {
@@ -43,10 +48,10 @@ public class Vision {
      * @return b angle, see whatsapp
      */
     public static double getPowerPortToRobotAngle() {
-        return limelight.getEntry("tx").getDouble(-1);
+        return limelight.getEntry("tx").getDouble(-1) *(-1);
     }
 
     public static boolean seePowerPort() {
-        return SmartDashboard.getBoolean("SeePowerPort", false);
+        return limelight.getEntry("tv").getDouble(0) == 1.0;
     }
 }

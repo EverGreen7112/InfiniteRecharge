@@ -88,9 +88,9 @@ public class Chassis extends SubsystemBase {
     //===============================CONTROL CONSTANTS================================
     //=======================PID Constants========================
     private double
-            ANGLE_KP = 0.016,
-            ANGLE_KI = 0.01,
-            ANGLE_KD = 0.093,
+            ANGLE_KP = 0.02,
+            ANGLE_KI = 0.007,
+            ANGLE_KD = 0,
             ANGLE_TOLERANCE = 1.7,
 
     VELOCITY_KP = 0,
@@ -714,7 +714,6 @@ public class Chassis extends SubsystemBase {
 
     public CommandBase turnToPowerPortCMD() {
 
-        Supplier<Double> something = () -> Preferences.getInstance().getDouble("PP/somthing", 0);
         return new PIDCommand(
                 new PIDController(
                         ANGLE_KP,
@@ -724,7 +723,8 @@ public class Chassis extends SubsystemBase {
                 0.0,
                 this::rotate,
                 this
-        ) {
+        )
+         {
             public void execute() {
                 super.execute();
                 SmartDashboard.putNumber(
@@ -739,7 +739,8 @@ public class Chassis extends SubsystemBase {
             public void end(boolean Interrupted) {
                 drive(0, 0);
             }
-        };
+        }
+        ;
     }
 
     /**
